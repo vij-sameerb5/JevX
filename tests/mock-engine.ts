@@ -13,6 +13,9 @@ const feats = (level: "high" | "mid" | "none") =>
     : { semantic_ambiguity: "none", context_dependence: "none", deterministic_expressibility: "high", judgment_required: "none", rule_stability: "high", risk_or_policy_component: "low", natural_language_understanding: "none", decision_complexity: "low" };
 
 const done = { context_sufficient: true, missing_context: [], context_used: [], understanding_confidence: "high" };
+// routeTicket's pattern deliberately leaks names (the AI is told not to; share.ts must scrub anyway)
+const ROUTE_PATTERN = { label: "keyword-intent-router", input_kind: "user_text", rule_kind: "keyword_list", rule_shape: "routeTicket in src/routing.ts checks ticket text against keyword lists", why_generic: "keyword lists like refund or invoice miss paraphrases", failure_example: "'my card was charged twice' has no listed keyword" };
+const PLAIN_PATTERN = { label: "exact-price-tiers", input_kind: "structured_app_data", rule_kind: "if_else_chain", rule_shape: "tiered price by plan", why_generic: "money must stay exact", failure_example: "" };
 
 const SPOTS = [
   { file: "src/routing.ts", start_line: 8, end_line: 20, function: "routeTicket", decision: "Which team handles a ticket", primitive: "choice", why: "keyword lists guess intent", confidence: 0.9 },
@@ -36,12 +39,12 @@ export function engineAnswerFor(props: Record<string, unknown>, prompt: string):
   if ("is_opportunity" in props) {
     const loc = prompt.match(/LOCATION TO ASSESS: (\S+)/)?.[1] ?? "";
     if (loc.startsWith("src/routing.ts"))
-      return { is_opportunity: true, decision: "Which team handles a ticket.", primitive: "choice", question: "Which team should handle this support ticket?", outcomes: ["billing", "technical", "account", "general"], state: ["subject", "body"], deterministic_remainder: "Queueing and SLA.", why: "Keyword lists guess intent and miss paraphrases.", features: feats("high"), ai_score: 0.86, ...done };
+      return { is_opportunity: true, decision: "Which team handles a ticket.", primitive: "choice", question: "Which team should handle this support ticket?", outcomes: ["billing", "technical", "account", "general"], state: ["subject", "body"], deterministic_remainder: "Queueing and SLA.", why: "Keyword lists guess intent and miss paraphrases.", features: feats("high"), ai_score: 0.86, ...done, pattern: ROUTE_PATTERN };
     if (loc.startsWith("src/priority.ts"))
-      return { is_opportunity: true, decision: "How urgent a ticket is.", primitive: "choice", question: "How urgently does this customer need help?", outcomes: ["urgent", "normal", "low"], state: ["subject", "body"], deterministic_remainder: "Due time from the SLA.", why: "Exclamation marks stand in for urgency.", features: feats("high"), ai_score: 0.8, ...done };
+      return { is_opportunity: true, decision: "How urgent a ticket is.", primitive: "choice", question: "How urgently does this customer need help?", outcomes: ["urgent", "normal", "low"], state: ["subject", "body"], deterministic_remainder: "Due time from the SLA.", why: "Exclamation marks stand in for urgency.", features: feats("high"), ai_score: 0.8, ...done, pattern: { label: "punctuation-urgency-heuristic", input_kind: "user_text", rule_kind: "includes_or_startswith", rule_shape: "exclamation marks and caps decide urgency", why_generic: "tone is not urgency", failure_example: "a calm message about an outage" } };
     if (loc.startsWith("src/inbox.ts"))
-      return { is_opportunity: true, decision: "How soon an urgent ticket is due.", primitive: "score", question: "How soon should this ticket be answered?", outcomes: ["2h", "4h", "SLA"], state: ["priority", "plan"], deterministic_remainder: "The SLA cap.", why: "A fixed 2-hour rule for every urgent ticket.", features: feats("mid"), ai_score: 0.6, ...done };
-    return { is_opportunity: false, decision: "Exact logic.", primitive: "none", question: "", outcomes: [], state: [], deterministic_remainder: "All of it.", why: "Exact rules over typed values.", features: feats("none"), ai_score: 0.05, ...done };
+      return { is_opportunity: true, decision: "How soon an urgent ticket is due.", primitive: "score", question: "How soon should this ticket be answered?", outcomes: ["2h", "4h", "SLA"], state: ["priority", "plan"], deterministic_remainder: "The SLA cap.", why: "A fixed 2-hour rule for every urgent ticket.", features: feats("mid"), ai_score: 0.6, ...done, pattern: { label: "fixed-due-time-rule", input_kind: "structured_app_data", rule_kind: "threshold", rule_shape: "urgent tickets get a fixed short deadline", why_generic: "the right deadline depends on the ticket", failure_example: "" } };
+    return { is_opportunity: false, decision: "Exact logic.", primitive: "none", question: "", outcomes: [], state: [], deterministic_remainder: "All of it.", why: "Exact rules over typed values.", features: feats("none"), ai_score: 0.05, ...done, pattern: PLAIN_PATTERN };
   }
   if ("edits" in props) {
     if (/APPROVED JEV DECISION at src\/routing\.ts/.test(prompt))

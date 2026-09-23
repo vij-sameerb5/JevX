@@ -59,7 +59,7 @@ beforeAll(async () => {
   const transport = new StdioClientTransport({
     command: "npx",
     args: ["tsx", SERVER],
-    env: { ...(process.env as Record<string, string>), JEVX_ROOT: repo, TYPESAFE_API_KEY: "test-key", TYPESAFE_BASE_URL: ts.url },
+    env: { ...(process.env as Record<string, string>), JEVX_ROOT: repo, TYPESAFE_API_KEY: "test-key", TYPESAFE_BASE_URL: ts.url, JEVX_SHARE: "0" },
     stderr: "pipe"
   });
   client = new Client({ name: "jevx-test", version: "0" });
@@ -75,12 +75,17 @@ afterAll(async () => {
 describe("jevx-mcp over stdio", () => {
   it("exposes the tools and the prompt an AI needs", async () => {
     const tools = (await client.listTools()).tools.map((t) => t.name).sort();
-    expect(tools).toEqual(["jevx_guide", "jevx_preview_change", "jevx_read", "jevx_related", "jevx_report", "jevx_scan", "jevx_scorecard", "jevx_search"]);
+    expect(tools).toEqual(["jevx_guide", "jevx_preview_change", "jevx_read", "jevx_related", "jevx_report", "jevx_scan", "jevx_scorecard", "jevx_search", "jevx_share"]);
     const prompts = (await client.listPrompts()).prompts.map((p) => p.name);
     expect(prompts).toContain("find-jev-opportunities");
     const g = await call("jevx_guide");
     expect(g.text).toMatch(/NOT a Jev opportunity/);
     expect(g.text).toMatch(/Keep the old rule as the fallback/);
+    expect(g.text).toMatch(/try\/catch blocks that read an error message/); // balanced, concrete guide
+    expect(g.text).toMatch(/NEVER below 50%/);
+    expect(g.text).not.toMatch(/Rejecting candidates is a correct answer/);
+    const p = await client.getPrompt({ name: "find-jev-opportunities", arguments: {} });
+    expect(JSON.stringify(p.messages)).toMatch(/minimum fit/);
   });
 
   it("scan lists static candidates with ids, and read / related / search navigate the repo", async () => {
@@ -89,6 +94,7 @@ describe("jevx-mcp over stdio", () => {
     expect(s.text).toMatch(/src\/routing\.ts:\d+-\d+ routeTicket \[.*outcome-set/);
     expect(s.text).toMatch(/id: unit:src\/routing\.ts#routeTicket@\d+/);
     expect(s.text).toMatch(/Static analysis misses things/);
+    expect(s.text).toMatch(/READING ORDER[\s\S]*src\/routing\.ts \(\d+ lines\)/); // the editor's AI reads the files itself
     const overview = await call("jevx_read", { id: "repo:overview" });
     expect(overview.text).toMatch(/helpdesk-demo/);
     expect(overview.text).toMatch(/Tickets arrive from email and chat/);
@@ -172,6 +178,20 @@ describe("jevx-mcp over stdio", () => {
     expect(html).toMatch(/class="ln del">-export function routeTicket/);
     expect(html).toMatch(/Strong fit · 88%/);
     expect(html).toMatch(/Sources disagree/);
+  });
+
+  it("scorecard accepts the generic pattern; jevx_share is off unless the user opted in", async () => {
+    const r = await call("jevx_scorecard", {
+      file: "src/priority.ts", start_line: 4, end_line: 12, decision: "How urgent a ticket is.", primitive: "choice", question: "How urgently does this customer need help?",
+      outcomes: ["urgent", "normal", "low"], state: ["subject", "body"], deterministic_remainder: "Due time.", why: "Punctuation stands in for urgency.",
+      features: { judgment_required: "high", semantic_ambiguity: "high" }, ai_score: 0.8, ai_reasons: "tone ≠ urgency",
+      pattern: { label: "Punctuation Urgency Heuristic", input_kind: "user_text", rule_kind: "includes_or_startswith", rule_shape: "exclamation marks decide urgency", why_generic: "tone is not urgency" }
+    });
+    expect(r.isError).toBe(false);
+    const saved = JSON.parse(readFileSync(path.join(repo, ".jevx/proposals/src_priority.ts_L4.json"), "utf8"));
+    expect(saved.pattern).toMatchObject({ label: "punctuation-urgency-heuristic", rule_kind: "includes_or_startswith" });
+    const sh = await call("jevx_share", { changed: [] });
+    expect(sh.text).toMatch(/Sharing is off/);
   });
 
   it("report summarises every proposal with its three scores", async () => {

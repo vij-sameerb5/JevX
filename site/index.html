@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JevX</title>
+<meta name="description" content="JevX finds where Jev fits in your codebase: hardcoded rules that are really judgment calls. It changes them and keeps the old rule as the fallback.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Martian+Mono:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="index.html"><i></i>JEVX</a>
+    <nav aria-label="Main">
+      <a class="hide-sm" href="#how">How it works</a>
+      <a class="hide-sm" href="#commands">Commands</a>
+      <a href="docs.html">Docs</a>
+      <a href="contributing.html">Contribute</a>
+      <a href="https://www.npmjs.com/package/jevx">npm</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="wordmark" aria-label="JEVX">JEVX</div>
+    <p class="tag">Find where Jev fits in your codebase.</p>
+    <p class="sub">Regexes that guess what an error means. Keyword lists that guess what a customer wants. <code>slice(0, 3)</code> that guesses what's best. JevX finds these judgment calls hiding as rules, and hands them to Jev. The old rule stays as the fallback.</p>
+    <div class="btns">
+      <a class="btn primary" href="#install">Install <code>npm i -g jevx</code></a>
+      <a class="btn" href="docs.html">Read the docs</a>
+      <a class="btn" href="contributing.html#repo">GitHub <span class="muted">· soon</span></a>
+    </div>
+    <div class="install"><span>$ <b>npx jevx --dry-run</b></span><button class="copy" type="button" data-copy="npx jevx --dry-run">Copy</button></div>
+
+    <div class="term" role="region" aria-label="JevX terminal recordings">
+      <div class="term-bar">
+        <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="tabs" role="tablist" aria-label="Recordings">
+          <button type="button" role="tab" data-rec="first" aria-selected="true">first run</button>
+          <button type="button" role="tab" data-rec="scan">scanning</button>
+          <button type="button" role="tab" data-rec="card">scorecard</button>
+          <button type="button" role="tab" data-rec="diff">red/green</button>
+          <button type="button" role="tab" data-rec="apply">apply + tests</button>
+          <button type="button" role="tab" data-rec="mcp">Claude Code</button>
+        </div>
+        <button class="replay" id="replay" type="button">▶ replay</button>
+      </div>
+      <pre class="screen" id="screen" aria-live="polite"></pre>
+      <div class="term-cap" id="term-cap"></div>
+    </div>
+
+    <ol class="pipeline" aria-label="What a run does">
+      <li><b>Scan</b><span>Indexes your repo on your machine. Free.</span></li>
+      <li><b>Understand</b><span>Your AI reads the source, logic first.</span></li>
+      <li><b>Validate</b><span>AI, TypeSafe and patterns each score every spot.</span></li>
+      <li><b>Preview</b><span>Red/green diffs and scorecards.</span></li>
+      <li><b>Apply</b><span>Strong fits only. Old rule kept as the fallback.</span></li>
+      <li><b>Test</b><span>Your tests run before and after. Breaks are reverted.</span></li>
+    </ol>
+  </section>
+
+  <section class="block wrap" id="what">
+    <div class="block-head">
+      <span class="eyebrow">What is JevX</span>
+      <h2>Some of your if-statements are really judgment calls.</h2>
+      <p>Jev (TypeSafe) answers bounded questions about messy input: a yes/no (<b>noul</b>), a pick from a list (<b>choice</b>) or a rating (<b>score</b>). JevX is the tool that finds where your code should be asking one.</p>
+    </div>
+    <div class="example">
+      <div>
+        <span class="label bad">Before · a guess written as a rule</span>
+        <pre><code>if (/User rejected|denied/i.test(msg)) {
+  setError("You cancelled…");
+} else if (/timeout/i.test(msg)) {
+  setError("Not confirmed in time…");
+} else if (/insufficient|balance/i.test(msg)) {
+  setError("Not enough funds…");
+}</code></pre>
+        <p class="muted">Every wallet words its errors differently. Anything the regexes miss shows the raw error to the user.</p>
+      </div>
+      <div>
+        <span class="label good">After · Jev decides, the rule is the fallback</span>
+        <pre><code>const kind = await failureKind(msg);
+// choice: cancelled | timeout | funds | other
+
+async function failureKind(msg) {
+  try { return (await jev.systemOne(…)).answers.kind.choice; }
+  catch { return legacyFailureKind(msg); }
+}</code></pre>
+        <p class="muted">New wordings are classified correctly. If Jev is unreachable, behaviour is exactly what it was.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="how">
+    <div class="block-head">
+      <span class="eyebrow">How it works</span>
+      <h2>Your AI reads. Three sources judge. Your tests decide.</h2>
+    </div>
+    <div class="cols">
+      <div><h3>Reads everything</h3><p>Your AI reads the source files part by part: API routes and libraries first, UI last. Static analysis only sets the reading order. It never decides what gets read.</p></div>
+      <div><h3>Scores three ways</h3><p>Every spot gets a scorecard: your AI's opinion, TypeSafe's own opinion, and patterns learned from real Jev projects. If they disagree, JevX shows it instead of hiding it in an average.</p></div>
+      <div><h3>Changes only strong fits</h3><p>70% and up by default. It keeps the old rule as the fallback, updates callers, adds <code>@typesafe-ai/sdk</code>, and skips files you're still editing.</p></div>
+      <div><h3>Proves it with your tests</h3><p>Your test script and typecheck run before and after. A change that breaks something that passed is reverted on its own. <code>jevx undo</code> puts everything back.</p></div>
+    </div>
+    <div style="margin-top:28px; max-width:560px">
+      <div class="card" aria-label="Example scorecard">
+        <div class="row"><span>AI</span><span class="bar"><i style="width:61%"></i></span><span>61%</span></div>
+        <div class="row"><span>TypeSafe</span><span class="bar"><i style="width:76%"></i></span><span>76%</span></div>
+        <div class="row"><span>Patterns</span><span class="bar"><i style="width:69%"></i></span><span>69%</span></div>
+        <div class="row fit"><span>JEV FIT</span><span>68% <span class="pill">POSSIBLE</span></span><span></span></div>
+      </div>
+      <p class="muted" style="margin-top:8px; font-size:0.9rem">A real scorecard from a Next.js checkout. It's under 70%, so it's previewed, not written, unless you ask with <code>--min-fit</code>.</p>
+    </div>
+  </section>
+
+  <section class="block wrap" id="cli">
+    <div class="block-head">
+      <span class="eyebrow">CLI</span>
+      <h2>One command, with your own AI key.</h2>
+      <p>JevX never ships a key. It uses xAI (Grok) or OpenRouter with your key, asks once before sending code, and never uploads your whole repo anywhere else.</p>
+    </div>
+    <div class="cols">
+      <div class="codebox"><pre class="code"><span class="c"># preview: nothing is written</span>
+jevx --dry-run
+
+<span class="c"># change strong fits, run your tests</span>
+jevx
+
+<span class="c"># put everything back</span>
+jevx undo</pre><button class="copy" type="button" data-copy="jevx --dry-run">Copy</button></div>
+      <div>
+        <h3>What a run costs</h3>
+        <p>About 15–25 AI calls for a 50-file app, roughly $0.50–0.90 on your key with Grok 4.6. <code>--budget</code> caps it, and <code>--fast</code> reads with less reasoning.</p>
+        <h3 style="margin-top:12px">When you want more</h3>
+        <p><code>--min-fit 55</code> also writes fits from 55%. It warns you below 70% and never goes under 50%.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="mcp">
+    <div class="block-head">
+      <span class="eyebrow">Claude Code · Cursor</span>
+      <h2>Or let your editor's AI do it.</h2>
+      <p>JevX is also an MCP server. Your editor's AI reads the code with JevX's tools and its own tokens. JevX adds the Jev know-how, the scorecard and the diffs. No JevX key needed.</p>
+    </div>
+    <div class="cols">
+      <div class="codebox"><pre class="code">jevx mcp install
+<span class="c"># restart Claude Code / Cursor, then say:</span>
+<span class="o">use jevx to find where Jev fits in this repo</span></pre><button class="copy" type="button" data-copy="jevx mcp install">Copy</button></div>
+      <div>
+        <h3>9 tools</h3>
+        <p><code>jevx_guide</code>, <code>jevx_scan</code> (with a reading order), <code>jevx_read</code>, <code>jevx_related</code>, <code>jevx_search</code>, <code>jevx_scorecard</code>, <code>jevx_preview_change</code>, <code>jevx_report</code> and the opt-in <code>jevx_share</code>.</p>
+        <p>Say <i>"use Jev where the fit is at least 55%"</i> to go lower. It never goes under 50%.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="install">
+    <div class="block-head">
+      <span class="eyebrow">Installation</span>
+      <h2>Up and running in a minute.</h2>
+    </div>
+    <div class="cols">
+      <div class="codebox"><pre class="code">npm i -g jevx          <span class="c"># or use npx jevx</span>
+export XAI_API_KEY=…    <span class="c"># or OPENROUTER_API_KEY</span>
+export TYPESAFE_API_KEY=…  <span class="c"># optional</span>
+cd your-project
+jevx --dry-run</pre><button class="copy" type="button" data-copy="npm i -g jevx">Copy</button></div>
+      <div>
+        <h3>Requirements</h3>
+        <p>Node 20.10 or newer, and a TypeScript or JavaScript project. Works on macOS, Linux and Windows.</p>
+        <h3 style="margin-top:12px">Keys in a file</h3>
+        <p>Put <code>KEY=value</code> lines in a file and set <code>JEVX_ENV_FILE</code> to it once. Anything you export in your shell still wins.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="commands">
+    <div class="block-head">
+      <span class="eyebrow">Commands</span>
+      <h2>Everything it does.</h2>
+    </div>
+    <div class="table">
+      <table>
+        <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>jevx</code></td><td>Find, judge, change strong fits (70%+), run your checks</td></tr>
+          <tr><td><code>jevx --dry-run</code></td><td>Preview every fit from 50%, with diffs. Writes nothing</td></tr>
+          <tr><td><code>jevx --min-fit &lt;n&gt;</code></td><td>Write fits from n% (50–100). Warns below 70</td></tr>
+          <tr><td><code>jevx --include-disagree</code></td><td>Also write fits the three sources disagree on</td></tr>
+          <tr><td><code>jevx undo</code></td><td>Restore every file the last run changed</td></tr>
+          <tr><td><code>jevx --fast</code></td><td>Less AI reasoning while reading. Cheaper, may miss spots</td></tr>
+          <tr><td><code>jevx --share</code></td><td>Share anonymous outcomes to improve JevX (opt-in)</td></tr>
+          <tr><td><code>jevx --report-json out.json</code></td><td>Save the full result on your machine</td></tr>
+          <tr><td><code>jevx mcp install</code></td><td>Add JevX to Claude Code and Cursor</td></tr>
+          <tr><td><code>jevx --welcome</code></td><td>Show the JEVX welcome again</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block wrap" id="privacy">
+    <div class="block-head">
+      <span class="eyebrow">Privacy</span>
+      <h2>Your code goes to your AI, and nowhere else.</h2>
+    </div>
+    <div class="split">
+      <div>
+        <h3>Sent to your AI (your key)</h3>
+        <ul><li>Your source files, with secrets scrubbed</li><li>Asked once per provider before anything is sent</li><li>Official provider addresses only</li></ul>
+      </div>
+      <div>
+        <h3>Shared with JevX (only with <code>--share</code>)</h3>
+        <ul><li>The <i>kind</i> of code, e.g. "regex on an error message"</li><li>Why Jev fits, the three scores, what happened</li><li>A random repo id, nothing else</li></ul>
+      </div>
+      <div class="never">
+        <h3>Never leaves your machine</h3>
+        <ul><li>Code, file or function names, paths, string literals</li><li><code>.env</code> files, tests, builds, <code>node_modules</code></li><li>Your API keys. They come from your environment only</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="examples">
+    <div class="block-head">
+      <span class="eyebrow">Examples</span>
+      <h2>What it found on a real app.</h2>
+      <p>GlobalCare is a Next.js medical-travel app with 53 files. xAI read all of it.</p>
+    </div>
+    <div class="table">
+      <table>
+        <thead><tr><th>Spot</th><th>Verdict</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td><code>checkout/page.tsx</code> wallet errors</td><td><span class="pill">68% POSSIBLE</span></td><td>Error text varies by wallet; regexes miss new wordings</td></tr>
+          <tr><td><code>countryImages.ts</code> free-text lookup</td><td>49% disagree</td><td>Real, but cosmetic</td></tr>
+          <tr><td><code>JourneyTicket.tsx</code> airport code</td><td>45% disagree</td><td>A real bug, but a proper airport lookup fixes it better</td></tr>
+          <tr><td>flights / hotels <code>slice(0, n)</code></td><td>left alone</td><td>Google already ranks them, and there's no patient data to judge with</td></tr>
+          <tr><td>refunds · escrow · payments</td><td>never proposed</td><td>Money logic stays exact</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><b style="color:var(--accent)">JEVX</b> · Find where Jev fits in your codebase · MIT</span>
+    <span class="btns"><a class="btn" href="contributing.html#repo">GitHub <span class="muted">· soon</span></a><a class="btn" href="https://www.npmjs.com/package/jevx">npm</a><a class="btn" href="docs.html#versions">Changelog</a></span>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

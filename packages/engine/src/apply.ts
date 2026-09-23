@@ -142,8 +142,8 @@ function needsSdk(root: string, changed: Opportunity[]): boolean {
 
 export function applyOpportunities(opts: ApplyOptions): ApplyResult {
   const root = path.resolve(opts.root);
-  // the caller decides what to apply (STRONG by default, POSSIBLE with --include-possible)
-  const candidates = opts.opportunities.filter((o) => (o.status === "strong" || o.status === "possible") && o.edits?.length);
+  // the caller decides what to apply (STRONG by default; lower only with --min-fit, never under 50%)
+  const candidates = opts.opportunities.filter((o) => o.edits?.length && o.status !== "edit_failed" && o.status !== "failed");
   const touched = [...new Set(candidates.flatMap((o) => o.edits!.map((e) => e.file)))];
   const dirty = dirtyFiles(root, touched);
   const skipped: ApplyResult["skipped"] = [];

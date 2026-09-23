@@ -13,9 +13,16 @@ import {
   GUIDE,
   LEVELS,
   PROFILE,
+  INPUT_KINDS,
+  RULE_KINDS,
   allProposals,
   askJev,
+  blendPatterns,
   combine,
+  learnedScore,
+  planRead,
+  shareEnabled,
+  shareRun,
   hunksOf,
   loadProposal,
   patternScore,
@@ -28,11 +35,12 @@ import {
   workspace,
   writeReport,
   type FeatureLevels,
+  type Opportunity,
   type Proposal,
   type ProposalRecord
 } from "@jevx/engine";
 
-export const VERSION = "0.3.0";
+export const VERSION = "0.4.0";
 const MAX_TEXT = 60_000;
 
 const text = (s: string) => ({ content: [{ type: "text" as const, text: s.length > MAX_TEXT ? `${s.slice(0, MAX_TEXT)}\n… (truncated at ${MAX_TEXT} characters — read a narrower item)` : s }] });
@@ -87,8 +95,12 @@ export function createServer(): McpServer {
           lines.push(`  ${c.file}:${c.unit.start}-${c.unit.end} ${c.unit.name} [${c.generators.map((g) => g.generator).join(", ")}]${outs}`);
           lines.push(`      id: unit:${c.file}#${c.unit.name}@${c.unit.start}`);
         }
-        if (!a.candidates.length) lines.push("  (none — read the overview and look for judgment calls yourself)");
-        lines.push("", "Static analysis misses things. Also look for judgment calls it did not list.");
+        if (!a.candidates.length) lines.push("  (none — read the source yourself, below)");
+        const plan = planRead(ws.root, ws.files, Number.POSITIVE_INFINITY);
+        lines.push("", `READING ORDER — read these source files yourself with jevx_read "file:<path>" (logic first, UI last; ${plan.skipped.length} tests/configs/ui-kit files skipped):`);
+        for (const f of plan.read.slice(0, 200)) lines.push(`  ${f} (${plan.lines.get(f) ?? "?"} lines)`);
+        if (plan.read.length > 200) lines.push(`  … and ${plan.read.length - 200} more`);
+        lines.push("", "Static analysis misses things: most real spots are found by reading the files, not from the candidate list.");
         return text(lines.join("\n"));
       } catch (e) {
         return fail(e instanceof Error ? e.message : String(e));
@@ -179,7 +191,18 @@ export function createServer(): McpServer {
         why: z.string().describe("Why a judgment is needed here, concretely."),
         features: z.object(Object.fromEntries(FEATURES.map((f) => [f, level.optional()])) as Record<(typeof FEATURES)[number], z.ZodOptional<typeof level>>),
         ai_score: z.number().min(0).max(1).describe("Your confidence (0–1) that Jev genuinely improves this decision."),
-        ai_reasons: z.string()
+        ai_reasons: z.string(),
+        pattern: z
+          .object({
+            label: z.string().describe("generic kebab-case slug, e.g. error-message-regex-classifier"),
+            input_kind: z.enum(INPUT_KINDS),
+            rule_kind: z.enum(RULE_KINDS),
+            rule_shape: z.string().describe("one generic sentence on the code shape — no names from this repo"),
+            why_generic: z.string().describe("one generic sentence on why Jev beats the rule"),
+            failure_example: z.string().optional().describe("an INVENTED input the rule gets wrong")
+          })
+          .optional()
+          .describe("The KIND of code, in generic words with no names, paths or literals from this repository. Lets JevX learn across projects.")
       },
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true }
     },
@@ -200,8 +223,10 @@ export function createServer(): McpServer {
           why: args.why
         };
         const pat = patternScore(args.features as FeatureLevels);
+        const pattern = args.pattern ? { ...args.pattern, label: args.pattern.label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60), failure_example: args.pattern.failure_example ?? "" } : undefined;
+        const learned = learnedScore(pattern);
         const jev = await askJev(root, file, code, proposal);
-        const card = combine({ patterns: pat.score, ai: args.ai_score, typesafe: jev.ok ? typesafeScore(jev.answers) : undefined });
+        const card = combine({ patterns: blendPatterns(pat.score, learned.score), ai: args.ai_score, typesafe: jev.ok ? typesafeScore(jev.answers) : undefined });
         const id = proposalId(file, args.start_line);
         const prev = loadProposal(root, id);
         const rec: ProposalRecord = {
@@ -215,6 +240,7 @@ export function createServer(): McpServer {
           patterns: pat.matches,
           ...(jev.ok ? { jev: jev.answers } : { jevError: jev.error }),
           scorecard: card,
+          ...(pattern ? { pattern } : {}),
           ...(prev?.patch && prev.startLine === args.start_line && prev.endLine === args.end_line ? { patch: prev.patch } : {}),
           at: new Date().toISOString()
         };
@@ -228,7 +254,7 @@ export function createServer(): McpServer {
             ? `TypeSafe: judgment ${jev.answers.judgment.toFixed(2)}, bounded ${jev.answers.bounded.toFixed(2)}, exact code still right ${jev.answers.deterministicIsCorrect.toFixed(2)}, suggests ${jev.answers.primitive} (${jev.answers.category})${jev.cached ? " · cached" : ""}.`
             : `TypeSafe: ${jev.error}`,
           jev.ok && jev.answers.primitive !== args.primitive && jev.answers.primitive !== "none" ? `Note: Jev would use ${jev.answers.primitive}, you proposed ${args.primitive}.` : "",
-          `Learned profile: ${PROFILE.from.jevSites} Jev sites and ${PROFILE.from.deterministicDecisions} deterministic decisions from ${PROFILE.from.projects} projects — a small pilot.`,
+          `Learned profile: ${PROFILE.from.jevSites} Jev sites and ${PROFILE.from.deterministicDecisions} deterministic decisions from ${PROFILE.from.projects} projects — a small pilot.${learned.basis ? ` Shared outcomes: ${learned.basis}.` : ""}`,
           "",
           card.verdict === "WEAK_FIT" ? "Next: probably leave this as exact code." : `Next: write the Jev implementation and call jevx_preview_change with file, start_line ${args.start_line}, end_line ${args.end_line}.`
         ].filter(Boolean);
@@ -323,11 +349,45 @@ export function createServer(): McpServer {
     }
   );
 
+  server.registerTool(
+    "jevx_share",
+    {
+      title: "Share anonymous outcomes (opt-in)",
+      description:
+        "Only when the user opted in (JEVX_SHARE=1 plus JEVX_SUPABASE_URL / JEVX_SUPABASE_ANON_KEY). Sends one anonymous row per scored proposal to the JevX dataset: the generic pattern, the scores, the verdict and whether you changed it. Never code, paths, file or function names (scrubbed in code). Call once at the end with the ids of the proposals you actually changed.",
+      inputSchema: {
+        root: rootArg,
+        changed: z.array(z.string()).describe("Proposal ids you applied (as in jevx_report / .jevx/proposals)."),
+        min_fit: z.number().min(50).max(100).optional().describe("The minimum fit the user asked for, in percent (default 70).")
+      },
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
+    },
+    async ({ root, changed, min_fit }) => {
+      if (!shareEnabled()) return text("Sharing is off (JEVX_SHARE is not 1). Nothing was sent.");
+      const r = resolveRoot(root);
+      const recs = allProposals(r);
+      const verdictStatus: Record<string, Opportunity["status"]> = { STRONG_FIT: "strong", POSSIBLE_FIT: "possible", REVIEW_DISAGREE: "review", WEAK_FIT: "weak" };
+      const opportunities: Opportunity[] = recs.map((p) => ({
+        id: p.id,
+        file: p.file,
+        unit: { name: "", start: p.startLine, end: p.endLine },
+        origin: "ai",
+        status: verdictStatus[p.scorecard.verdict] ?? "weak",
+        assessment: { is_opportunity: true, decision: p.proposal.decision, primitive: p.proposal.primitive as "noul" | "choice" | "score", question: p.proposal.question, outcomes: p.proposal.outcomes, state: p.proposal.state, deterministic_remainder: p.proposal.deterministic_remainder, why: p.proposal.why, features: p.features, ai_score: p.ai.score, context_sufficient: true, missing_context: [], understanding_confidence: "high", ...(p.pattern ? { pattern: p.pattern } : {}) },
+        record: p
+      }));
+      const set = new Set(changed);
+      const applied = { changed: opportunities.filter((o) => set.has(o.id)), reverted: [], skipped: [], checks: { baseline: [], after: [], gate: [] }, backupDir: "", files: [] };
+      const res = await shareRun({ root: r, runId: `mcp-${new Date().toISOString().replace(/[:.]/g, "-")}`, version: VERSION, provider: "mcp", model: "editor", dryRun: false, minFit: (min_fit ?? 70) / 100, opportunities, applied });
+      return "error" in res ? fail(`not shared: ${res.error}`) : text(`Shared ${res.sent} anonymous finding(s) with the JevX dataset (no code, no names).`);
+    }
+  );
+
   server.registerPrompt(
     "find-jev-opportunities",
     { title: "Find Jev opportunities in this repository", description: "Runs the JevX workflow: scan, read, propose, score, preview.", argsSchema: { focus: z.string().optional().describe("A folder or feature to focus on") } },
     ({ focus }) => ({
-      messages: [{ role: "user", content: { type: "text", text: `${GUIDE}\n\nNow do it for this repository${focus ? `, focusing on ${focus}` : ""}. Start with jevx_scan. Change every STRONG_FIT directly (callers included), run the tests, revert anything that breaks them, then summarise with the scorecards. Don't ask me to pick.` } }]
+      messages: [{ role: "user", content: { type: "text", text: `${GUIDE}\n\nNow do it for this repository${focus ? `, focusing on ${focus}` : ""}. Start with jevx_scan, then read the source files in its reading order. Change every STRONG_FIT directly (callers included) — or, if I state a minimum fit (e.g. "use Jev where the fit is at least 55%"), every fit at or above it, never below 50%. Run the tests, revert anything that breaks them, then summarise with the scorecards. Don't ask me to pick.` } }]
     })
   );
 

@@ -8,6 +8,7 @@
 // and when they point different ways the card says REVIEW instead of pretending to agree. The
 // bands (strong ≥ 0.70, possible ≥ 0.50) are display bands, not calibrated thresholds.
 import profileJson from "./profile.json" with { type: "json" };
+import learnedJson from "./patterns-learned.json" with { type: "json" };
 
 export const LEVELS = ["none", "low", "medium", "high"] as const;
 export type Level = (typeof LEVELS)[number];
@@ -61,6 +62,47 @@ export function patternScore(levels: FeatureLevels): { score?: number; matches: 
     matches.push({ feature: f, level: l, looksLike, jevSitesShowed: p.jevTop, deterministicShowed: p.deterministicTop });
   }
   return { ...(matches.length ? { score: sum / matches.length } : {}), matches };
+}
+
+// ─── learned from shared outcomes (scripts/export-patterns.ts) ───
+
+export interface LearnedPattern {
+  pattern_label: string;
+  input_kind: string;
+  rule_kind: string;
+  primitive: string;
+  findings: number;
+  good: number;
+  bad: number;
+  rejected: number;
+}
+export const LEARNED = learnedJson as { exportedAt: string | null; note: string; patterns: LearnedPattern[] };
+/** A pattern needs this many kept-or-undone outcomes before it moves a score. */
+export const LEARNED_MIN_LABELLED = 5;
+
+/**
+ * How often changes of this kind were kept (tests passed, not undone) vs reverted or undone.
+ * Matches on the exact label first, then on the input + rule kind. undefined = not enough history.
+ */
+export function learnedScore(p: { label: string; input_kind: string; rule_kind: string } | undefined, learned: LearnedPattern[] = LEARNED.patterns): { score?: number; basis?: string } {
+  if (!p) return {};
+  const sum = (rows: LearnedPattern[]) => rows.reduce((a, r) => ({ good: a.good + r.good, bad: a.bad + r.bad }), { good: 0, bad: 0 });
+  const tries: [string, LearnedPattern[]][] = [
+    [`"${p.label}"`, learned.filter((r) => r.pattern_label === p.label)],
+    [`${p.input_kind} + ${p.rule_kind}`, learned.filter((r) => r.input_kind === p.input_kind && r.rule_kind === p.rule_kind)]
+  ];
+  for (const [basis, rows] of tries) {
+    const t = sum(rows);
+    if (t.good + t.bad >= LEARNED_MIN_LABELLED) return { score: t.good / (t.good + t.bad), basis: `${t.good} kept / ${t.bad} undone for ${basis}` };
+  }
+  return {};
+}
+
+/** Patterns score = the feature profile, blended 50/50 with learned outcomes when there are enough. */
+export function blendPatterns(profile: number | undefined, learned: number | undefined): number | undefined {
+  if (learned === undefined) return profile;
+  if (profile === undefined) return learned;
+  return (profile + learned) / 2;
 }
 
 export interface JevAnswers {

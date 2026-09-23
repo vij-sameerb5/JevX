@@ -7,6 +7,43 @@
 
 ---
 
+## 2026-09-23 — Session 30: 0.4.0 release candidate (A–E, branding, MCP test, site)
+
+- **A · patterns dataset:** the assess step now returns a generic `pattern` (label, input_kind, rule_kind,
+  rule_shape, why_generic, failure_example; prompt r5).
+  - `share.ts` scrubs every text field in code against the spot's own names: path segments, the function,
+    identifiers that look specific, and specific string literals. Comments and plain words stay usable.
+  - `supabase/jevx-dataset-v2.sql` adds the columns plus `min_fit` and the `jevx_patterns` view.
+  - `scripts/export-patterns.ts` (service key from env) writes `patterns-learned.json`. `learnedScore`
+    blends it 50/50 into the patterns score once a pattern has ≥ 5 kept-or-undone outcomes.
+- **B · `--min-fit` 50–100** (default 70; under 50 refused; under 70 warns) and `--include-disagree`.
+  `--include-possible` = 50. `eligible()` in the engine decides.
+  - Dry-run previews everything ≥ 50 and says which flag would write each one.
+  - `apply` applies what the caller passes.
+- **C · MCP parity:**
+  - The guide is rewritten in the balanced way, with concrete patterns and the min-fit rule. "Rejecting is
+    correct" is gone.
+  - `jevx_scan` returns a READING ORDER, `jevx_scorecard` takes `pattern`, and there's a new `jevx_share`.
+- **Branding:** the big JEVX mark (orange, with a drop shadow) on the first run per machine (`~/.jevx/welcomed`),
+  and `jevx --welcome`.
+- **D · npm:**
+  - `apps/jevx` 0.4.0: MIT (to be confirmed by Sameer), Node ≥ 20.10 (tsup target node20), files =
+    dist/README/LICENSE/CHANGELOG, publishConfig public.
+  - `scripts/release-check.sh` packs, checks the tarball contents and the bundle for keys, installs into a
+    clean prefix, and runs `release-smoke.ts` (9 checks, CLI + MCP) — all pass.
+  - The name `jevx` was free on npm.
+- **E:** `--report-json`, `docs/BENCHMARK.md` (GlobalCare reference results), `docs/RELEASE.md`.
+- **MCP test:**
+  - `scripts/mcp-smoke.ts` drives `jevx mcp` over stdio like Claude Code. It passes all 12 steps on the demo
+    and on a copy of GlobalCare (source only, no .env), and scores the checkout spot.
+  - `docs/MCP-TEST.md` has the manual Claude Code steps. Not yet done by Sameer.
+- **Site** (`site/`): landing, docs (with version history) and contributing pages in #c15f3c; a terminal with 6
+  replayable recordings (real GlobalCare output for scan and scorecard); VHS tapes for real GIFs. It fits a
+  phone (390 px, no sideways scroll). A preview is published as an artifact.
+- `CONTRIBUTING.md`, `LICENSE`.
+- **Mistake caught:** I overwrote the existing `tests/patterns.test.ts` (26 Layer E tests). It was restored
+  from the Mac, and the new tests live in `tests/learned-patterns.test.ts`.
+
 ## 2026-09-23 — Session 29: the AI reads the code itself; Supabase dataset
 
 - **Why:** `jevx --dry-run` on GlobalCare found 0. The survey call (24k overview + 60 candidates) timed out and

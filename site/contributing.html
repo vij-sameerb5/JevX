@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contributing to JevX</title>
+<meta name="description" content="How to set up the JevX repo, where things live, the rules we keep, and what makes a good pull request.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Martian+Mono:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="index.html"><i></i>JEVX</a>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="docs.html">Docs</a>
+      <a href="contributing.html" aria-current="page">Contribute</a>
+      <a href="https://www.npmjs.com/package/jevx">npm</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs">
+  <nav class="toc" aria-label="On this page">
+    <b>Contribute</b>
+    <a href="#repo">The repo</a>
+    <a href="#setup">Set up</a>
+    <a href="#map">Where things live</a>
+    <a href="#rules">Rules we keep</a>
+    <a href="#pr">A good PR</a>
+    <a href="#first">Good first issues</a>
+    <a href="#bugs">Bugs &amp; security</a>
+  </nav>
+
+  <article class="prose">
+    <h1>Contributing to JevX</h1>
+    <p class="muted">JevX is small and moves fast. Short pull requests with a test are the easiest to merge.</p>
+
+    <section id="repo">
+      <h2>The repo</h2>
+      <p>The GitHub repository opens with the first public release. Until then this page, <code>CONTRIBUTING.md</code> and the <a href="docs.html#versions">changelog</a> describe how it works. It's a TypeScript pnpm monorepo, MIT-licensed.</p>
+    </section>
+
+    <section id="setup">
+      <h2>Set up (5 minutes)</h2>
+      <div class="codebox"><pre class="code">git clone &lt;repo-url&gt; jevX &amp;&amp; cd jevX
+pnpm install          <span class="c"># Node ≥ 20.10, pnpm ≥ 9</span>
+pnpm test             <span class="c"># ~230 tests · no network, no keys</span>
+pnpm jevx --help      <span class="c"># the CLI from source</span>
+pnpm mcp-smoke examples/jev-demo   <span class="c"># the MCP server, end to end</span></pre><button class="copy" type="button">Copy</button></div>
+      <p>The tests never call a real API. <code>tests/mock-xai.ts</code> and <code>tests/mock-typesafe.ts</code> stand in for xAI and TypeSafe, and <code>tests/mock-engine.ts</code> holds the AI's answers for the demo repo.</p>
+    </section>
+
+    <section id="map">
+      <h2>Where things live</h2>
+      <div class="table"><table>
+        <thead><tr><th>Folder</th><th>What</th></tr></thead>
+        <tbody>
+          <tr><td><code>apps/jevx</code></td><td>The <code>jevx</code> CLI and MCP server: what ships to npm</td></tr>
+          <tr><td><code>packages/engine</code></td><td>The pipeline: read → assess → scorecard → edit → apply → share</td></tr>
+          <tr><td><code>packages/gemini</code></td><td>AI transports (xAI, OpenRouter) and the adaptive context loop</td></tr>
+          <tr><td><code>packages/analyzer</code> · <code>scanner</code> · <code>core</code></td><td>Local indexing, static candidates, secret scrubbing</td></tr>
+          <tr><td><code>tests/</code></td><td>vitest, with mocks for every external service</td></tr>
+          <tr><td><code>examples/jev-demo</code></td><td>A tiny helpdesk repo every end-to-end test runs on</td></tr>
+          <tr><td><code>supabase/</code></td><td>The anonymous-outcomes dataset (insert-only SQL)</td></tr>
+          <tr><td><code>site/</code></td><td>This website</td></tr>
+          <tr><td><code>packages/boundary</code> · <code>apps/cli</code></td><td>Frozen research. Please don't build on them</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="rules">
+      <h2>Rules we keep</h2>
+      <ol>
+        <li><b>No API key, ever</b>, in code, config, tests or fixtures. Keys come from the environment.</li>
+        <li><b>No user code leaves the machine</b>, except to the user's own AI. Anything shared must be generic, with a test proving names are scrubbed.</li>
+        <li><b>Safety lives in the tool</b>: the old rule as fallback, tests before/after with auto-revert, never touching files with uncommitted changes, <code>jevx undo</code>.</li>
+        <li><b>Prompts are versioned</b>: bump <code>ENGINE_PROMPT_VERSION</code> when you change one.</li>
+        <li><b>Plain English</b> in everything a user reads. Short.</li>
+      </ol>
+    </section>
+
+    <section id="pr">
+      <h2>A good PR</h2>
+      <ul>
+        <li>One change, with a test. <code>pnpm test</code>, <code>pnpm typecheck</code> and <code>pnpm lint</code> green.</li>
+        <li>A prompt or pattern change: add the case to <code>tests/mock-engine.ts</code> or a unit test, and say which real repo you tried it on.</li>
+        <li>An entry under "Unreleased" in <code>apps/jevx/CHANGELOG.md</code>.</li>
+        <li>Before a release, maintainers run <code>bash scripts/release-check.sh</code>. It packs, installs into a clean folder, and smoke-tests the CLI and MCP server.</li>
+      </ul>
+    </section>
+
+    <section id="first">
+      <h2>Good first issues</h2>
+      <ul>
+        <li>Detect more test runners in <code>checksFor</code> (vitest, jest, Bun).</li>
+        <li>A <code>jevx --only &lt;folder&gt;</code> filter.</li>
+        <li>More examples in <code>examples/</code>: a moderation app, a search-ranking app.</li>
+        <li>Nicer diffs in <code>.jevx/report.html</code>.</li>
+        <li>Real terminal recordings for this site (<code>site/recordings/*.tape</code>, made with VHS).</li>
+      </ul>
+    </section>
+
+    <section id="bugs">
+      <h2>Bugs &amp; security</h2>
+      <p>For a bug, include <code>jevx --version</code>, the command, and ideally <code>jevx --dry-run --report-json out.json</code> plus the relevant <code>.jevx/debug/*.json</code>. Check them for anything private first.</p>
+      <p class="note">Found a way JevX could leak code or keys? Please tell the maintainer privately instead of opening a public issue.</p>
+    </section>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span><b style="color:var(--accent)">JEVX</b> · MIT</span>
+    <span class="btns"><a class="btn" href="index.html">Home</a><a class="btn" href="docs.html">Docs</a><a class="btn" href="https://www.npmjs.com/package/jevx">npm</a></span>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

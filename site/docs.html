@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JevX Docs</title>
+<meta name="description" content="How to install, run and configure JevX, what it sends and stores, and every version so far.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Martian+Mono:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="index.html"><i></i>JEVX</a>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="contributing.html">Contribute</a>
+      <a href="https://www.npmjs.com/package/jevx">npm</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs">
+  <nav class="toc" aria-label="On this page">
+    <b>Start</b>
+    <a href="#start">Quick start</a>
+    <a href="#keys">Keys</a>
+    <a href="#run">What a run does</a>
+    <b>Use</b>
+    <a href="#commands">Commands</a>
+    <a href="#scorecard">Scorecard &amp; fit</a>
+    <a href="#minfit">Lower fits</a>
+    <a href="#mcp">Claude Code / Cursor</a>
+    <b>Reference</b>
+    <a href="#privacy">Privacy &amp; data</a>
+    <a href="#config">Configuration</a>
+    <a href="#trouble">Troubleshooting</a>
+    <a href="#versions">Versions</a>
+  </nav>
+
+  <article class="prose">
+    <h1>JevX docs</h1>
+    <p class="muted">JevX finds hardcoded rules that are really judgment calls and replaces them with a Jev decision (TypeSafe <b>noul</b> / <b>choice</b> / <b>score</b>). The old rule stays as the fallback. Current version: <b>0.4.0</b>.</p>
+
+    <section id="start">
+      <h2>Quick start</h2>
+      <div class="codebox"><pre class="code">npm i -g jevx
+export XAI_API_KEY=…         <span class="c"># your key (or OPENROUTER_API_KEY)</span>
+cd your-project
+jevx --dry-run               <span class="c"># preview, writes nothing</span>
+jevx                         <span class="c"># change strong fits, run your tests</span>
+jevx undo                    <span class="c"># put everything back</span></pre><button class="copy" type="button" data-copy="npm i -g jevx">Copy</button></div>
+      <p>After a real run, open VS Code or Cursor → <b>Source Control</b>. Every change is there in red/green. <code>.jevx/report.html</code> has every scorecard and diff.</p>
+    </section>
+
+    <section id="keys">
+      <h2>Keys</h2>
+      <p>JevX uses <b>your</b> AI key and never ships one. Anything inside an npm package can be extracted, so it never will.</p>
+      <ul>
+        <li><code>XAI_API_KEY</code> (xAI / Grok) or <code>OPENROUTER_API_KEY</code>: required for the terminal version.</li>
+        <li><code>TYPESAFE_API_KEY</code>: optional. Adds Jev's own opinion to every scorecard. The code JevX writes also needs it at runtime, in your app's environment.</li>
+      </ul>
+      <p>To keep keys in a file, put <code>KEY=value</code> lines in it and point to it once:</p>
+      <div class="codebox"><pre class="code">echo 'export JEVX_ENV_FILE="$HOME/path/to/.env"' &gt;&gt; ~/.zshrc
+source ~/.zshrc</pre><button class="copy" type="button">Copy</button></div>
+      <p class="note">Anything you export in your shell always wins over the file. The run's header says where the keys came from, never what they are. Keep that file out of git.</p>
+    </section>
+
+    <section id="run">
+      <h2>What a run does</h2>
+      <ol>
+        <li><b>Index</b>: functions, callers and types, on your machine. Free.</li>
+        <li><b>Read</b>: your AI reads the source files in parts of about 23k tokens, API routes and libraries first, UI last. It names every spot where a rule looks like a judgment. Tests, <code>.d.ts</code> files, UI kits and configs are skipped.</li>
+        <li><b>Re-check</b>: each spot is read again with its surrounding code (callers, types) and exact logic is dropped.</li>
+        <li><b>Score</b>: AI + TypeSafe + patterns, averaged (see <a href="#scorecard">Scorecard</a>).</li>
+        <li><b>Write</b>: for fits at or above your minimum, the smallest change. The old rule becomes a named fallback, callers are updated (e.g. <code>await</code>), and <code>@typesafe-ai/sdk</code> is added.</li>
+        <li><b>Verify</b>: your <code>test</code> script and <code>tsc --noEmit</code> run before and after. If a check that passed now fails, JevX re-applies the changes one at a time and reverts the ones that break it.</li>
+      </ol>
+      <p>Files with your own uncommitted changes are never touched. Backups go to <code>.jevx/backup/</code>, and <code>.jevx/</code> ignores itself in git.</p>
+    </section>
+
+    <section id="commands">
+      <h2>Commands</h2>
+      <div class="table"><table>
+        <thead><tr><th>Command / flag</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>jevx [path]</code></td><td>Run on a folder (default: the current one)</td></tr>
+          <tr><td><code>--dry-run</code></td><td>Preview every fit from 50% with diffs. Writes nothing</td></tr>
+          <tr><td><code>--min-fit &lt;n&gt;</code></td><td>Lowest fit that gets written, 50–100 (default 70)</td></tr>
+          <tr><td><code>--include-possible</code></td><td>Same as <code>--min-fit 50</code></td></tr>
+          <tr><td><code>--include-disagree</code></td><td>Also write fits the sources disagree on, if they reach <code>--min-fit</code></td></tr>
+          <tr><td><code>--provider xai|openrouter</code></td><td>Pick the AI when both keys are set</td></tr>
+          <tr><td><code>--model &lt;id&gt;</code></td><td>Model for that provider (default Grok 4.6 on xAI)</td></tr>
+          <tr><td><code>--max &lt;n&gt;</code></td><td>Most spots to check in depth (default 12)</td></tr>
+          <tr><td><code>--budget &lt;tokens&gt;</code></td><td>Token cap for the run (default 400,000). Half is for reading</td></tr>
+          <tr><td><code>--fast</code></td><td>Less reasoning while reading. Cheaper, may miss spots</td></tr>
+          <tr><td><code>--no-verify</code></td><td>Don't run your tests / typecheck</td></tr>
+          <tr><td><code>--no-install</code></td><td>Don't install <code>@typesafe-ai/sdk</code></td></tr>
+          <tr><td><code>-y, --yes</code></td><td>Don't ask before sending code (for scripts and CI)</td></tr>
+          <tr><td><code>--share</code></td><td>Share anonymous outcomes (see <a href="#privacy">Privacy</a>)</td></tr>
+          <tr><td><code>--report-json &lt;file&gt;</code></td><td>Save the full result as JSON on your machine</td></tr>
+          <tr><td><code>--welcome</code></td><td>Show the JEVX welcome again</td></tr>
+          <tr><td><code>jevx undo [path]</code></td><td>Restore every file the last run changed</td></tr>
+          <tr><td><code>jevx mcp install</code></td><td>Add JevX to Claude Code and Cursor</td></tr>
+          <tr><td><code>jevx mcp</code></td><td>The MCP server itself (editors start it)</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="scorecard">
+      <h2>Scorecard &amp; fit</h2>
+      <p>Every spot gets three independent scores from 0 to 100%:</p>
+      <ul>
+        <li><b>AI</b>: your AI's confidence, after reading the code, that Jev improves this decision.</li>
+        <li><b>TypeSafe</b>: Jev's own opinion. Is it a judgment, are the outcomes bounded, and is exact code <i>not</i> the better tool?</li>
+        <li><b>Patterns</b>: how this spot compares with real Jev projects (8 features such as ambiguity and rule stability), blended with outcomes shared by other users once a pattern has at least 5 of them.</li>
+      </ul>
+      <div class="table"><table>
+        <thead><tr><th>Verdict</th><th>When</th><th>What JevX does</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill">STRONG</span></td><td>Average ≥ 70%, all sources agree</td><td>Writes it</td></tr>
+          <tr><td>POSSIBLE</td><td>Average 50–69%</td><td>Previews it. Writes it with <code>--min-fit</code></td></tr>
+          <tr><td>SOURCES DISAGREE</td><td>Some sources above 50%, some below</td><td>Shows who said what. Writes it only with <code>--include-disagree</code></td></tr>
+          <tr><td>WEAK</td><td>Average under 50%</td><td>Left alone</td></tr>
+        </tbody>
+      </table></div>
+      <p class="muted">The bands are for people, not a proof. The three scores are always shown next to the average.</p>
+    </section>
+
+    <section id="minfit">
+      <h2>Lower fits, on purpose</h2>
+      <p>Some teams want Jev even where the fit is 55–69%. That's fine, as long as it's your call:</p>
+      <div class="codebox"><pre class="code">jevx --dry-run --min-fit 55   <span class="c"># see exactly what would be written</span>
+jevx --min-fit 55             <span class="c"># write it</span></pre><button class="copy" type="button" data-copy="jevx --dry-run --min-fit 55">Copy</button></div>
+      <ul>
+        <li>Below 70, JevX prints a warning before writing.</li>
+        <li>Below 50 it refuses. A fit under 50% means the sources think exact code is better.</li>
+        <li>Your tests still run, breaks are still reverted, and <code>jevx undo</code> still works.</li>
+      </ul>
+    </section>
+
+    <section id="mcp">
+      <h2>Claude Code / Cursor</h2>
+      <div class="codebox"><pre class="code">jevx mcp install</pre><button class="copy" type="button" data-copy="jevx mcp install">Copy</button></div>
+      <p>Restart the editor, open a project and say <i>"use jevx to find where Jev fits in this repo"</i>. The editor's AI uses these tools with its own tokens:</p>
+      <div class="table"><table>
+        <thead><tr><th>Tool</th><th>What it gives the AI</th></tr></thead>
+        <tbody>
+          <tr><td><code>jevx_guide</code></td><td>What a Jev opportunity is (and isn't), and how to write the change</td></tr>
+          <tr><td><code>jevx_scan</code></td><td>Repo summary, where Jev is already used, candidates, and the reading order</td></tr>
+          <tr><td><code>jevx_read</code></td><td>A file, outline, folder, function or the repo overview. Secrets scrubbed</td></tr>
+          <tr><td><code>jevx_related</code></td><td>Callers, callees, types and constants of a function</td></tr>
+          <tr><td><code>jevx_search</code></td><td>Find a function, type or file by name</td></tr>
+          <tr><td><code>jevx_scorecard</code></td><td>Scores a proposal: patterns + AI + TypeSafe</td></tr>
+          <tr><td><code>jevx_preview_change</code></td><td>Red/green diff of a change. Edits nothing</td></tr>
+          <tr><td><code>jevx_report</code></td><td>Writes <code>.jevx/report.html</code></td></tr>
+          <tr><td><code>jevx_share</code></td><td>Opt-in anonymous outcomes (off unless <code>JEVX_SHARE=1</code>)</td></tr>
+        </tbody>
+      </table></div>
+      <p>It changes strong fits by default. Say <i>"use Jev where the fit is at least 55%"</i> to go lower. It never goes under 50%.</p>
+    </section>
+
+    <section id="privacy">
+      <h2>Privacy &amp; data</h2>
+      <h3>Sent to your AI</h3>
+      <p>Your source files, with secrets scrubbed, sent to the provider's official address using your key. Never <code>.env</code> files, tests, builds or <code>node_modules</code>. JevX asks once per provider, and again when what it sends changes.</p>
+      <h3>Stored by JevX: only with <code>--share</code></h3>
+      <p>One anonymous row per checked spot:</p>
+      <ul>
+        <li>The <b>kind</b> of code: e.g. <code>error-message-regex-classifier</code>, the input kind, the rule kind, the code shape in generic words, why Jev fits, and an invented example the rule gets wrong.</li>
+        <li>The three scores, the verdict, your <code>--min-fit</code>, and what happened: changed, reverted by tests, undone, previewed or left.</li>
+      </ul>
+      <p class="note"><b>Never stored:</b> code, file or function names, identifiers, string literals, paths, your repo's name or your keys. The AI is asked to write generic text, and JevX also strips every name it finds in the spot's code <i>before</i> sending. The dataset only accepts inserts: nobody can read it with the key JevX uses.</p>
+      <p>That's how JevX learns which kinds of changes hold up. Outcomes feed back into the patterns score in later releases.</p>
+    </section>
+
+    <section id="config">
+      <h2>Configuration</h2>
+      <div class="table"><table>
+        <thead><tr><th>Variable</th><th>What</th></tr></thead>
+        <tbody>
+          <tr><td><code>XAI_API_KEY</code></td><td>xAI key (Grok)</td></tr>
+          <tr><td><code>OPENROUTER_API_KEY</code></td><td>OpenRouter key</td></tr>
+          <tr><td><code>TYPESAFE_API_KEY</code></td><td>TypeSafe key: scorecards, and at runtime for the changed code</td></tr>
+          <tr><td><code>XAI_MODEL</code> · <code>XAI_TIMEOUT_MS</code></td><td>Model and per-call timeout for xAI</td></tr>
+          <tr><td><code>JEVX_ENV_FILE</code></td><td>A <code>KEY=value</code> file to read keys from (default <code>~/.jevx/.env</code>)</td></tr>
+          <tr><td><code>JEVX_HOME</code></td><td>Where consent and the welcome marker live (default <code>~/.jevx</code>)</td></tr>
+          <tr><td><code>JEVX_SHARE</code></td><td><code>1</code> = always share anonymous outcomes</td></tr>
+          <tr><td><code>JEVX_SUPABASE_URL</code> · <code>JEVX_SUPABASE_ANON_KEY</code></td><td>Where shared outcomes go (insert-only)</td></tr>
+          <tr><td><code>JEVX_ALLOW_CUSTOM_BASE_URL</code></td><td><code>1</code> = allow a custom AI address (off by default, so a stray variable can't redirect your code)</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="trouble">
+      <h2>Troubleshooting</h2>
+      <ul>
+        <li><b>"No AI key found"</b>: the key isn't in <i>this</i> terminal. Exports only apply to the terminal you typed them in. Use <code>JEVX_ENV_FILE</code> or <code>~/.zshrc</code>.</li>
+        <li><b>"TypeSafe not set" although it's in your file</b>: <code>JEVX_ENV_FILE</code> isn't set. The header line <i>Keys</i> should say <code>from … + your shell</code>.</li>
+        <li><b>"No Jev opportunities found"</b>: the result box lists why each spot was left alone. The full answers are in <code>.jevx/debug/</code>. Many apps are mostly UI and plumbing, and zero is a valid answer.</li>
+        <li><b>A part "could not be read (timed out)"</b>: each AI call gets 4 minutes. Try again, or set <code>XAI_TIMEOUT_MS</code>.</li>
+        <li><b>"Stats not shared"</b>: <code>JEVX_SUPABASE_URL</code> / <code>JEVX_SUPABASE_ANON_KEY</code> aren't set in this run.</li>
+        <li><b>Something changed you didn't want</b>: <code>jevx undo</code>, or revert that one change in Source Control.</li>
+      </ul>
+    </section>
+
+    <section id="versions">
+      <h2>Versions</h2>
+      <div>
+        <div class="ver"><header><b>0.4.0</b><span>2026-09-23 · first public release candidate</span></header>
+          <ul>
+            <li>Learns <b>where and why</b> Jev fits: every finding carries a generic pattern. It's shared only with <code>--share</code>, scrubbed in code, and learned outcomes feed the patterns score.</li>
+            <li><code>--min-fit</code> (50–100) and <code>--include-disagree</code>. Warns below 70, refuses below 50.</li>
+            <li>Claude Code / Cursor now match the CLI: a balanced guide, a reading order, the pattern on scorecards, the minimum-fit rule, and <code>jevx_share</code>.</li>
+            <li>A first-run JEVX welcome, <code>--report-json</code>, MIT license, Node ≥ 20.10, and a release check that installs the package into a clean folder.</li>
+          </ul></div>
+        <div class="ver"><header><b>0.3.0</b><span>2026-09-23 · the AI reads your code</span></header>
+          <ul>
+            <li>The AI reads the source itself, part by part. Static analysis only sets the order, and is the fallback if reading fails.</li>
+            <li>Balanced second check: small spots get low scores instead of a flat no.</li>
+            <li>Fixed: AI calls were cut off after 30 s (now 4 minutes). That's why 0.2 found nothing on a real app.</li>
+            <li>POSSIBLE previews, <code>--fast</code>, keys from an env file, <code>.jevx/debug/</code>, and opt-in anonymous outcomes.</li>
+          </ul></div>
+        <div class="ver"><header><b>0.2.0</b><span>2026-09-22 · one command</span></header>
+          <ul>
+            <li><code>jevx</code> finds, judges and changes strong fits. No picking, no accepting.</li>
+            <li>Safety in the tool: the old rule as fallback, callers updated, your uncommitted files skipped, tests before/after with auto-revert, backups and <code>jevx undo</code>.</li>
+            <li><code>--dry-run</code>, <code>jevx mcp install</code>, and terminal scorecards and diffs.</li>
+          </ul></div>
+        <div class="ver"><header><b>0.1.0</b><span>2026-09-22 · MCP server</span></header>
+          <ul><li>JevX as tools for Claude Code / Cursor: scan, read, related, search, a three-source scorecard, red/green preview and an HTML report.</li></ul></div>
+        <div class="ver"><header><b>Research</b><span>2026-09-19 → 09-21 · not released</span></header>
+          <ul>
+            <li>A static decision detector, TypeSafe validation and calibration on real apps.</li>
+            <li>Code analysts on Gemini, OpenRouter and direct xAI, with adaptive repository context.</li>
+            <li>A study of 30 real Jev projects that produced the first pattern profile. Its lesson: patterns alone can't decide where Jev belongs, so an AI must read the code. That became 0.1.</li>
+          </ul></div>
+      </div>
+    </section>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span><b style="color:var(--accent)">JEVX</b> · MIT</span>
+    <span class="btns"><a class="btn" href="index.html">Home</a><a class="btn" href="contributing.html">Contribute</a><a class="btn" href="https://www.npmjs.com/package/jevx">npm</a></span>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

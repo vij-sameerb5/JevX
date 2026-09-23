@@ -6,6 +6,7 @@ import path from "node:path";
 import { createTwoFilesPatch } from "diff";
 import type { Proposal } from "./jev.js";
 import type { FeatureLevels, FeatureMatch, JevAnswers, Scorecard } from "./scorecard.js";
+import type { Pattern } from "./prompts.js";
 
 export interface ProposalRecord {
   id: string;
@@ -19,6 +20,8 @@ export interface ProposalRecord {
   jev?: JevAnswers;
   jevError?: string;
   scorecard: Scorecard;
+  /** Generic kind of code (no names) — what JevX learns from when outcomes are shared. */
+  pattern?: Pattern;
   patch?: string;
   at: string;
 }

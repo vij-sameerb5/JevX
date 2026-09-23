@@ -10,7 +10,7 @@ import type { AdaptiveParse, AdaptiveTurn } from "@jevx/gemini";
 import { FEATURES, LEVELS, type FeatureLevels } from "./scorecard.js";
 import { GUIDE } from "./guide.js";
 
-export const ENGINE_PROMPT_VERSION = "r4";
+export const ENGINE_PROMPT_VERSION = "r5";
 
 type S = Record<string, unknown>;
 const str = (description?: string): S => ({ type: "string", ...(description ? { description } : {}) });
@@ -122,6 +122,21 @@ export function buildSurveyPrompt(overview: string, candidates: SurveyCandidate[
 
 // ─── assess ───
 
+export const INPUT_KINDS = ["user_text", "error_message", "ai_output", "external_api_results", "free_text_name", "structured_app_data", "other"] as const;
+export const RULE_KINDS = ["regex", "keyword_list", "includes_or_startswith", "lookup_with_default", "sort_or_slice", "threshold", "if_else_chain", "switch", "other"] as const;
+
+export const PATTERN_SCHEMA = obj(
+  {
+    label: str("short generic kebab-case slug, e.g. error-message-regex-classifier, free-text-lookup-with-default, api-results-top-n-slice, keyword-intent-router, magic-threshold-on-fuzzy-signal"),
+    input_kind: en(INPUT_KINDS),
+    rule_kind: en(RULE_KINDS),
+    rule_shape: str("one generic sentence on the code shape, e.g. 'catch block → regex on error message → pick user-facing copy'"),
+    why_generic: str("one generic sentence on why Jev would beat the rule (or why the rule is fine)"),
+    failure_example: str("one INVENTED input the rule gets wrong, or empty")
+  },
+  "The spot as a reusable pattern. NO names from this repository: no file, function, variable, product or company names, no string literals copied from the code."
+);
+
 export const ASSESS_SCHEMA = obj({
   is_opportunity: bool("true only if replacing a hardcoded rule here with a Jev decision genuinely improves the software"),
   decision: str("what is decided, one sentence"),
@@ -136,7 +151,8 @@ export const ASSESS_SCHEMA = obj({
   context_sufficient: bool(),
   missing_context: arr(obj({ request: str("a catalog id, or a symbol / file name"), why: str() })),
   context_used: arr(str()),
-  understanding_confidence: en(["low", "medium", "high"])
+  understanding_confidence: en(["low", "medium", "high"]),
+  pattern: PATTERN_SCHEMA
 });
 
 export const ASSESS_SYSTEM = [
@@ -155,6 +171,7 @@ export const ASSESS_SYSTEM = [
   "",
   "Feature levels: semantic_ambiguity, context_dependence, deterministic_expressibility (high = exact rules are fine), judgment_required, rule_stability (low = keeps changing), risk_or_policy_component, natural_language_understanding, decision_complexity.",
   "If you need to see where an input comes from or how the result is used, set context_sufficient=false and list what you need in missing_context (prefer catalog ids). Do not guess.",
+  "Always fill `pattern` (also when is_opportunity=false): it describes the KIND of code in generic words so JevX can learn across projects. Never put names, paths or literals from this repository in it.",
   RULES
 ].join("\n");
 
@@ -327,6 +344,24 @@ export function parseRead(raw: string | undefined, files: Map<string, number>): 
   return { ok: true, analysis: { spots, named: all.length, ...DONE } };
 }
 
+export interface Pattern {
+  label: string;
+  input_kind: (typeof INPUT_KINDS)[number];
+  rule_kind: (typeof RULE_KINDS)[number];
+  rule_shape: string;
+  why_generic: string;
+  failure_example: string;
+}
+
+const oneOf = <T extends readonly string[]>(v: unknown, all: T): T[number] => (all.includes(String(v)) ? (v as T[number]) : ("other" as T[number]));
+
+export function parsePattern(v: unknown): Pattern | undefined {
+  if (!isObj(v)) return undefined;
+  const label = text(v.label, 60).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  if (!label) return undefined;
+  return { label, input_kind: oneOf(v.input_kind, INPUT_KINDS), rule_kind: oneOf(v.rule_kind, RULE_KINDS), rule_shape: text(v.rule_shape, 200), why_generic: text(v.why_generic, 200), failure_example: text(v.failure_example, 200) };
+}
+
 export interface Assessment {
   is_opportunity: boolean;
   decision: string;
@@ -341,6 +376,7 @@ export interface Assessment {
   context_sufficient: boolean;
   missing_context: { request: string; why: string }[];
   understanding_confidence: "low" | "medium" | "high";
+  pattern?: Pattern;
 }
 
 export function parseAssessment(raw: string | undefined): AdaptiveParse<Assessment> {
@@ -367,7 +403,8 @@ export function parseAssessment(raw: string | undefined): AdaptiveParse<Assessme
       missing_context: list(o.missing_context, 8)
         .map((m) => (isObj(m) ? { request: text(m.request, 300), why: text(m.why) } : { request: text(m, 300), why: "" }))
         .filter((m) => m.request),
-      understanding_confidence: ["low", "medium", "high"].includes(String(o.understanding_confidence)) ? (o.understanding_confidence as Assessment["understanding_confidence"]) : "medium"
+      understanding_confidence: ["low", "medium", "high"].includes(String(o.understanding_confidence)) ? (o.understanding_confidence as Assessment["understanding_confidence"]) : "medium",
+      ...(parsePattern(o.pattern) ? { pattern: parsePattern(o.pattern) } : {})
     }
   };
 }

@@ -19,13 +19,24 @@ import { askJev, type Proposal } from "./jev.js";
 import { proposalId, saveProposal, type ProposalRecord } from "./proposals.js";
 import { buildAssessPrompt, buildEditPrompt, buildReadPrompt, parseAssessment, parseEdits, parseRead, type Assessment, type Edit, type EditInputFile, type ReadSpot } from "./prompts.js";
 import { CHARS_PER_TOKEN, planRead, readPriority } from "./read.js";
-import { combine, patternScore, typesafeScore } from "./scorecard.js";
+import { blendPatterns, combine, learnedScore, patternScore, typesafeScore } from "./scorecard.js";
 import { workspace, type Workspace } from "./workspace.js";
 
 export const DEFAULT_MAX_INSPECT = 12;
 /** Spots the reader itself rates below this are not worth a second call. */
 export const MIN_SPOT_CONFIDENCE = 0.5;
 export const DEFAULT_RUN_BUDGET = 400_000;
+/** Default and floor for writing a change. JevX never writes a fit under 50%. */
+export const DEFAULT_MIN_FIT = 0.7;
+export const MIN_FIT_FLOOR = 0.5;
+
+/** Would this fit be written at `minFit`? The AI must call it an opportunity and the average must reach it. */
+export function eligible(o: { status: OpportunityStatus; assessment?: { is_opportunity: boolean }; record?: { scorecard: { average?: number; verdict: string } } }, minFit = DEFAULT_MIN_FIT, includeDisagree = false): boolean {
+  const avg = o.record?.scorecard.average;
+  if (!o.assessment?.is_opportunity || avg === undefined || avg + 1e-9 < Math.max(MIN_FIT_FLOOR, minFit)) return false;
+  if (o.record!.scorecard.verdict === "REVIEW_DISAGREE") return includeDisagree;
+  return o.record!.scorecard.verdict !== "WEAK_FIT";
+}
 /** Per AI call. Reading ~23k tokens with a reasoning model can take minutes; the generic 30 s default is far too short. */
 export const DEFAULT_CALL_TIMEOUT_MS = 240_000;
 
@@ -76,8 +87,10 @@ export interface PipelineOptions {
   readShare?: number;
   /** Reasoning effort for the read step only (`jevx --fast` = "low"). Assess and edit keep the model's default. */
   readEffort?: "low" | "medium" | "high";
-  /** Also write changes for POSSIBLE fits (previews, or `--include-possible`). */
-  editPossible?: boolean;
+  /** Write changes for fits whose average reaches this (0.5–1, default 0.7 = STRONG only). */
+  minFit?: number;
+  /** Also write fits where the sources disagree (REVIEW_DISAGREE), if they reach `minFit`. */
+  includeDisagree?: boolean;
   onEvent?: (e: PipelineEvent) => void;
 }
 
@@ -303,8 +316,9 @@ export async function runPipeline(opts: PipelineOptions): Promise<PipelineResult
     const code = lines.slice(t.unit.start - 1, t.unit.end).join("\n");
     const proposal: Proposal = { decision: as.decision, primitive: as.primitive, question: as.question, outcomes: as.outcomes, state: as.state, deterministic_remainder: as.deterministic_remainder, why: as.why };
     const pat = patternScore(as.features);
+    const learned = learnedScore(as.pattern);
     const jev = await askJev(root, t.file, code, proposal);
-    const card = combine({ patterns: pat.score, ai: as.ai_score, typesafe: jev.ok ? typesafeScore(jev.answers) : undefined });
+    const card = combine({ patterns: blendPatterns(pat.score, learned.score), ai: as.ai_score, typesafe: jev.ok ? typesafeScore(jev.answers) : undefined });
     const record: ProposalRecord = {
       id: t.id,
       file: t.file,
@@ -321,7 +335,7 @@ export async function runPipeline(opts: PipelineOptions): Promise<PipelineResult
     const status: OpportunityStatus = card.verdict === "STRONG_FIT" ? "strong" : card.verdict === "POSSIBLE_FIT" ? "possible" : card.verdict === "REVIEW_DISAGREE" ? "review" : "weak";
     const o: Opportunity = { ...t, status, assessment: as, record };
 
-    if ((status === "strong" || (opts.editPossible && status === "possible")) && !overBudget()) {
+    if (eligible({ status, assessment: as, record }, opts.minFit, opts.includeDisagree) && !overBudget()) {
       opts.onEvent?.({ type: "editing", where: where(t) });
       const files: EditInputFile[] = [{ file: t.file, role: "decision", text: lines.join("\n") }];
       const callers = ws.index.initial({ file: t.file, unit: { name: t.unit.name, start: t.unit.start } }).catalog.filter((r) => r.kind === "caller" && r.file && r.file !== t.file).slice(0, 6);

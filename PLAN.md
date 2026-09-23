@@ -2,7 +2,7 @@
 
 > **Current direction: [docs/CURRENT-ARCHITECTURE.md](docs/CURRENT-ARCHITECTURE.md) (authoritative).** This file has two parts. **Now**, which is current, and **History**, which is kept for context and must not be followed. What was done: [JOURNAL.md](./JOURNAL.md).
 
-_Last updated: 2026-09-23 (Session 29: the AI reads the code itself; opt-in Supabase dataset; 0.3.0)._
+_Last updated: 2026-09-23 (Session 30: 0.4.0 release candidate — patterns dataset, --min-fit, MCP parity, npm packaging, site)._
 
 # Now
 
@@ -21,6 +21,7 @@ _Last updated: 2026-09-23 (Session 29: the AI reads the code itself; opt-in Supa
 ## M6 steps (3-day target)
 
 1. ✅ Day 1 (Session 27): MCP server — tools, scorecard (patterns + AI + TypeSafe), red/green preview, report, demo repo.
+2b. ✅ Session 30: 0.4.0 RC. Remaining before publish: Sameer runs v2 SQL, confirms MIT + GitHub URL, runs docs/MCP-TEST.md in real Claude Code on GlobalCare + 1 other repo, fills docs/BENCHMARK.md for 2–3 repos, deploys site/, records GIFs, then `bash scripts/release-check.sh` → `npm publish`.
 2a. ✅ Session 29: AI full-read replaces the survey; ranked static fallback; env file; `--share` → Supabase (`supabase/jevx-dataset.sql`). Next: GlobalCare benchmark (find checkout errors + flights ranking, leave refunds alone).
 2. ✅ Day 2 (Session 28): `packages/engine` (one engine, two interfaces); autonomous pipeline (survey → assess →
    score → edit, callers included); safe apply (backup, skip the user's uncommitted files, add the SDK, checks

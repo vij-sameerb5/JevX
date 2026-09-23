@@ -14,7 +14,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "eval": "tsx scripts/eval.ts",
-    "corpus": "tsx scripts/corpus.ts"
+    "corpus": "tsx scripts/corpus.ts",
+    "release-check": "bash scripts/release-check.sh",
+    "mcp-smoke": "tsx scripts/mcp-smoke.ts",
+    "export-patterns": "tsx scripts/export-patterns.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

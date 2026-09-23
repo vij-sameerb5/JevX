@@ -14,6 +14,7 @@ import chalk from "chalk";
 import { Command } from "commander";
 import { shareEnabled, shareUndo, undoLast } from "@jevx/engine";
 import { loadEnvFile } from "./env.js";
+import { bigLogo } from "./logo.js";
 import { VERSION } from "./server.js";
 import { run } from "./run.js";
 import { accent, banner, box, dim, ok, warn } from "./ui.js";
@@ -28,6 +29,7 @@ const program = new Command()
   .version(VERSION)
   .argument("[path]", "project folder", ".")
   .option("--dry-run", "show the changes without writing them")
+  .option("--welcome", "show the JEVX welcome again")
   .option("--provider <name>", "xai | openrouter (default: whichever key is set)")
   .option("--model <id>", "model to use with that provider")
   .option("--max <n>", "most places to inspect (default 12)", Number)
@@ -36,10 +38,14 @@ const program = new Command()
   .option("--no-install", "don't install @typesafe-ai/sdk")
   .option("-y, --yes", "don't ask before sending code to the AI")
   .option("--share", "share anonymous outcomes (no code) with the JevX dataset; same as JEVX_SHARE=1")
-  .option("--include-possible", "also write POSSIBLE fits (still tested, still undoable)")
+  .option("--min-fit <percent>", "lowest fit that gets written, 50–100 (default 70 = strong fits only)", Number)
+  .option("--include-possible", "same as --min-fit 50")
+  .option("--include-disagree", "also write fits the sources disagree on, if they reach --min-fit")
+  .option("--report-json <file>", "also write the full result as JSON (stays on your machine)")
   .option("--fast", "less AI reasoning while reading the code (cheaper, may miss spots)")
-  .action(async (p: string, o: { dryRun?: boolean; provider?: string; model?: string; max?: number; budget?: number; verify: boolean; install: boolean; yes?: boolean; share?: boolean; includePossible?: boolean; fast?: boolean }) => {
-    process.exitCode = await run({ root: p, provider: o.provider, model: o.model, max: o.max, budget: o.budget, dryRun: Boolean(o.dryRun), verify: o.verify, install: o.install, yes: Boolean(o.yes), share: o.share, envFile, includePossible: Boolean(o.includePossible), fast: Boolean(o.fast) });
+  .action(async (p: string, o: { welcome?: boolean; dryRun?: boolean; provider?: string; model?: string; max?: number; budget?: number; verify: boolean; install: boolean; yes?: boolean; share?: boolean; minFit?: number; includePossible?: boolean; includeDisagree?: boolean; fast?: boolean; reportJson?: string }) => {
+    if (o.welcome) return log(bigLogo(VERSION));
+    process.exitCode = await run({ root: p, provider: o.provider, model: o.model, max: o.max, budget: o.budget, dryRun: Boolean(o.dryRun), verify: o.verify, install: o.install, yes: Boolean(o.yes), share: o.share, envFile, minFit: o.minFit ?? (o.includePossible ? 50 : undefined), includeDisagree: Boolean(o.includeDisagree), fast: Boolean(o.fast), reportJson: o.reportJson });
   });
 
 program

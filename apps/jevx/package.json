@@ -1,19 +1,35 @@
 {
   "name": "jevx",
-  "version": "0.3.0",
-  "description": "Find where Jev (TypeSafe Noul / Choice / Score) belongs in your codebase, and change it \u2014 from the terminal or from Claude Code / Cursor.",
+  "version": "0.4.0",
+  "description": "Find where Jev (TypeSafe Noul / Choice / Score) fits in your TypeScript / JavaScript codebase, and change it — from the terminal or from Claude Code / Cursor.",
+  "keywords": [
+    "jev",
+    "typesafe",
+    "ai",
+    "refactor",
+    "cli",
+    "mcp",
+    "claude-code",
+    "cursor",
+    "typescript",
+    "code-analysis"
+  ],
+  "license": "MIT",
   "type": "module",
-  "license": "UNLICENSED",
-  "private": true,
   "bin": {
     "jevx": "./dist/index.js"
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=20.10"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsup"

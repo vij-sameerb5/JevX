@@ -67,6 +67,9 @@ actual code. JevX's job is to make that AI good at it, not to replace it.
   mock AI + mock TypeSafe (201 tests total).
 - **Session 29:** AI full-read step, ranked static fallback, env file (`JEVX_ENV_FILE` / `~/.jevx/.env`),
   opt-in Supabase sharing, `jevx-0.3.0.tgz`. 214 tests.
+- **Session 30 (0.4.0 RC):** generic patterns per finding (scrubbed in code) + learned blend; `--min-fit` (floor 50);
+  MCP parity (balanced guide, reading order, `jevx_share`); first-run logo; npm packaging + release check;
+  MCP smoke harness; `site/`. Release path: `docs/RELEASE.md`, `docs/MCP-TEST.md`, `docs/BENCHMARK.md`.
 - **Next:** GlobalCare as benchmark #1 — must find the checkout error classifier and the flights ranking, must
   not touch refund/escrow maths. Then Sameer installs `jevx-0.2.0.tgz` on another laptop and runs `jevx` on 2–3 unrelated TypeScript repos; the benchmark (a corpus project with its real
   Jev call swapped for if/else → does the AI find it? plus a repo with no opportunity → does it say no?).

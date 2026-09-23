@@ -1,81 +1,55 @@
 # jevx
 
-Finds where **Jev** (TypeSafe Noul / Choice / Score) should replace hardcoded rules in your codebase, and makes
-the change. One command, no questions.
+**Find where Jev fits in your codebase — and change it.**
+
+Your code is full of hardcoded rules that are really judgment calls: regexes that guess what an
+error means, keyword lists that guess what a customer wants, `slice(0, 3)` that guesses what's
+best. jevx finds them and replaces them with a Jev decision
+(TypeSafe **noul** yes/no · **choice** · **score**) — keeping the old rule as the fallback.
 
 ```bash
+npm i -g jevx          # or: npx jevx
 cd your-project
-export XAI_API_KEY=…          # your key (or OPENROUTER_API_KEY)
-export TYPESAFE_API_KEY=…     # optional: adds Jev's own opinion to every scorecard
-jevx
+jevx --dry-run         # see what it would change
+jevx                   # change the strong fits, run your tests, undo anytime
 ```
 
+## 60-second start
+
+1. **An AI key of your own** — jevx never ships one:
+   ```bash
+   export XAI_API_KEY=…            # xAI (Grok)   — or OPENROUTER_API_KEY=…
+   export TYPESAFE_API_KEY=…       # optional: Jev's own opinion on every scorecard
+   ```
+   Or put them in a file and point to it once: `export JEVX_ENV_FILE=~/path/to/.env`.
+2. `jevx --dry-run` in your project → scorecards + red/green previews, nothing written.
+3. `jevx` → strong fits are written, your tests run before and after, anything that breaks them
+   is undone automatically. Review in VS Code / Cursor → **Source Control**. `jevx undo` restores all.
+
+## What happens
+
 ```
-  ✓ Indexed 142 files · 12 possible spot(s)          (local, free)
-  ◆ xAI is reading 118 file(s) in 6 part(s)  ~140,000 tokens
-  ✓ xAI found 7 spot(s) worth checking
-  ◆ Writing the change src/routing.ts:8 routeTicket
-  ✓ Checks before: tests pass
-  ! Reverted priorityOf(): tests failed
-
-╭─ #1  routeTicket()  src/routing.ts:8 ─────────────────────╮
-│ AI        ██████████░░  86%                               │
-│ TypeSafe  ███████████░  90%                               │
-│ Patterns  ███████████░  88%                               │
-│ JEV FIT   88%  STRONG  → changed                          │
-╰───────────────────────────────────────────────────────────╯
+index your repo (local, free)
+  → your AI reads the source, logic first, and names every spot that looks like a judgment
+  → it re-checks each spot with the surrounding code and drops exact logic
+  → scorecard: your AI + TypeSafe (Jev itself) + patterns learned from real Jev projects
+  → writes fits ≥ 70% (keeps the old rule as fallback, updates callers, adds @typesafe-ai/sdk)
+  → runs your tests / typecheck before and after; reverts what breaks
 ```
-
-Then open VS Code or Cursor → **Source Control**: every change is there in red/green.
-
-## What it does
-
-1. **Indexes** the repo locally: functions, callers, types. Free.
-2. **Your AI reads your source files**, part by part (logic folders first, UI last), and names every place
-   where a hardcoded rule is really a judgment. Then it re-checks each spot with the surrounding code and
-   throws out the ones that are exact logic.
-3. **Scores** each real one three ways: your AI, TypeSafe/Jev itself, and patterns learned from real Jev
-   projects.
-4. **Changes only STRONG fits** (all sources agree). It keeps the old rule as a fallback, updates callers
-   (e.g. `await` when a function becomes async), and adds `@typesafe-ai/sdk`.
-5. **Runs your checks** (test script, TypeScript) before and after. A change that breaks something that passed
-   before is reverted automatically; the rest stay.
 
 ## Commands
 
 | | |
 | --- | --- |
-| `jevx` | do it |
-| `jevx --dry-run` | show the red/green changes (STRONG and POSSIBLE), write nothing |
-| `jevx --include-possible` | also write POSSIBLE fits (still tested, still undoable) |
-| `jevx --fast` | less AI reasoning while reading (cheaper; may miss spots) |
+| `jevx` | find, judge, change strong fits, test |
+| `jevx --dry-run` | preview everything from 50% fit; write nothing |
+| `jevx --min-fit 55` | also write fits from 55% (50–100; default 70). Under 70 warns, under 50 refused |
+| `jevx --include-disagree` | also write fits the sources disagree on (if they reach `--min-fit`) |
 | `jevx undo` | put back everything the last run changed |
+| `jevx --fast` | less AI reasoning while reading (cheaper, may miss spots) |
+| `jevx --share` | share anonymous outcomes to improve jevx (see Privacy) |
+| `jevx --report-json out.json` | save the full result locally |
 | `jevx mcp install` | use it from Claude Code / Cursor instead (their AI, no key needed) |
-
-## Safety
-
-- **Your key, your AI.** JevX never ships a key. It uses `XAI_API_KEY` or `OPENROUTER_API_KEY` from your
-  environment and never stores or prints it.
-- **Asks once** per provider before sending code. The AI reads your source files with secrets scrubbed;
-  `.env` files, tests, builds and `node_modules` are never sent. On a big repo it reads as much as
-  `--budget` allows (logic first) and tells you the coverage.
-- **Never mixes with your work.** Files with uncommitted changes of yours are skipped.
-- **Undo** restores the originals from `.jevx/backup/`.
-- Custom API addresses are refused unless `JEVX_ALLOW_CUSTOM_BASE_URL=1`.
-
-## Keys in a file
-
-```bash
-export JEVX_ENV_FILE=~/path/to/.env     # or put the file at ~/.jevx/.env
-```
-
-`KEY=value` lines (see `.env.example`). Variables already set in your shell win.
-
-## Sharing outcomes (optional)
-
-`jevx --share` (or `JEVX_SHARE=1`) sends one anonymous row per finding to the JevX dataset: the kind of
-decision, the scores, and what happened (changed / reverted by tests / undone). **No code, paths, file or
-function names.** It's how JevX learns which suggestions hold up.
 
 ## Claude Code / Cursor
 
@@ -83,10 +57,28 @@ function names.** It's how JevX learns which suggestions hold up.
 jevx mcp install
 ```
 
-Restart the editor and say *"use jevx to find where Jev fits in this repo"*. The editor's AI does the work with
-JevX's tools and makes the changes itself, so they appear as its usual inline red/green.
+Restart the editor and say *"use jevx to find where Jev fits in this repo"*. The editor's AI
+reads your code with jevx's tools, scores each spot and makes the changes itself — you see them
+as its usual inline red/green. Say *"use Jev where the fit is at least 55%"* to go lower.
+
+## Privacy
+
+- **Sent to your AI** (xAI / OpenRouter, your key): your source files, secrets scrubbed. Never
+  `.env` files, tests, builds or `node_modules`. You're asked once per provider.
+- **Stored by jevx** (only with `--share`): one anonymous row per finding — the *kind* of code
+  (e.g. "regex on an error message"), why Jev fits, the scores and what happened. **Never** code,
+  file or function names, paths, string literals or your repo's name — scrubbed in code before
+  sending. The dataset accepts inserts only; nobody can read it with the public key.
+- `.jevx/` in your project holds backups, the report and debug output. It ignores itself in git.
 
 ## Cost
 
-A 50-file app takes about 15–25 AI calls on your key (~$0.50 with Grok 4.6). The run stops at
-`--budget` tokens (default 400,000).
+About 15–25 AI calls for a 50-file app (~$0.50–0.90 with Grok 4.6), on your key. The run stops at
+`--budget` tokens (default 400,000). Changed code calls Jev at runtime: set `TYPESAFE_API_KEY` in
+your app's environment.
+
+## Requirements
+
+Node ≥ 20.10 · a TypeScript or JavaScript project · macOS, Linux or Windows.
+
+MIT · [changelog](./CHANGELOG.md)

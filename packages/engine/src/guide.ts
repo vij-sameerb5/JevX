@@ -7,36 +7,48 @@ Jev (TypeSafe) answers bounded judgment questions about messy input:
 - choice → pick one option from a known list ("which team should handle this ticket?")
 - score  → rate on a graded scale ("how urgent is this, 0–3?")
 
-A Jev opportunity is a place where code APPROXIMATES a judgment with a hardcoded rule:
-keyword lists, regexes over human text, long if/else chains guessing intent, magic thresholds
-standing in for "is this good / risky / relevant / urgent", brittle heuristics that miss
-paraphrases or new cases. The outcomes are bounded (a label, a route, yes/no, a level).
+A Jev opportunity is a place where code APPROXIMATES a judgment with a hardcoded rule over messy
+or open-ended input (text people write, error messages from other systems, AI output, results
+from an external API, free-text names), with bounded outcomes (a label, a route, yes/no, a level).
+The old rule stays as the fallback when Jev fails, so an added network call is not a reason to
+say no — reflect it in your score instead.
 
-NOT a Jev opportunity — say so and move on:
-arithmetic, parsing, protocol/status handling, exact lookups, validation of formats, typed enum
-dispatch, money / security / legal rules that must stay exact, anything already using Jev.
-Most decision-looking code is ordinary exact logic. Rejecting candidates is a correct answer.
+Look for these:
+- regex / keyword / includes() / startsWith() checks that sort free text into categories
+- try/catch blocks that read an error message's text to decide what to tell the user
+- lookup tables keyed by free text with a default when the text doesn't match exactly
+- \`.sort()\` / \`.slice(0, n)\` / \`.find()\` over external results when the best pick depends on
+  the user's situation, not a fixed order
+- magic thresholds or weights on fuzzy signals deciding risk, quality, urgency, relevance
+- if/else or switch chains guessing intent, category, sentiment, urgency or eligibility
+
+NOT a Jev opportunity (exact logic — say so): arithmetic; money, balances, payments, refunds,
+escrow; status / state machines over the app's own values; auth and permissions; validating
+formats; parsing structured data; typed enum dispatch; UI layout and styling; anything already
+using Jev. Small or cosmetic decisions can still be opportunities — score them low (0.4–0.6)
+instead of rejecting them.
 
 ## Workflow
 
-1. \`jevx_scan\` — repository summary, the static candidates JevX found (free, local), and where
-   Jev is already used. Candidates are only a starting list: static analysis finds SHAPES
-   (functions choosing between outcomes), not meaning.
-2. Read before judging. Use \`jevx_read\` (a function, file, outline, folder or the repo overview),
-   \`jevx_related\` (callers, callees, types, constants of a function) and \`jevx_search\`.
-   Understand where the input comes from, what the outcomes mean, and how the result is used.
-3. Look for opportunities static analysis MISSED: read the repo overview and the modules that hold
-   the product's core behaviour (routing, triage, moderation, ranking, review, recommendations,
-   agents, game AI…). Any function works — it does not need to be on the candidate list.
-4. For each real opportunity call \`jevx_scorecard\` with your proposal, the 8 feature levels and
-   your own score. JevX adds the patterns score and Jev's own opinion and averages them.
-5. Do NOT ask the user to pick or approve. For every STRONG_FIT, make the change directly with your
-   own edit tool — including every caller that must change — so the editor shows it in red/green.
-   Leave POSSIBLE_FIT, REVIEW_DISAGREE and WEAK_FIT untouched.
-6. Run the project's tests (and typecheck). If a change breaks something that passed before,
+1. \`jevx_scan\` — repository summary, where Jev is already used, the static candidates, and the
+   READING ORDER of the source files (logic folders first, UI last). The candidates are only a
+   starting list: static analysis finds shapes, not meaning.
+2. Read the source yourself, in that order, with \`jevx_read\` ("file:<path>"). Use
+   \`jevx_related\` (callers, callees, types) and \`jevx_search\` to understand where an input comes
+   from and how the result is used. Any line can be a spot — it does not need to be a candidate.
+3. For each real opportunity call \`jevx_scorecard\` with your proposal, the 8 feature levels, your
+   own score and the generic \`pattern\` (what KIND of code it is, with no names from this repo).
+   JevX adds the patterns score and Jev's own opinion and averages them.
+4. Do NOT ask the user to pick or approve. Change every STRONG_FIT (70%+, all sources agree)
+   directly with your own edit tool — including every caller that must change — so the editor
+   shows it in red/green. If the user stated a minimum fit (e.g. "use Jev where the fit is at
+   least 55%"), change every fit at or above it instead — but NEVER below 50%, and a
+   REVIEW_DISAGREE fit only if the user explicitly allowed disagreeing fits. Leave the rest.
+5. Run the project's tests (and typecheck). If a change breaks something that passed before,
    revert that change and keep the others.
-7. Call \`jevx_report\`, then tell the user in a few lines: what changed (with scores), what was left
-   alone and why, and that every change is visible in Source Control / the diff view.
+6. Call \`jevx_report\`. If the user opted in to sharing (JEVX_SHARE=1), call \`jevx_share\` with
+   the ids you changed. Then tell the user in a few lines: what changed (with scores), what was
+   left alone and why, and that every change is visible in Source Control / the diff view.
    (\`jevx_preview_change\` is there if you want a diff before editing; it changes nothing.)
 
 ## Writing the change
