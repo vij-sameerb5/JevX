@@ -4,9 +4,11 @@
 //
 // Nothing here edits source files. Writes go only to <root>/.jevx/ (proposals, patches, report,
 // caches). Network: only jevx_scorecard, and only to TypeSafe when TYPESAFE_API_KEY is set.
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { hasApiKey } from "@jevx/typesafe";
 import { z } from "zod";
 import {
   FEATURES,
@@ -14,6 +16,11 @@ import {
   LEVELS,
   PROFILE,
   INPUT_KINDS,
+  MIN_FIT_FLOOR,
+  applyOpportunities,
+  assertProjectRoot,
+  selfIgnore,
+  undoLast,
   RULE_KINDS,
   allProposals,
   askJev,
@@ -45,17 +52,32 @@ const MAX_TEXT = 60_000;
 
 const text = (s: string) => ({ content: [{ type: "text" as const, text: s.length > MAX_TEXT ? `${s.slice(0, MAX_TEXT)}\n… (truncated at ${MAX_TEXT} characters — read a narrower item)` : s }] });
 const fail = (s: string) => ({ content: [{ type: "text" as const, text: `Error: ${s}` }], isError: true });
-const rootArg = z.string().optional().describe("Repository root. Default: JEVX_ROOT or the server's working directory.");
+const rootArg = z.string().optional().describe("Absolute path of the project folder. Default: JEVX_ROOT or the server's working directory. In Claude Desktop (no project open), always pass it.");
 const relFile = (root: string, file: string) => path.relative(root, path.resolve(root, file)).split(path.sep).join("/");
+const sha = (t: string) => createHash("sha256").update(t).digest("hex");
+/** The project folder for a tool call — never "/" or the home folder (Claude Desktop starts servers in "/"). */
+const projectRoot = (root?: string) => {
+  const r = assertProjectRoot(resolveRoot(root));
+  selfIgnore(r);
+  return r;
+};
+const typesafeStatus = () =>
+  hasApiKey()
+    ? "TypeSafe: connected — scorecards include Jev's own opinion."
+    : "TypeSafe: NOT configured — scorecards use 2 of 3 sources (patterns + AI). To add it: Claude Desktop → Settings → Extensions → JevX → Configure; other apps: TYPESAFE_API_KEY in the file JEVX_ENV_FILE points to. Say so in your summary.";
+const JEVX_ONLY = "Writes only to <root>/.jevx/ (JevX's own git-ignored folder) and never touches source files, so it is fine to call even when the user asked for no changes.";
 
 export function createServer(): McpServer {
-  const server = new McpServer({ name: "jevx", version: VERSION }, { instructions: "JevX finds where TypeSafe Jev (Noul / Choice / Score) would improve a codebase. Start with jevx_guide, then jevx_scan." });
+  const server = new McpServer(
+    { name: "jevx", version: VERSION },
+    { instructions: "JevX finds where TypeSafe Jev (Noul / Choice / Score) would improve a codebase. Start with jevx_guide, then jevx_scan. If no project folder is open (e.g. Claude Desktop), ask the user which folder and pass it as `root` on every call." }
+  );
 
   server.registerTool(
     "jevx_guide",
     {
       title: "How to find Jev opportunities",
-      description: "Read this first. Explains what a Jev opportunity is (and is not), the workflow with the other jevx tools, how to write the Jev change, and the scorecard inputs.",
+      description: "Read-only. Read this first. Explains what a Jev opportunity is (and is not), the workflow with the other jevx tools, how to write the Jev change, and the scorecard inputs.",
       inputSchema: {},
       annotations: { readOnlyHint: true, openWorldHint: false }
     },
@@ -67,7 +89,7 @@ export function createServer(): McpServer {
     {
       title: "Scan the repository",
       description:
-        "Local, free, no AI: indexes the repository and lists the functions static analysis thinks MIGHT hold a decision (a starting list, not a verdict), plus where Jev is already used. Returns ids to pass to jevx_read.",
+        "Read-only, local, free, no AI: indexes the repository and lists the functions static analysis thinks MIGHT hold a decision (a starting list, not a verdict), plus where Jev is already used. Returns ids to pass to jevx_read.",
       inputSchema: {
         root: rootArg,
         limit: z.number().int().min(1).max(300).optional().describe("Max candidates to list (default 60)."),
@@ -82,7 +104,8 @@ export function createServer(): McpServer {
         const lines: string[] = [];
         lines.push(`JevX scan · ${ws.root}`);
         lines.push(`${ws.files.length} files · ${a.candidates.length} candidate decision(s) · ${a.filtered.length} ruled out as exact logic · ${ws.jev.stats.decisionSites} existing Jev decision(s)`);
-        lines.push(`Read the repository overview with jevx_read id "repo:overview".`, "");
+        lines.push(typesafeStatus());
+        lines.push(`Read the repository overview with jevx_read id "repo:overview". Read several files per call with jevx_read ids: [...] (up to 20).`, "");
         if (ws.jev.sites.length) {
           lines.push("Already using Jev (do not re-propose these):");
           for (const s of ws.jev.sites.filter((x) => x.role === "decision")) lines.push(`  ${s.file}:${s.unit.start} ${s.unit.name} — ${s.questions.map((q) => q.primitive + (q.key ? `:${q.key}` : "")).join(", ")}`);
@@ -113,16 +136,29 @@ export function createServer(): McpServer {
     {
       title: "Read code from the repository",
       description:
-        'Read one item by id: "repo:overview" (package, README head, tree, exports), "file:<path>", "outline:<path>" (imports + signatures), "module:<folder>" (outlines of a folder), "unit:<path>#<name>@<line>" (a function), or any id returned by jevx_related / jevx_search. Secrets are scrubbed.',
-      inputSchema: { root: rootArg, id: z.string().describe('e.g. "repo:overview", "file:src/router.ts", "unit:src/router.ts#route@12"') },
+        'Read-only. Read items by id — one (`id`) or up to 20 at once (`ids`, preferred: fewer calls, fewer approvals): "repo:overview" (package, README head, tree, exports), "file:<path>", "outline:<path>" (imports + signatures), "module:<folder>" (outlines of a folder), "unit:<path>#<name>@<line>" (a function), or any id returned by jevx_related / jevx_search. Secrets are scrubbed. Writes nothing.',
+      inputSchema: {
+        root: rootArg,
+        id: z.string().optional().describe('e.g. "repo:overview", "file:src/router.ts", "unit:src/router.ts#route@12"'),
+        ids: z.array(z.string()).max(20).optional().describe("Several ids in one call, e.g. the next files of the reading order.")
+      },
       annotations: { readOnlyHint: true, openWorldHint: false }
     },
-    async ({ root, id }) => {
+    async ({ root, id, ids }) => {
       try {
         const ws = await workspace(root);
-        const item = ws.index.resolve(id.trim());
-        if (!item) return fail(`nothing found for "${id}". Use jevx_search, or an id from jevx_scan / jevx_related.`);
-        return text(`${item.title}\n${item.text}`);
+        const wanted = [...(id ? [id] : []), ...(ids ?? [])].map((x) => x.trim()).filter(Boolean);
+        if (!wanted.length) return fail("pass id or ids");
+        if (wanted.length === 1) {
+          const item = ws.index.resolve(wanted[0]!);
+          if (!item) return fail(`nothing found for "${wanted[0]}". Use jevx_search, or an id from jevx_scan / jevx_related.`);
+          return text(`${item.title}\n${item.text}`);
+        }
+        const parts = wanted.map((w) => {
+          const item = ws.index.resolve(w);
+          return item ? `=== [${w}] ${item.title} ===\n${item.text}` : `=== [${w}] not found (use jevx_search) ===`;
+        });
+        return text(parts.join("\n\n"));
       } catch (e) {
         return fail(e instanceof Error ? e.message : String(e));
       }
@@ -133,7 +169,7 @@ export function createServer(): McpServer {
     "jevx_related",
     {
       title: "What a function connects to",
-      description: "For the function starting at <file>:<line>: its callees, callers, the types and constants it uses, files that import its file, its folder and the repo overview — as ids for jevx_read.",
+      description: "Read-only. For the function starting at <file>:<line>: its callees, callers, the types and constants it uses, files that import its file, its folder and the repo overview — as ids for jevx_read.",
       inputSchema: { root: rootArg, file: z.string(), line: z.number().int().min(1).describe("The line the function starts on."), name: z.string().optional() },
       annotations: { readOnlyHint: true, openWorldHint: false }
     },
@@ -154,7 +190,7 @@ export function createServer(): McpServer {
     "jevx_search",
     {
       title: "Search the repository",
-      description: "Find functions, types, constants or files by name or description. Returns ids for jevx_read.",
+      description: "Read-only. Find functions, types, constants or files by name or description. Returns ids for jevx_read.",
       inputSchema: { root: rootArg, query: z.string(), limit: z.number().int().min(1).max(30).optional() },
       annotations: { readOnlyHint: true, openWorldHint: false }
     },
@@ -176,7 +212,7 @@ export function createServer(): McpServer {
     {
       title: "Score a proposed Jev decision",
       description:
-        "Scores ONE proposed Jev decision three ways — patterns (how it compares with real Jev sites JevX studied), your AI score, and TypeSafe (Jev's own opinion, needs TYPESAFE_API_KEY) — and averages them. Saves the proposal to .jevx/proposals and updates .jevx/report.html. Changes no source code. Call before jevx_preview_change.",
+        `Scores ONE proposed Jev decision three ways — patterns (how it compares with real Jev sites JevX studied), your AI score, and TypeSafe (Jev's own opinion, needs TYPESAFE_API_KEY) — and averages them. Saves the proposal to .jevx/proposals and updates .jevx/report.html. ${JEVX_ONLY} Call before jevx_preview_change.`,
       inputSchema: {
         root: rootArg,
         file: z.string(),
@@ -208,7 +244,7 @@ export function createServer(): McpServer {
     },
     async (args) => {
       try {
-        const root = resolveRoot(args.root);
+        const root = projectRoot(args.root);
         const file = relFile(root, args.file);
         const src = readFileSync(path.join(root, file), "utf8").split("\n");
         if (args.end_line < args.start_line || args.end_line > src.length) return fail(`lines ${args.start_line}-${args.end_line} are outside ${file} (${src.length} lines)`);
@@ -252,7 +288,7 @@ export function createServer(): McpServer {
           `Patterns: ${pat.matches.map((m) => `${m.feature}=${m.level} (${m.looksLike === "jev" ? "like Jev sites" : m.looksLike === "deterministic" ? "like exact code" : "in between"})`).join(", ") || "no features given"}.`,
           jev.ok
             ? `TypeSafe: judgment ${jev.answers.judgment.toFixed(2)}, bounded ${jev.answers.bounded.toFixed(2)}, exact code still right ${jev.answers.deterministicIsCorrect.toFixed(2)}, suggests ${jev.answers.primitive} (${jev.answers.category})${jev.cached ? " · cached" : ""}.`
-            : `TypeSafe: ${jev.error}`,
+            : `TypeSafe: unavailable (${jev.error}) — this score uses 2 of 3 sources (patterns + AI), not three.`,
           jev.ok && jev.answers.primitive !== args.primitive && jev.answers.primitive !== "none" ? `Note: Jev would use ${jev.answers.primitive}, you proposed ${args.primitive}.` : "",
           `Learned profile: ${PROFILE.from.jevSites} Jev sites and ${PROFILE.from.deterministicDecisions} deterministic decisions from ${PROFILE.from.projects} projects — a small pilot.${learned.basis ? ` Shared outcomes: ${learned.basis}.` : ""}`,
           "",
@@ -270,7 +306,7 @@ export function createServer(): McpServer {
     {
       title: "Preview the Jev change (red/green diff)",
       description:
-        "Shows the exact change as a red/green unified diff: lines start_line..end_line of the file replaced with new_code. DOES NOT modify the file. Saves the patch to .jevx/proposals and the report. Show the diff to the user; apply it with your own edit tool only after they agree.",
+        `Shows the exact change as a red/green unified diff: lines start_line..end_line of the file replaced with new_code. DOES NOT modify the file. ${JEVX_ONLY} Apply it with your own edit tool — or, if you have none (e.g. Claude Desktop), with jevx_apply.`,
       inputSchema: {
         root: rootArg,
         file: z.string(),
@@ -283,7 +319,7 @@ export function createServer(): McpServer {
     },
     async (args) => {
       try {
-        const root = resolveRoot(args.root);
+        const root = projectRoot(args.root);
         const file = relFile(root, args.file);
         let { patch, added, removed } = previewDiff(root, file, args.start_line, args.end_line, args.new_code);
         if (args.imports?.trim()) {
@@ -298,9 +334,16 @@ export function createServer(): McpServer {
           added = ls.filter((l) => l.startsWith("+") && !l.startsWith("+++")).length;
           removed = ls.filter((l) => l.startsWith("-") && !l.startsWith("---")).length;
         }
+        const before = readFileSync(path.join(root, file), "utf8");
+        const bl = before.split("\n");
+        const body = [...bl.slice(0, args.start_line - 1), ...args.new_code.replace(/\n$/, "").split("\n"), ...bl.slice(args.end_line)];
+        if (args.imports?.trim()) {
+          const lastImport = body.reduce((last, l, i) => (/^\s*import\s/.test(l) ? i : last), -1);
+          body.splice(lastImport + 1, 0, ...args.imports.trim().split("\n"));
+        }
         const id = proposalId(file, args.start_line);
         const rec = loadProposal(root, id);
-        if (rec) saveProposal(root, { ...rec, patch });
+        if (rec) saveProposal(root, { ...rec, patch, change: { file, beforeSha: sha(before), after: body.join("\n") } });
         else writeReport(root);
         return text(
           [
@@ -312,7 +355,7 @@ export function createServer(): McpServer {
             "",
             rec ? `Scorecard: ${rec.scorecard.verdict} · average ${typeof rec.scorecard.average === "number" ? Math.round(rec.scorecard.average * 100) + "%" : "—"}.` : "No scorecard for this location yet — run jevx_scorecard first so the user can judge the fit.",
             `Saved to .jevx/proposals/${id}.patch · report: .jevx/report.html`,
-            "Apply it with your edit tool only after the user agrees, then run the tests."
+            "Apply it with your own edit tool (then run the tests), or call jevx_apply with this id if you can't edit files."
           ].join("\n")
         );
       } catch (e) {
@@ -325,12 +368,17 @@ export function createServer(): McpServer {
     "jevx_report",
     {
       title: "Write the JevX report",
-      description: "Writes .jevx/report.html (every scorecard with its red/green diff) and returns a summary table of all proposals.",
+      description: `Writes .jevx/report.html (every scorecard with its red/green diff) and returns a summary table of all proposals. ${JEVX_ONLY}`,
       inputSchema: { root: rootArg },
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }
     },
     async ({ root }) => {
-      const r = resolveRoot(root);
+      let r: string;
+      try {
+        r = projectRoot(root);
+      } catch (e) {
+        return fail(e instanceof Error ? e.message : String(e));
+      }
       const f = writeReport(r);
       const rows = allProposals(r).map(
         (p) =>
@@ -350,6 +398,67 @@ export function createServer(): McpServer {
   );
 
   server.registerTool(
+    "jevx_apply",
+    {
+      title: "Apply a previewed change",
+      description:
+        "For AI apps that cannot edit files themselves (e.g. Claude Desktop): writes a change previewed with jevx_preview_change. Refuses fits under 50% and files you (or the user) changed since the preview, skips files with uncommitted edits, backs up, runs the project's tests / typecheck before and after and reverts the change if it breaks them. Undo with jevx_undo.",
+      inputSchema: { root: rootArg, id: z.string().describe("Proposal id from jevx_preview_change / jevx_report."), run_checks: z.boolean().optional().describe("Run the project's tests / typecheck before and after (default true).") },
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false }
+    },
+    async ({ root, id, run_checks }) => {
+      try {
+        const r = projectRoot(root);
+        const rec = loadProposal(r, id);
+        if (!rec) return fail(`no proposal "${id}" — score it with jevx_scorecard first`);
+        if (!rec.change) return fail(`nothing previewed for "${id}" — call jevx_preview_change first`);
+        if ((rec.scorecard.average ?? 0) + 1e-9 < MIN_FIT_FLOOR) return fail(`fit ${Math.round((rec.scorecard.average ?? 0) * 100)}% — JevX never writes a fit under 50%`);
+        const current = readFileSync(path.join(r, rec.change.file), "utf8");
+        if (sha(current) !== rec.change.beforeSha) return fail(`${rec.change.file} changed since the preview — preview it again`);
+        const res = applyOpportunities({
+          root: r,
+          runId: `mcp-${new Date().toISOString().replace(/[:.]/g, "-")}`,
+          opportunities: [{ id, file: rec.change.file, unit: { name: "", start: rec.startLine, end: rec.endLine }, origin: "ai", status: "strong", edits: [{ file: rec.change.file, find: current, replace: rec.change.after }] }],
+          verify: run_checks !== false,
+          install: false
+        });
+        const checks = (xs: { name: string; ok: boolean }[]) => xs.map((c) => `${c.name} ${c.ok ? "pass" : "fail"}`).join(" · ") || "none found";
+        if (res.changed.length)
+          return text(
+            [
+              `Applied ${id} to ${rec.change.file}.`,
+              `Checks before: ${checks(res.checks.baseline)} · after: ${checks(res.checks.after)}`,
+              res.dependency?.added ? "Added @typesafe-ai/sdk to package.json — run the project's install (npm / pnpm install)." : "",
+              "Undo with jevx_undo (or `jevx undo` in a terminal). The change shows in the editor's Source Control."
+            ].filter(Boolean).join("\n")
+          );
+        const why = res.reverted[0]?.reason ?? res.skipped[0]?.reason ?? "not applied";
+        return text(`Not applied: ${why}. Nothing was left changed.`);
+      } catch (e) {
+        return fail(e instanceof Error ? e.message : String(e));
+      }
+    }
+  );
+
+  server.registerTool(
+    "jevx_undo",
+    {
+      title: "Undo the last JevX change",
+      description: "Restores every file the last jevx_apply (or `jevx` run) changed in this project, from JevX's backup.",
+      inputSchema: { root: rootArg },
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false }
+    },
+    async ({ root }) => {
+      try {
+        const u = undoLast(projectRoot(root));
+        return text(u.runId ? `Restored ${u.files.length} file(s): ${u.files.join(", ")}` : "Nothing to undo.");
+      } catch (e) {
+        return fail(e instanceof Error ? e.message : String(e));
+      }
+    }
+  );
+
+  server.registerTool(
     "jevx_share",
     {
       title: "Share anonymous outcomes (opt-in)",
@@ -364,7 +473,7 @@ export function createServer(): McpServer {
     },
     async ({ root, changed, min_fit }) => {
       if (!shareEnabled()) return text("Sharing is off (JEVX_SHARE is not 1). Nothing was sent.");
-      const r = resolveRoot(root);
+      const r = projectRoot(root);
       const recs = allProposals(r);
       const verdictStatus: Record<string, Opportunity["status"]> = { STRONG_FIT: "strong", POSSIBLE_FIT: "possible", REVIEW_DISAGREE: "review", WEAK_FIT: "weak" };
       const opportunities: Opportunity[] = recs.map((p) => ({

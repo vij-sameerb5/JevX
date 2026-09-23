@@ -3,6 +3,7 @@
 // the AI navigates through. Reloaded when any tracked file changes on disk (the user's AI edits
 // files between calls), so nothing the AI reads is stale.
 import { statSync } from "node:fs";
+import { homedir } from "node:os";
 import path from "node:path";
 import { RepoIndex, analyzeProject, findJevUsage } from "@jevx/analyzer";
 import { DEFAULT_EXCLUDE, DEFAULT_INCLUDE, type AnalysisResult, type JevUsageReport } from "@jevx/core";
@@ -36,8 +37,15 @@ export function resolveRoot(root?: string): string {
   return path.resolve(root?.trim() || process.env.JEVX_ROOT?.trim() || process.cwd());
 }
 
+/** Refuse to index a disk root or the home folder (Claude Desktop starts servers in "/"). */
+export function assertProjectRoot(root: string): string {
+  const r = path.resolve(root);
+  if (r === path.parse(r).root || r === path.resolve(homedir())) throw new Error(`"${r}" is not a project folder. Pass the project's path as root, e.g. "${path.join(homedir(), "code", "my-app")}".`);
+  return r;
+}
+
 export async function workspace(rootArg?: string, force = false): Promise<Workspace> {
-  const root = resolveRoot(rootArg);
+  const root = assertProjectRoot(resolveRoot(rootArg));
   const hit = cache.get(root);
   if (hit && !force && fingerprintOf(root, hit.files) === hit.fingerprint) return hit;
   const scanned = await scanProject({ root, include: DEFAULT_INCLUDE, exclude: DEFAULT_EXCLUDE });

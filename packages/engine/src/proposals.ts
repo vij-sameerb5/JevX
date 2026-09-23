@@ -23,6 +23,8 @@ export interface ProposalRecord {
   /** Generic kind of code (no names) — what JevX learns from when outcomes are shared. */
   pattern?: Pattern;
   patch?: string;
+  /** The previewed change, so an MCP client without its own edit tool can apply it (jevx_apply). */
+  change?: { file: string; beforeSha: string; after: string };
   at: string;
 }
 

@@ -3,7 +3,7 @@
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 import chalk from "chalk";
-import { DEFAULT_MIN_FIT, MIN_FIT_FLOOR, applyOpportunities, eligible, runPipeline, shareEnabled, shareRun, writeReport, type Opportunity } from "@jevx/engine";
+import { DEFAULT_MIN_FIT, MIN_FIT_FLOOR, applyOpportunities, assertProjectRoot, eligible, runPipeline, shareEnabled, shareRun, writeReport, type Opportunity } from "@jevx/engine";
 import { hasApiKey } from "@jevx/typesafe";
 import { askYesNo, chooseAi, hasConsent, saveConsent } from "./ai.js";
 import { bigLogo, firstRun } from "./logo.js";
@@ -38,6 +38,12 @@ const n = (x: number) => x.toLocaleString("en-US");
 export async function run(f: RunFlags): Promise<number> {
   const root = path.resolve(f.root);
   log(firstRun() ? bigLogo(VERSION) : banner());
+  try {
+    assertProjectRoot(root);
+  } catch (e) {
+    log(chalk.red(`\n  ${e instanceof Error ? e.message : String(e)} Run jevx inside a project folder.\n`));
+    return 1;
+  }
   const minPct = f.minFit ?? DEFAULT_MIN_FIT * 100;
   if (!Number.isFinite(minPct) || minPct < MIN_FIT_FLOOR * 100 || minPct > 100) {
     log(chalk.red(`\n  --min-fit must be between ${MIN_FIT_FLOOR * 100} and 100. JevX never writes a fit under ${MIN_FIT_FLOOR * 100}%.\n`));

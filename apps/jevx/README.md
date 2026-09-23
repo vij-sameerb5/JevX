@@ -49,17 +49,32 @@ index your repo (local, free)
 | `jevx --fast` | less AI reasoning while reading (cheaper, may miss spots) |
 | `jevx --share` | share anonymous outcomes to improve jevx (see Privacy) |
 | `jevx --report-json out.json` | save the full result locally |
-| `jevx mcp install` | use it from Claude Code / Cursor instead (their AI, no key needed) |
+| `jevx mcp install` | use it from Claude Code, Claude Desktop, Cursor, … instead (their AI, no key needed) |
 
-## Claude Code / Cursor
+## Claude Code, Claude Desktop, Cursor & more
 
 ```bash
-jevx mcp install
+jevx mcp install        # jevx mcp uninstall removes it again
 ```
 
-Restart the editor and say *"use jevx to find where Jev fits in this repo"*. The editor's AI
-reads your code with jevx's tools, scores each spot and makes the changes itself — you see them
-as its usual inline red/green. Say *"use Jev where the fit is at least 55%"* to go lower.
+Adds JevX to every supported app on this machine: **Claude Code, Claude Desktop, Cursor, Windsurf,
+VS Code (Copilot), Gemini CLI and Codex** (each config is backed up once; nothing else in it is
+touched). Restart the app and say *"use jevx to find where Jev fits in this repo"*. The app's AI
+reads your code with jevx's tools, scores each spot and makes the changes — or, where it can't edit
+files (Claude Desktop), applies them with `jevx_apply`: backup, tests before/after, auto-revert.
+Say *"use Jev where the fit is at least 55%"* to go lower.
+
+**Claude Desktop, one click:** double-click `jevx.mcpb` (or Settings → Extensions → Advanced settings →
+Install Extension), pick your project folder, and paste your TypeSafe key if you have one (Claude Desktop
+stores it as a secret). In chat, name other folders: *"…in ~/code/my-app"*.
+
+- The **"not verified by Anthropic"** warning is expected: JevX isn't in Anthropic's reviewed directory
+  yet. The bundle is open source (this repo), MIT, contains no keys, and is built by `pnpm build-mcpb`
+  with a content check — build it yourself if you prefer.
+- **Approvals:** Claude Desktop asks per tool. Choose **Always allow** for the read-only tools
+  (`jevx_guide`, `jevx_scan`, `jevx_read`, `jevx_search`, `jevx_related`) — they never write or send
+  anything. Keep asking for `jevx_apply` / `jevx_undo`, which change files. `jevx_read` reads up to 20
+  files per call, so a scan needs few approvals.
 
 ## Privacy
 

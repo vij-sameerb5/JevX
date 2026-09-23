@@ -6,7 +6,6 @@
 //   jevx mcp install      let Claude Code / Cursor do it with the AI you already use
 //   jevx mcp              the MCP server itself (what Claude Code / Cursor start)
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +14,7 @@ import { Command } from "commander";
 import { shareEnabled, shareUndo, undoLast } from "@jevx/engine";
 import { loadEnvFile } from "./env.js";
 import { bigLogo } from "./logo.js";
+import { installAll, launchers, realClaude, uninstallAll, type InstallContext, type Outcome } from "./install.js";
 import { VERSION } from "./server.js";
 import { run } from "./run.js";
 import { accent, banner, box, dim, ok, warn } from "./ui.js";
@@ -71,55 +71,63 @@ const mcp = program
 
 mcp
   .command("install")
-  .description("add JevX to Claude Code and Cursor")
+  .description("add JevX to Claude Code, Claude Desktop, Cursor, Windsurf, VS Code, Gemini CLI and Codex")
   .action(() => {
-    log(banner());
-    // Prefer the installed `jevx` command; fall back to this exact file.
-    let command = "jevx";
-    let args = ["mcp"];
-    try {
-      execFileSync(process.platform === "win32" ? "where" : "which", ["jevx"], { stdio: "ignore" });
-    } catch {
-      command = process.execPath;
-      args = [fileURLToPath(import.meta.url), "mcp"];
-    }
-    let any = false;
-    // Claude Code
-    try {
-      execFileSync("claude", ["mcp", "remove", "--scope", "user", "jevx"], { stdio: "ignore" });
-    } catch {
-      /* not there yet */
-    }
-    try {
-      execFileSync("claude", ["mcp", "add", "--scope", "user", "jevx", "--", command, ...args], { stdio: "ignore" });
-      log(ok("Claude Code — added for every project"));
-      any = true;
-    } catch {
-      log(dim("  ○ Claude Code not found (skipped)"));
-    }
-    // Cursor
-    const cursorDir = path.join(homedir(), ".cursor");
-    if (existsSync(cursorDir)) {
-      const f = path.join(cursorDir, "mcp.json");
-      let cfg: { mcpServers?: Record<string, unknown> } = {};
-      try {
-        if (existsSync(f)) cfg = JSON.parse(readFileSync(f, "utf8")) as typeof cfg;
-      } catch {
-        return log(warn(`${f} is not valid JSON — add JevX by hand: "jevx": { "command": "${command}", "args": ${JSON.stringify(args)} }`));
-      }
-      cfg.mcpServers = { ...(cfg.mcpServers ?? {}), jevx: { command, args } };
-      mkdirSync(cursorDir, { recursive: true });
-      writeFileSync(f, JSON.stringify(cfg, null, 2) + "\n");
-      log(ok("Cursor — added for every project"));
-      any = true;
-    } else log(dim("  ○ Cursor not found (skipped)"));
+    log(bigLogo(VERSION));
+    const results = installAll(context());
+    report(results, "added");
+    const added = results.filter((r) => r.status === "added" || r.status === "unchanged");
+    const { gui } = launchers(scriptPath(), false);
     log("");
     log(
-      any
-        ? box([`Restart Claude Code / Cursor, open any project and say:`, accent(`  "use jevx to find where Jev fits in this repo"`), "", dim("Optional: set TYPESAFE_API_KEY so scorecards include Jev's own opinion.")], "READY")
-        : box(["Neither Claude Code nor Cursor was found.", `Add this MCP server by hand: command ${chalk.bold(command)} args ${chalk.bold(args.join(" "))}`], "JEVX")
+      added.length
+        ? box(
+            [
+              `Restart the app(s) above, open a project and say:`,
+              accent(`  "use jevx to find where Jev fits in this repo"`),
+              "",
+              dim("Claude Desktop: say which folder, e.g. \"…in ~/code/my-app\" — or install jevx.mcpb to pick it once."),
+              dim("Optional: TYPESAFE_API_KEY (in your JEVX_ENV_FILE) adds Jev's own opinion to scorecards."),
+              dim(`Any other MCP app: command ${gui.command}  args ${gui.args.join(" ")}`)
+            ],
+            "READY"
+          )
+        : box(["No supported AI app found.", `Add this MCP server by hand: command ${chalk.bold(gui.command)} args ${chalk.bold(gui.args.join(" "))}`], "JEVX")
     );
   });
+
+mcp
+  .command("uninstall")
+  .description("remove JevX from every AI app it was added to")
+  .action(() => {
+    log(banner());
+    report(uninstallAll(context()), "removed");
+  });
+
+function scriptPath(): string {
+  return fileURLToPath(import.meta.url);
+}
+
+function context(): InstallContext {
+  let onPath = false;
+  try {
+    execFileSync(process.platform === "win32" ? "where" : "which", ["jevx"], { stdio: "ignore" });
+    onPath = true;
+  } catch {
+    /* running from a checkout */
+  }
+  const { gui, cli } = launchers(scriptPath(), onPath);
+  return { home: homedir(), platform: process.platform, appData: process.env.APPDATA, gui, cli, claude: realClaude };
+}
+
+function report(results: Outcome[], verb: string) {
+  for (const r of results) {
+    if (r.status === "added" || r.status === "removed") log(ok(`${r.app} — ${verb}`));
+    else if (r.status === "unchanged") log(ok(`${r.app} — already set`));
+    else if (r.status === "skipped") log(warn(`${r.app} — ${r.detail}`));
+    else log(dim(`  ○ ${r.app} not found`));
+  }
+}
 
 program.parseAsync(process.argv).catch((err: unknown) => {
   process.stderr.write(chalk.red(`jevx: ${err instanceof Error ? err.message : String(err)}\n`));

@@ -20,6 +20,7 @@
       <a class="hide-sm" href="#commands">Commands</a>
       <a href="docs.html">Docs</a>
       <a href="contributing.html">Contribute</a>
+      <a href="https://github.com/vij-sameerb5/JevX">GitHub</a>
       <a href="https://www.npmjs.com/package/jevx">npm</a>
     </nav>
   </div>
@@ -33,7 +34,7 @@
     <div class="btns">
       <a class="btn primary" href="#install">Install <code>npm i -g jevx</code></a>
       <a class="btn" href="docs.html">Read the docs</a>
-      <a class="btn" href="contributing.html#repo">GitHub <span class="muted">· soon</span></a>
+      <a class="btn" href="https://github.com/vij-sameerb5/JevX">GitHub</a>
     </div>
     <div class="install"><span>$ <b>npx jevx --dry-run</b></span><button class="copy" type="button" data-copy="npx jevx --dry-run">Copy</button></div>
 
@@ -110,9 +111,9 @@ async function failureKind(msg) {
     <div style="margin-top:28px; max-width:560px">
       <div class="card" aria-label="Example scorecard">
         <div class="row"><span>AI</span><span class="bar"><i style="width:61%"></i></span><span>61%</span></div>
-        <div class="row"><span>TypeSafe</span><span class="bar"><i style="width:76%"></i></span><span>76%</span></div>
+        <div class="row"><span>TypeSafe</span><span class="bar"><i style="width:63%"></i></span><span>63%</span></div>
         <div class="row"><span>Patterns</span><span class="bar"><i style="width:69%"></i></span><span>69%</span></div>
-        <div class="row fit"><span>JEV FIT</span><span>68% <span class="pill">POSSIBLE</span></span><span></span></div>
+        <div class="row fit"><span>JEV FIT</span><span>64% <span class="pill">POSSIBLE</span></span><span></span></div>
       </div>
       <p class="muted" style="margin-top:8px; font-size:0.9rem">A real scorecard from a Next.js checkout. It's under 70%, so it's previewed, not written, unless you ask with <code>--min-fit</code>.</p>
     </div>
@@ -144,17 +145,20 @@ jevx undo</pre><button class="copy" type="button" data-copy="jevx --dry-run">Cop
 
   <section class="block wrap" id="mcp">
     <div class="block-head">
-      <span class="eyebrow">Claude Code · Cursor</span>
-      <h2>Or let your editor's AI do it.</h2>
-      <p>JevX is also an MCP server. Your editor's AI reads the code with JevX's tools and its own tokens. JevX adds the Jev know-how, the scorecard and the diffs. No JevX key needed.</p>
+      <span class="eyebrow">Claude Code · Claude Desktop · Cursor · more</span>
+      <h2>Or let the AI you already use do it.</h2>
+      <p>JevX is also an MCP server. Your AI reads the code with JevX's tools and its own tokens. JevX adds the Jev know-how, the scorecard, the diffs and a safe apply. No JevX key needed. One command adds it to Claude Code, Claude Desktop, Cursor, Windsurf, VS Code, Gemini CLI and Codex.</p>
     </div>
     <div class="cols">
       <div class="codebox"><pre class="code">jevx mcp install
 <span class="c"># restart Claude Code / Cursor, then say:</span>
-<span class="o">use jevx to find where Jev fits in this repo</span></pre><button class="copy" type="button" data-copy="jevx mcp install">Copy</button></div>
+<span class="o">use jevx to find where Jev fits in this repo</span>
+
+<span class="c"># Claude Desktop: or double-click jevx.mcpb</span>
+<span class="c"># and pick your project folder once</span></pre><button class="copy" type="button" data-copy="jevx mcp install">Copy</button></div>
       <div>
-        <h3>9 tools</h3>
-        <p><code>jevx_guide</code>, <code>jevx_scan</code> (with a reading order), <code>jevx_read</code>, <code>jevx_related</code>, <code>jevx_search</code>, <code>jevx_scorecard</code>, <code>jevx_preview_change</code>, <code>jevx_report</code> and the opt-in <code>jevx_share</code>.</p>
+        <h3>11 tools</h3>
+        <p><code>jevx_guide</code>, <code>jevx_scan</code> (with a reading order), <code>jevx_read</code>, <code>jevx_related</code>, <code>jevx_search</code>, <code>jevx_scorecard</code>, <code>jevx_preview_change</code>, <code>jevx_apply</code> and <code>jevx_undo</code> for apps that can't edit files, <code>jevx_report</code>, and the opt-in <code>jevx_share</code>.</p>
         <p>Say <i>"use Jev where the fit is at least 55%"</i> to go lower. It never goes under 50%.</p>
       </div>
     </div>
@@ -197,7 +201,7 @@ jevx --dry-run</pre><button class="copy" type="button" data-copy="npm i -g jevx"
           <tr><td><code>jevx --fast</code></td><td>Less AI reasoning while reading. Cheaper, may miss spots</td></tr>
           <tr><td><code>jevx --share</code></td><td>Share anonymous outcomes to improve JevX (opt-in)</td></tr>
           <tr><td><code>jevx --report-json out.json</code></td><td>Save the full result on your machine</td></tr>
-          <tr><td><code>jevx mcp install</code></td><td>Add JevX to Claude Code and Cursor</td></tr>
+          <tr><td><code>jevx mcp install</code></td><td>Add JevX to every AI app on this machine (<code>uninstall</code> removes it)</td></tr>
           <tr><td><code>jevx --welcome</code></td><td>Show the JEVX welcome again</td></tr>
         </tbody>
       </table>
@@ -235,7 +239,7 @@ jevx --dry-run</pre><button class="copy" type="button" data-copy="npm i -g jevx"
       <table>
         <thead><tr><th>Spot</th><th>Verdict</th><th>Why</th></tr></thead>
         <tbody>
-          <tr><td><code>checkout/page.tsx</code> wallet errors</td><td><span class="pill">68% POSSIBLE</span></td><td>Error text varies by wallet; regexes miss new wordings</td></tr>
+          <tr><td><code>checkout/page.tsx</code> wallet errors</td><td><span class="pill">64% POSSIBLE</span></td><td>Error text varies by wallet; regexes miss new wordings</td></tr>
           <tr><td><code>countryImages.ts</code> free-text lookup</td><td>49% disagree</td><td>Real, but cosmetic</td></tr>
           <tr><td><code>JourneyTicket.tsx</code> airport code</td><td>45% disagree</td><td>A real bug, but a proper airport lookup fixes it better</td></tr>
           <tr><td>flights / hotels <code>slice(0, n)</code></td><td>left alone</td><td>Google already ranks them, and there's no patient data to judge with</td></tr>
@@ -249,7 +253,7 @@ jevx --dry-run</pre><button class="copy" type="button" data-copy="npm i -g jevx"
 <footer>
   <div class="wrap">
     <span><b style="color:var(--accent)">JEVX</b> · Find where Jev fits in your codebase · MIT</span>
-    <span class="btns"><a class="btn" href="contributing.html#repo">GitHub <span class="muted">· soon</span></a><a class="btn" href="https://www.npmjs.com/package/jevx">npm</a><a class="btn" href="docs.html#versions">Changelog</a></span>
+    <span class="btns"><a class="btn" href="https://github.com/vij-sameerb5/JevX">GitHub</a><a class="btn" href="https://www.npmjs.com/package/jevx">npm</a><a class="btn" href="docs.html#versions">Changelog</a></span>
   </div>
 </footer>
 

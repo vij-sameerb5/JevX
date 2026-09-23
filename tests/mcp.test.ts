@@ -75,7 +75,7 @@ afterAll(async () => {
 describe("jevx-mcp over stdio", () => {
   it("exposes the tools and the prompt an AI needs", async () => {
     const tools = (await client.listTools()).tools.map((t) => t.name).sort();
-    expect(tools).toEqual(["jevx_guide", "jevx_preview_change", "jevx_read", "jevx_related", "jevx_report", "jevx_scan", "jevx_scorecard", "jevx_search", "jevx_share"]);
+    expect(tools).toEqual(["jevx_apply", "jevx_guide", "jevx_preview_change", "jevx_read", "jevx_related", "jevx_report", "jevx_scan", "jevx_scorecard", "jevx_search", "jevx_share", "jevx_undo"]);
     const prompts = (await client.listPrompts()).prompts.map((p) => p.name);
     expect(prompts).toContain("find-jev-opportunities");
     const g = await call("jevx_guide");
@@ -114,8 +114,8 @@ describe("jevx-mcp over stdio", () => {
     expect(r.isError).toBe(false);
     expect(r.text).toMatch(/patterns +█+░* 88%/);
     expect(r.text).toMatch(/AI +█+░* 85%/);
-    expect(r.text).toMatch(/TypeSafe +█+░* 90%/);
-    expect(r.text).toMatch(/average .* 88%.*STRONG_FIT/);
+    expect(r.text).toMatch(/TypeSafe +█+░* 81%/);
+    expect(r.text).toMatch(/average .* 85%.*STRONG_FIT/);
     expect(r.text).toMatch(/TypeSafe: judgment 0\.90, bounded 0\.90, exact code still right 0\.10, suggests choice \(routing\)/);
     expect(ts.calls.filter((c) => c.path === "/v1/systemone")).toHaveLength(1);
     const sent = ts.calls.at(-1)!.body!.state as unknown as Record<string, unknown>;
@@ -170,13 +170,13 @@ describe("jevx-mcp over stdio", () => {
     expect(r.text).toMatch(/^-export function routeTicket\(t: Ticket\): Team \{$/m);
     expect(r.text).toMatch(/^\+export async function routeTicket\(t: Ticket\): Promise<Team> \{$/m);
     expect(r.text).toMatch(/^\+import \{ TypeSafeClient, choice \} from "@typesafe-ai\/sdk";$/m);
-    expect(r.text).toMatch(/Scorecard: STRONG_FIT · average 88%/);
+    expect(r.text).toMatch(/Scorecard: STRONG_FIT · average 85%/);
     expect(readFileSync(path.join(repo, "src/routing.ts"), "utf8")).toBe(before);
     expect(readFileSync(path.join(repo, ".jevx/proposals/src_routing.ts_L7.patch"), "utf8")).toMatch(/\+\s+return answers\.team\.choice;/);
     const html = readFileSync(path.join(repo, ".jevx/report.html"), "utf8");
     expect(html).toMatch(/class="ln add">\+export async function routeTicket/);
     expect(html).toMatch(/class="ln del">-export function routeTicket/);
-    expect(html).toMatch(/Strong fit · 88%/);
+    expect(html).toMatch(/Strong fit · 85%/);
     expect(html).toMatch(/Sources disagree/);
   });
 
@@ -194,10 +194,35 @@ describe("jevx-mcp over stdio", () => {
     expect(sh.text).toMatch(/Sharing is off/);
   });
 
+  it("jevx_apply writes a previewed change (tests before/after), refuses stale previews, and jevx_undo restores", async () => {
+    const before = readFileSync(path.join(repo, "src/routing.ts"), "utf8");
+    await call("jevx_scorecard", {
+      file: "src/routing.ts", start_line: 8, end_line: 14, decision: "Which team.", primitive: "choice", question: "Which team?", outcomes: ["billing", "technical"], state: ["body"],
+      deterministic_remainder: "", why: "keywords", features: { judgment_required: "high", semantic_ambiguity: "high", natural_language_understanding: "high" }, ai_score: 0.9, ai_reasons: "x"
+    });
+    const lines = before.split("\n");
+    await call("jevx_preview_change", { file: "src/routing.ts", start_line: 8, end_line: 8, new_code: `${lines[7]} // applied by jevx_apply` });
+    const a = await call("jevx_apply", { id: "src_routing.ts_L8" });
+    expect(a.isError).toBe(false);
+    expect(a.text).toMatch(/Applied src_routing\.ts_L8/);
+    expect(readFileSync(path.join(repo, "src/routing.ts"), "utf8")).toMatch(/applied by jevx_apply/);
+    const again = await call("jevx_apply", { id: "src_routing.ts_L8" });
+    expect(again.text).toMatch(/changed since the preview/);
+    const u = await call("jevx_undo");
+    expect(u.text).toMatch(/Restored \d file\(s\): src\/routing\.ts/);
+    expect(readFileSync(path.join(repo, "src/routing.ts"), "utf8")).toBe(before);
+  });
+
+  it("refuses to index / or the home folder", async () => {
+    const r = await call("jevx_scan", { root: "/" });
+    expect(r.isError).toBe(true);
+    expect(r.text).toMatch(/is not a project folder/);
+  });
+
   it("report summarises every proposal with its three scores", async () => {
     const r = await call("jevx_report");
-    expect(r.text).toMatch(/\| src\/routing\.ts:7 \| choice \| 88% \| 85% \| 90% \| \*\*88%\*\* \| STRONG_FIT \| yes \|/);
-    expect(r.text).toMatch(/\| src\/billing\.ts:15 \| choice \| 0% \| 70% \| 37% \| \*\*36%\*\* \| REVIEW_DISAGREE \| — \|/);
+    expect(r.text).toMatch(/\| src\/routing\.ts:7 \| choice \| 88% \| 85% \| 81% \| \*\*85%\*\* \| STRONG_FIT \| yes \|/);
+    expect(r.text).toMatch(/\| src\/billing\.ts:15 \| choice \| 0% \| 70% \| 9% \| \*\*26%\*\* \| REVIEW_DISAGREE \| — \|/);
   });
 
   it("rejects line ranges outside the file instead of guessing", async () => {
@@ -217,8 +242,10 @@ describe("scorecard maths", () => {
   });
 
   it("TypeSafe score rewards judgment and bounded outcomes, penalises 'exact code is right'", () => {
-    expect(typesafeScore({ judgment: 0.9, bounded: 0.9, deterministicIsCorrect: 0.1, primitive: "choice", primitiveConfidence: 0.8, category: "routing" })).toBeCloseTo(0.9);
-    expect(typesafeScore({ judgment: 0.1, bounded: 0.9, deterministicIsCorrect: 0.9, primitive: "none", primitiveConfidence: 0.8, category: "other" })).toBeCloseTo(0.3667, 3);
+    expect(typesafeScore({ judgment: 0.9, bounded: 0.9, deterministicIsCorrect: 0.1, primitive: "choice", primitiveConfidence: 0.8, category: "routing" })).toBeCloseTo(0.81);
+    expect(typesafeScore({ judgment: 0.1, bounded: 0.9, deterministicIsCorrect: 0.9, primitive: "none", primitiveConfidence: 0.8, category: "other" })).toBeCloseTo(0.09, 3);
+    // the GlobalCare status→colour map: bounded but no judgment — must not read as a fit any more (was 62%)
+    expect(typesafeScore({ judgment: 0.07, bounded: 0.98, deterministicIsCorrect: 0.19, primitive: "choice", primitiveConfidence: 0.5, category: "ui" })).toBeLessThan(0.5);
   });
 
   it("averages what is available, says what is missing, and flags disagreement", () => {

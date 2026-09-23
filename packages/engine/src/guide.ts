@@ -25,8 +25,8 @@ Look for these:
 NOT a Jev opportunity (exact logic — say so): arithmetic; money, balances, payments, refunds,
 escrow; status / state machines over the app's own values; auth and permissions; validating
 formats; parsing structured data; typed enum dispatch; UI layout and styling; anything already
-using Jev. Small or cosmetic decisions can still be opportunities — score them low (0.4–0.6)
-instead of rejecting them.
+using Jev. Small or cosmetic decisions can still be opportunities — score them low instead of
+rejecting them (see the ai_score scale below).
 
 ## Workflow
 
@@ -44,6 +44,9 @@ instead of rejecting them.
    shows it in red/green. If the user stated a minimum fit (e.g. "use Jev where the fit is at
    least 55%"), change every fit at or above it instead — but NEVER below 50%, and a
    REVIEW_DISAGREE fit only if the user explicitly allowed disagreeing fits. Leave the rest.
+   No edit tool (e.g. Claude Desktop)? Call \`jevx_preview_change\` and then \`jevx_apply\` with the
+   proposal id: it backs up, runs the tests and reverts on failure; \`jevx_undo\` restores.
+   No project open? Ask the user which folder and pass it as \`root\` on every call.
 5. Run the project's tests (and typecheck). If a change breaks something that passed before,
    revert that change and keep the others.
 6. Call \`jevx_report\`. If the user opted in to sharing (JEVX_SHARE=1), call \`jevx_share\` with
@@ -102,5 +105,9 @@ export async function routeTicket(t: Ticket): Promise<Team> {
 - decision_complexity: how many things weigh on the outcome?
 
 \`ai_score\` — 0 to 1: your own confidence that replacing this rule with Jev genuinely improves
-the software. Be honest; low scores are useful. Say why in \`ai_reasons\`.
+the software. Use the whole scale (the bands are 70%+ strong, 50–69% possible):
+0.9 = like real Jev uses — people's free text (or other messy input) is judged, the rule visibly
+fails on real inputs, outcomes are bounded · 0.7 = a clear improvement, the rule misses cases users
+actually hit · 0.5 = plausible but small, or the rule mostly works · 0.3 = exact rules would do with
+a little work · 0.1 = exact logic. Say why in \`ai_reasons\`.
 `;

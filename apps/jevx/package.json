@@ -15,6 +15,16 @@
     "code-analysis"
   ],
   "license": "MIT",
+  "author": "Sameer Shaik",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vij-sameerb5/JevX.git",
+    "directory": "apps/jevx"
+  },
+  "homepage": "https://github.com/vij-sameerb5/JevX#readme",
+  "bugs": {
+    "url": "https://github.com/vij-sameerb5/JevX/issues"
+  },
   "type": "module",
   "bin": {
     "jevx": "./dist/index.js"

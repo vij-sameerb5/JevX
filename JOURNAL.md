@@ -7,6 +7,69 @@
 
 ---
 
+## 2026-09-23 — Session 32: scorecard calibrated on real data; fewer approvals; privacy proven by tests
+
+- **Claude Desktop (.mcpb) works:** it shows 11 tools and scanned a real repo. Seen there:
+  - the "not verified by Anthropic" warning (expected for any custom extension; documented, never hidden)
+  - an approval prompt for every tool
+  - TypeSafe missing
+  - no spot ≥ 70% (paytm 33–65%, GlobalCare 42–68%)
+- **Analysis** (docs/SCORECARD.md), using the saved GlobalCare proposals and the Layer E pilot records:
+  - Real Jev sites score 88–100% on patterns and 84–90% STRONG with AI 0.8.
+  - Deterministic neighbours score 0–13%.
+  - Real-app spots are genuinely weaker: TypeSafe judgment was ≤ 0.26 for all but the checkout classifier.
+  - TypeSafe's "bounded" was ≈ 0.97 for everything, controls included, adding a free ~0.25, which caused the
+    status-chip false positive and fake disagreement flags.
+  - The AI prompt said "be conservative" without anchors.
+  - The 70% bar was hand-set and is kept.
+- **Changes:**
+  - `typesafeScore = bounded × (0.6·judgment + 0.4·(1−exactIsRight))`
+  - AI score rubric 0.1–0.9 in the assess prompt (r6), the guide and the scorecard tool
+  - `jevx_read ids[]` (up to 20)
+  - read-only labels on tools and in the manifest
+  - the scan shows TypeSafe status; the scorecard says "2 of 3 sources" when TypeSafe is missing
+  - the `.mcpb` build refuses personal files, `.env`, `dataset/`, local paths and keys
+  - docs on the warning, signing and directory submission
+- **Tests:**
+  - `tests/fixtures/scorecard-calibration.json` holds 12 known + 8 observed cases (features and scores only)
+  - `scorecard-calibration.test.ts` (6)
+  - `mcp-privacy.test.ts` (3): read-only tools write and send nothing even with sharing on; only jevx_share sends
+- 243 tests, release check green, `.mcpb` rebuilt.
+
+## 2026-09-23 — Session 31: every AI app, Claude Desktop (.mcpb), apply/undo tools, public repo hygiene
+
+- **Sameer's real Claude Code test on GlobalCare passed.** Claude Code called jevx 8 times with TypeSafe on:
+  - flights 57% POSSIBLE; hotels 54%, countryImage 49% and journey stage 42%, all sources disagreeing
+  - refund 18% WEAK: the control was correctly rejected
+  - status-chip colour 22%: TypeSafe alone said 62% ("bounded" 0.98 with no judgment) — a false positive
+  - Claude first hesitated to call scorecard/report because they write `.jevx/`.
+- **Fixes:**
+  - `typesafeScore` = 0.5·judgment + 0.25·bounded + 0.25·(1−exact-is-right), so the status chip drops under 50%.
+  - The tool descriptions now say "writes only to .jevx/ … fine when the user asked for no changes".
+- **`jevx mcp install`** (new `apps/jevx/src/install.ts`):
+  - Covers Claude Code (CLI), Claude Desktop, Cursor, Windsurf, VS Code (`servers`, type stdio), Gemini CLI
+    and Codex (TOML).
+  - Backs each config up once, skips broken JSON, and uses absolute node+script for GUI apps.
+  - Only `JEVX_ENV_FILE` is passed on, never keys. `jevx mcp uninstall` removes it.
+  - Shows the big orange logo.
+- **Claude Desktop:**
+  - `scripts/build-mcpb.mjs` makes `jevx-0.4.0.mcpb` (8.8 MB, validated with @anthropic-ai/mcpb 2.1.2), with a
+    project-folder picker and a sensitive TypeSafe key.
+  - `mcp.ts` strips unfilled `${user_config.*}` placeholders.
+  - `assertProjectRoot` refuses `/` and the home folder (Desktop starts servers in `/`).
+  - A simulated Desktop launch passes.
+- **New MCP tools `jevx_apply` / `jevx_undo`**, for apps without an edit tool:
+  - apply a previewed change via applyOpportunities (backup, checks before/after, revert)
+  - refuse under 50% and stale previews (sha check)
+- **Repo hygiene:**
+  - `pnpm dev` = the new CLI welcome; the old research CLI moved to `pnpm lab`.
+  - The public root README was rewritten.
+  - `.gitignore` now hides the personal notes (BLUEPRINT, CLAUDE, COMMUNITY-NOTES, REBOOT-AUDIT, JOURNAL, PLAN,
+    internal docs), `dataset/` (other people's code from the corpus), build outputs, `_to_delete/` and
+    `Claude outputs/`.
+  - GitHub URL https://github.com/vij-sameerb5/JevX added to the package, site, README and CONTRIBUTING.
+- 234 tests; release check passes (11 MCP tools).
+
 ## 2026-09-23 — Session 30: 0.4.0 release candidate (A–E, branding, MCP test, site)
 
 - **A · patterns dataset:** the assess step now returns a generic `pattern` (label, input_kind, rule_kind,

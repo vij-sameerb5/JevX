@@ -19,6 +19,7 @@
       <a href="index.html">Home</a>
       <a href="docs.html" aria-current="page">Docs</a>
       <a href="contributing.html">Contribute</a>
+      <a href="https://github.com/vij-sameerb5/JevX">GitHub</a>
       <a href="https://www.npmjs.com/package/jevx">npm</a>
     </nav>
   </div>
@@ -34,7 +35,7 @@
     <a href="#commands">Commands</a>
     <a href="#scorecard">Scorecard &amp; fit</a>
     <a href="#minfit">Lower fits</a>
-    <a href="#mcp">Claude Code / Cursor</a>
+    <a href="#mcp">MCP: Claude &amp; more</a>
     <b>Reference</b>
     <a href="#privacy">Privacy &amp; data</a>
     <a href="#config">Configuration</a>
@@ -105,7 +106,8 @@ source ~/.zshrc</pre><button class="copy" type="button">Copy</button></div>
           <tr><td><code>--report-json &lt;file&gt;</code></td><td>Save the full result as JSON on your machine</td></tr>
           <tr><td><code>--welcome</code></td><td>Show the JEVX welcome again</td></tr>
           <tr><td><code>jevx undo [path]</code></td><td>Restore every file the last run changed</td></tr>
-          <tr><td><code>jevx mcp install</code></td><td>Add JevX to Claude Code and Cursor</td></tr>
+          <tr><td><code>jevx mcp install</code></td><td>Add JevX to Claude Code, Claude Desktop, Cursor, Windsurf, VS Code, Gemini CLI and Codex</td></tr>
+          <tr><td><code>jevx mcp uninstall</code></td><td>Remove it from all of them</td></tr>
           <tr><td><code>jevx mcp</code></td><td>The MCP server itself (editors start it)</td></tr>
         </tbody>
       </table></div>
@@ -144,9 +146,12 @@ jevx --min-fit 55             <span class="c"># write it</span></pre><button cla
     </section>
 
     <section id="mcp">
-      <h2>Claude Code / Cursor</h2>
+      <h2>MCP: Claude Code, Claude Desktop &amp; more</h2>
       <div class="codebox"><pre class="code">jevx mcp install</pre><button class="copy" type="button" data-copy="jevx mcp install">Copy</button></div>
-      <p>Restart the editor, open a project and say <i>"use jevx to find where Jev fits in this repo"</i>. The editor's AI uses these tools with its own tokens:</p>
+      <p>It finds and configures every supported app on your machine: <b>Claude Code, Claude Desktop, Cursor, Windsurf, VS Code (Copilot), Gemini CLI and Codex</b>. Each config file is backed up once, and anything else in it is left alone. Restart the app, open a project and say <i>"use jevx to find where Jev fits in this repo"</i>.</p>
+      <p><b>Claude Desktop:</b> it has no open project, so name the folder (<i>"…in ~/code/my-app"</i>). Or install <code>jevx.mcpb</code>: double-click it, pick your project folder once, and optionally paste your TypeSafe key. Claude Desktop stores the key, not JevX. It can't edit files itself, so it uses <code>jevx_apply</code>, which backs up, runs your tests and reverts on failure.</p>
+      <p><b>Any other MCP app:</b> the install output prints the command and arguments to paste.</p>
+      <p>The AI uses these tools with its own tokens:</p>
       <div class="table"><table>
         <thead><tr><th>Tool</th><th>What it gives the AI</th></tr></thead>
         <tbody>
@@ -157,6 +162,8 @@ jevx --min-fit 55             <span class="c"># write it</span></pre><button cla
           <tr><td><code>jevx_search</code></td><td>Find a function, type or file by name</td></tr>
           <tr><td><code>jevx_scorecard</code></td><td>Scores a proposal: patterns + AI + TypeSafe</td></tr>
           <tr><td><code>jevx_preview_change</code></td><td>Red/green diff of a change. Edits nothing</td></tr>
+          <tr><td><code>jevx_apply</code></td><td>Apply a previewed change: backup, tests before/after, auto-revert. Never under 50%</td></tr>
+          <tr><td><code>jevx_undo</code></td><td>Restore what the last change touched</td></tr>
           <tr><td><code>jevx_report</code></td><td>Writes <code>.jevx/report.html</code></td></tr>
           <tr><td><code>jevx_share</code></td><td>Opt-in anonymous outcomes (off unless <code>JEVX_SHARE=1</code>)</td></tr>
         </tbody>
@@ -216,6 +223,8 @@ jevx --min-fit 55             <span class="c"># write it</span></pre><button cla
             <li>Learns <b>where and why</b> Jev fits: every finding carries a generic pattern. It's shared only with <code>--share</code>, scrubbed in code, and learned outcomes feed the patterns score.</li>
             <li><code>--min-fit</code> (50–100) and <code>--include-disagree</code>. Warns below 70, refuses below 50.</li>
             <li>Claude Code / Cursor now match the CLI: a balanced guide, a reading order, the pattern on scorecards, the minimum-fit rule, and <code>jevx_share</code>.</li>
+            <li><code>jevx mcp install</code> covers Claude Desktop, Windsurf, VS Code, Gemini CLI and Codex too. There's also a one-click <code>jevx.mcpb</code> for Claude Desktop, plus <code>jevx_apply</code> and <code>jevx_undo</code> for apps that can't edit files.</li>
+            <li>The TypeSafe score now weights judgment double, so fixed mappings no longer look like fits.</li>
             <li>A first-run JEVX welcome, <code>--report-json</code>, MIT license, Node ≥ 20.10, and a release check that installs the package into a clean folder.</li>
           </ul></div>
         <div class="ver"><header><b>0.3.0</b><span>2026-09-23 · the AI reads your code</span></header>

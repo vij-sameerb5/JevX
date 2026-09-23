@@ -10,7 +10,7 @@ import type { AdaptiveParse, AdaptiveTurn } from "@jevx/gemini";
 import { FEATURES, LEVELS, type FeatureLevels } from "./scorecard.js";
 import { GUIDE } from "./guide.js";
 
-export const ENGINE_PROMPT_VERSION = "r5";
+export const ENGINE_PROMPT_VERSION = "r6";
 
 type S = Record<string, unknown>;
 const str = (description?: string): S => ({ type: "string", ...(description ? { description } : {}) });
@@ -165,7 +165,8 @@ export const ASSESS_SYSTEM = [
   "",
   "is_opportunity = true when the code maps messy or open-ended input (text written by people, error messages from other systems, AI output, results from an external API, free-text names) to a bounded outcome with a hardcoded rule that misses real cases: new wordings, paraphrases, spelling variants, or a best pick that depends on the user's situation.",
   "The existing rule stays in the code as the fallback when Jev fails. So an added network call, latency or cost is NOT a reason to reject; reflect it in ai_score instead.",
-  "Small or cosmetic decisions can still be opportunities: give them a lower ai_score (0.4-0.6) instead of rejecting. Reserve 0.8+ for decisions where the hardcoded rule clearly lets users down.",
+  "Small or cosmetic decisions can still be opportunities: score them low instead of rejecting.",
+  "ai_score rubric (use the whole scale; the verdict bands are 70%+ strong, 50–69% possible): 0.9 = like real Jev uses — people's free text (or other messy input) is judged, the rule visibly fails on real inputs, outcomes are bounded; 0.7 = a clear improvement — the rule misses cases users actually hit; 0.5 = plausible but small, or the rule mostly works; 0.3 = exact rules would do with a little work; 0.1 = exact logic.",
   "",
   "is_opportunity = false when the rule is exact and complete: arithmetic, money / balances / payments / escrow, status or state machines over the app's own values, auth and permissions, validating formats, parsing structured data, typed enum dispatch, UI layout and styling, or when every input is controlled by the app itself (fixed enums, database status values). Say which of these it is in `why`.",
   "",

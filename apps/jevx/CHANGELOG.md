@@ -6,6 +6,11 @@ All notable changes to `jevx`. Versions follow [semver](https://semver.org); bef
 
 - **Learns where and why Jev fits.** Every finding now carries a generic *pattern* (e.g. `error-message-regex-classifier`: input kind, rule kind, code shape, why Jev beats the rule). With `--share`, these go to the JevX dataset — scrubbed in code of every file, function, identifier and string literal. Learned outcomes feed back into the patterns score in later releases.
 - **`--min-fit <percent>`**: write fits from 50–100% (default 70 = strong fits only). Anything under 70 prints a warning; under 50 is refused. `--include-disagree` also writes fits the sources disagree on. `--include-possible` = `--min-fit 50`.
+- **Every AI app:** `jevx mcp install` now configures Claude Code, **Claude Desktop**, Cursor, Windsurf, VS Code (Copilot), Gemini CLI and Codex (backs up each config; `jevx mcp uninstall` removes it). **`jevx.mcpb`**: one-click Claude Desktop extension with a project-folder picker and a secure TypeSafe key field.
+- **`jevx_apply` / `jevx_undo`** MCP tools for apps that can't edit files: backup, tests before/after, auto-revert, never under 50%. The MCP server refuses to index `/` or your home folder.
+- **Scorecard calibrated on real data** (docs/SCORECARD.md): TypeSafe's "bounded" is now a gate instead of a free ~0.25 (it was ≈ 0.97 for every spot, controls included); the AI gets an explicit 0.1–0.9 rubric tied to the verdict bands. Real Jev sites still reach 84–90%; deterministic controls drop to WEAK. The 70% bar is unchanged.
+- **Fewer approval prompts:** `jevx_read` reads up to 20 files per call; read-only tools say so. The scan reports whether TypeSafe is configured.
+- **Privacy verified by tests:** read-only tools write nothing and send nothing, even with sharing on; only `jevx_share` sends. The `.mcpb` build refuses personal notes, `.env`, research data, local paths or key-like strings.
 - **Claude Code / Cursor (MCP)** now works like the terminal: balanced guide, a reading order so the editor's AI reads the files itself, the generic pattern on every scorecard, the minimum-fit rule, and an opt-in `jevx_share` tool.
 - **First-run welcome**: a JEVX logo the first time you run it (`jevx --welcome` shows it again).
 - **`--report-json <file>`**: the full result as JSON, for comparing runs (stays on your machine).

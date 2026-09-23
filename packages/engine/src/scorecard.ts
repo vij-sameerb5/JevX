@@ -114,9 +114,17 @@ export interface JevAnswers {
   category: string;
 }
 
-/** Jev's fit: judgment needed, outcomes bounded, and exact code NOT the better tool — averaged. */
+/**
+ * Jev's fit, from TypeSafe's own three answers:
+ *   bounded                 a PRECONDITION (Jev needs a bounded answer) — it gates, it doesn't add
+ *   judgment                is a judgment needed? (60%)
+ *   1 − deterministicIsCorrect   is exact code NOT the better tool? (40%)
+ * "bounded" was ≈ 0.97 for 7 of 8 spots in a real run, both deterministic controls included, so as
+ * an added term it gave every enum a free ~0.24 (a status→colour map scored 53–62%). Calibration:
+ * tests/scorecard-calibration.test.ts, docs/SCORECARD.md.
+ */
 export function typesafeScore(a: JevAnswers): number {
-  return (a.judgment + a.bounded + (1 - a.deterministicIsCorrect)) / 3;
+  return a.bounded * (0.6 * a.judgment + 0.4 * (1 - a.deterministicIsCorrect));
 }
 
 export type Verdict = "STRONG_FIT" | "POSSIBLE_FIT" | "WEAK_FIT" | "REVIEW_DISAGREE";

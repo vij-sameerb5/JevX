@@ -19,6 +19,7 @@
       <a href="index.html">Home</a>
       <a href="docs.html">Docs</a>
       <a href="contributing.html" aria-current="page">Contribute</a>
+      <a href="https://github.com/vij-sameerb5/JevX">GitHub</a>
       <a href="https://www.npmjs.com/package/jevx">npm</a>
     </nav>
   </div>
@@ -42,12 +43,12 @@
 
     <section id="repo">
       <h2>The repo</h2>
-      <p>The GitHub repository opens with the first public release. Until then this page, <code>CONTRIBUTING.md</code> and the <a href="docs.html#versions">changelog</a> describe how it works. It's a TypeScript pnpm monorepo, MIT-licensed.</p>
+      <p>JevX lives at <a href="https://github.com/vij-sameerb5/JevX">github.com/vij-sameerb5/JevX</a>: a TypeScript pnpm monorepo, MIT-licensed. Issues and pull requests are welcome there.</p>
     </section>
 
     <section id="setup">
       <h2>Set up (5 minutes)</h2>
-      <div class="codebox"><pre class="code">git clone &lt;repo-url&gt; jevX &amp;&amp; cd jevX
+      <div class="codebox"><pre class="code">git clone https://github.com/vij-sameerb5/JevX.git &amp;&amp; cd JevX
 pnpm install          <span class="c"># Node ≥ 20.10, pnpm ≥ 9</span>
 pnpm test             <span class="c"># ~230 tests · no network, no keys</span>
 pnpm jevx --help      <span class="c"># the CLI from source</span>
@@ -108,7 +109,7 @@ pnpm mcp-smoke examples/jev-demo   <span class="c"># the MCP server, end to end<
     <section id="bugs">
       <h2>Bugs &amp; security</h2>
       <p>For a bug, include <code>jevx --version</code>, the command, and ideally <code>jevx --dry-run --report-json out.json</code> plus the relevant <code>.jevx/debug/*.json</code>. Check them for anything private first.</p>
-      <p class="note">Found a way JevX could leak code or keys? Please tell the maintainer privately instead of opening a public issue.</p>
+      <p class="note">Found a way JevX could leak code or keys? Please use GitHub's private vulnerability reporting (Security → Report a vulnerability) instead of a public issue.</p>
     </section>
   </article>
 </div>
@@ -116,7 +117,7 @@ pnpm mcp-smoke examples/jev-demo   <span class="c"># the MCP server, end to end<
 <footer>
   <div class="wrap">
     <span><b style="color:var(--accent)">JEVX</b> · MIT</span>
-    <span class="btns"><a class="btn" href="index.html">Home</a><a class="btn" href="docs.html">Docs</a><a class="btn" href="https://www.npmjs.com/package/jevx">npm</a></span>
+    <span class="btns"><a class="btn" href="index.html">Home</a><a class="btn" href="docs.html">Docs</a><a class="btn" href="https://github.com/vij-sameerb5/JevX">GitHub</a><a class="btn" href="https://www.npmjs.com/package/jevx">npm</a></span>
   </div>
 </footer>
 

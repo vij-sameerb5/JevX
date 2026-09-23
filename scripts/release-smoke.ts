@@ -47,7 +47,7 @@ try {
   const client = new Client({ name: "release-smoke", version: "1" });
   await client.connect(new StdioClientTransport({ command: bin, args: ["mcp"], env: { ...(process.env as Record<string, string>), ...env, JEVX_ROOT: repo }, stderr: "ignore" }));
   const tools = (await client.listTools()).tools.map((t) => t.name);
-  check("jevx mcp: 9 tools over stdio", tools.length === 9 && tools.includes("jevx_scan") && tools.includes("jevx_share"), tools.join(", "));
+  check("jevx mcp: 11 tools over stdio", tools.length === 11 && tools.includes("jevx_scan") && tools.includes("jevx_share"), tools.join(", "));
   const scan = (await client.callTool({ name: "jevx_scan", arguments: {} })) as { content: { text: string }[] };
   check("jevx mcp: jevx_scan gives a reading order", /READING ORDER/.test(scan.content[0]!.text), scan.content[0]!.text);
   await client.close();

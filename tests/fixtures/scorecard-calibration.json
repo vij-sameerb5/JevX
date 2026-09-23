@@ -1,0 +1,335 @@
+{
+ "note": "Calibration data for the scorecard. Feature levels and scores only \u2014 no code, no names. 'known' = the 7 real Jev sites and 5 deterministic neighbours from the Layer E pilot (the data profile.json was derived from, so pattern results on it are in-sample). 'observed' = the 8 spots scored in a real Claude Code + TypeSafe run on a Next.js app (2026-09-23), with the AI's own score and TypeSafe's raw answers.",
+ "known": [
+  {
+   "kind": "real-jev-site",
+   "features": {
+    "semantic_ambiguity": "high",
+    "context_dependence": "high",
+    "deterministic_expressibility": "low",
+    "judgment_required": "high",
+    "rule_stability": "low",
+    "risk_or_policy_component": "none",
+    "natural_language_understanding": "high",
+    "decision_complexity": "medium"
+   },
+   "analystConfidence": "high"
+  },
+  {
+   "kind": "real-jev-site",
+   "features": {
+    "semantic_ambiguity": "high",
+    "context_dependence": "medium",
+    "deterministic_expressibility": "low",
+    "judgment_required": "high",
+    "rule_stability": "low",
+    "risk_or_policy_component": "high",
+    "natural_language_understanding": "high",
+    "decision_complexity": "medium"
+   },
+   "analystConfidence": "high"
+  },
+  {
+   "kind": "real-jev-site",
+   "features": {
+    "semantic_ambiguity": "high",
+    "context_dependence": "high",
+    "deterministic_expressibility": "low",
+    "judgment_required": "high",
+    "rule_stability": "low",
+    "risk_or_policy_component": "high",
+    "natural_language_understanding": "high",
+    "decision_complexity": "medium"
+   },
+   "analystConfidence": "high"
+  },
+  {
+   "kind": "real-jev-site",
+   "features": {
+    "semantic_ambiguity": "high",
+    "context_dependence": "high",
+    "deterministic_expressibility": "low",
+    "judgment_required": "high",
+    "rule_stability": "low",
+    "risk_or_policy_component": "high",
+    "natural_language_understanding": "high",
+    "decision_complexity": "medium"
+   },
+   "analystConfidence": "high"
+  },
+  {
+   "kind": "real-jev-site",
+   "features": {
+    "semantic_ambiguity": "high",
+    "context_dependence": "high",
+    "deterministic_expressibility": "low",
+    "judgment_required": "high",
+    "rule_stability": "low",
+    "risk_or_policy_component": "high",
+    "natural_language_understanding": "medium",
+    "decision_complexity": "medium"
+   },
+   "analystConfidence": "high"
+  },
+  {
+   "kind": "real-jev-site",
+   "features": {
+    "semantic_ambiguity": "high",
+    "context_dependence": "medium",
+    "deterministic_expressibility": "low",
+    "judgment_required": "high",
+    "rule_stability": "low",
+    "risk_or_policy_component": "high",
+    "natural_language_understanding": "high",
+    "decision_complexity": "medium"
+   },
+   "analystConfidence": "high"
+  },
+  {
+   "kind": "real-jev-site",
+   "features": {
+    "semantic_ambiguity": "high",
+    "context_dependence": "high",
+    "deterministic_expressibility": "low",
+    "judgment_required": "high",
+    "rule_stability": "low",
+    "risk_or_policy_component": "none",
+    "natural_language_understanding": "high",
+    "decision_complexity": "medium"
+   },
+   "analystConfidence": "high"
+  },
+  {
+   "kind": "deterministic-neighbour",
+   "features": {
+    "semantic_ambiguity": "none",
+    "context_dependence": "low",
+    "deterministic_expressibility": "high",
+    "judgment_required": "none",
+    "rule_stability": "medium",
+    "risk_or_policy_component": "none",
+    "natural_language_understanding": "none",
+    "decision_complexity": "low"
+   },
+   "analystConfidence": "low"
+  },
+  {
+   "kind": "deterministic-neighbour",
+   "features": {
+    "semantic_ambiguity": "none",
+    "context_dependence": "low",
+    "deterministic_expressibility": "high",
+    "judgment_required": "none",
+    "rule_stability": "high",
+    "risk_or_policy_component": "medium",
+    "natural_language_understanding": "none",
+    "decision_complexity": "low"
+   },
+   "analystConfidence": "low"
+  },
+  {
+   "kind": "deterministic-neighbour",
+   "features": {
+    "semantic_ambiguity": "none",
+    "context_dependence": "low",
+    "deterministic_expressibility": "high",
+    "judgment_required": "none",
+    "rule_stability": "high",
+    "risk_or_policy_component": "high",
+    "natural_language_understanding": "none",
+    "decision_complexity": "low"
+   },
+   "analystConfidence": "low"
+  },
+  {
+   "kind": "deterministic-neighbour",
+   "features": {
+    "semantic_ambiguity": "none",
+    "context_dependence": "low",
+    "deterministic_expressibility": "high",
+    "judgment_required": "none",
+    "rule_stability": "high",
+    "risk_or_policy_component": "medium",
+    "natural_language_understanding": "none",
+    "decision_complexity": "low"
+   },
+   "analystConfidence": "low"
+  },
+  {
+   "kind": "deterministic-neighbour",
+   "features": {
+    "semantic_ambiguity": "none",
+    "context_dependence": "low",
+    "deterministic_expressibility": "high",
+    "judgment_required": "none",
+    "rule_stability": "high",
+    "risk_or_policy_component": "low",
+    "natural_language_understanding": "none",
+    "decision_complexity": "low"
+   },
+   "analystConfidence": "low"
+  }
+ ],
+ "observed": [
+  {
+   "spot": "error-text-classifier (catch block \u2192 user message)",
+   "expect": "ambiguous-or-possible",
+   "features": {
+    "semantic_ambiguity": "high",
+    "context_dependence": "medium",
+    "deterministic_expressibility": "low",
+    "judgment_required": "medium",
+    "rule_stability": "low",
+    "risk_or_policy_component": "low",
+    "natural_language_understanding": "high",
+    "decision_complexity": "low"
+   },
+   "ai": 0.61,
+   "typesafe": {
+    "judgment": 0.67,
+    "bounded": 0.97,
+    "deterministicIsCorrect": 0.37
+   }
+  },
+  {
+   "spot": "api-results-top-n (flights)",
+   "expect": "ambiguous-or-possible",
+   "features": {
+    "semantic_ambiguity": "low",
+    "context_dependence": "high",
+    "deterministic_expressibility": "medium",
+    "judgment_required": "medium",
+    "rule_stability": "medium",
+    "risk_or_policy_component": "low",
+    "natural_language_understanding": "low",
+    "decision_complexity": "medium"
+   },
+   "ai": 0.55,
+   "typesafe": {
+    "judgment": 0.19,
+    "bounded": 0.97,
+    "deterministicIsCorrect": 0.19
+   }
+  },
+  {
+   "spot": "api-results-top-n (hotels)",
+   "expect": "ambiguous-or-possible",
+   "features": {
+    "semantic_ambiguity": "low",
+    "context_dependence": "high",
+    "deterministic_expressibility": "medium",
+    "judgment_required": "medium",
+    "rule_stability": "medium",
+    "risk_or_policy_component": "low",
+    "natural_language_understanding": "low",
+    "decision_complexity": "medium"
+   },
+   "ai": 0.45,
+   "typesafe": {
+    "judgment": 0.2,
+    "bounded": 0.97,
+    "deterministicIsCorrect": 0.16
+   }
+  },
+  {
+   "spot": "free-text-lookup-with-default (image key)",
+   "expect": "ambiguous-or-possible",
+   "features": {
+    "semantic_ambiguity": "medium",
+    "context_dependence": "low",
+    "deterministic_expressibility": "medium",
+    "judgment_required": "low",
+    "rule_stability": "medium",
+    "risk_or_policy_component": "none",
+    "natural_language_understanding": "medium",
+    "decision_complexity": "low"
+   },
+   "ai": 0.55,
+   "typesafe": {
+    "judgment": 0.07,
+    "bounded": 0.98,
+    "deterministicIsCorrect": 0.39
+   }
+  },
+  {
+   "spot": "stage-from-chat-blocks",
+   "expect": "ambiguous-or-possible",
+   "features": {
+    "semantic_ambiguity": "medium",
+    "context_dependence": "medium",
+    "deterministic_expressibility": "medium",
+    "judgment_required": "low",
+    "rule_stability": "high",
+    "risk_or_policy_component": "low",
+    "natural_language_understanding": "medium",
+    "decision_complexity": "low"
+   },
+   "ai": 0.3,
+   "typesafe": {
+    "judgment": 0.14,
+    "bounded": 0.98,
+    "deterministicIsCorrect": 0.4
+   }
+  },
+  {
+   "spot": "city-to-airport-code fallback",
+   "expect": "ambiguous-or-possible",
+   "features": {
+    "semantic_ambiguity": "medium",
+    "context_dependence": "medium",
+    "deterministic_expressibility": "medium",
+    "judgment_required": "medium",
+    "rule_stability": "high",
+    "risk_or_policy_component": "none",
+    "natural_language_understanding": "medium",
+    "decision_complexity": "low"
+   },
+   "ai": 0.45,
+   "typesafe": {
+    "judgment": 0.14,
+    "bounded": 0.42,
+    "deterministicIsCorrect": 0.4
+   }
+  },
+  {
+   "spot": "refund validation + money transfer (control)",
+   "expect": "deterministic-control",
+   "features": {
+    "semantic_ambiguity": "none",
+    "context_dependence": "none",
+    "deterministic_expressibility": "high",
+    "judgment_required": "none",
+    "rule_stability": "high",
+    "risk_or_policy_component": "high",
+    "natural_language_understanding": "none",
+    "decision_complexity": "low"
+   },
+   "ai": 0.02,
+   "typesafe": {
+    "judgment": 0.09,
+    "bounded": 0.97,
+    "deterministicIsCorrect": 0.84
+   }
+  },
+  {
+   "spot": "status \u2192 colour map (control, TypeSafe false positive)",
+   "expect": "deterministic-control",
+   "features": {
+    "semantic_ambiguity": "none",
+    "context_dependence": "none",
+    "deterministic_expressibility": "high",
+    "judgment_required": "none",
+    "rule_stability": "high",
+    "risk_or_policy_component": "none",
+    "natural_language_understanding": "none",
+    "decision_complexity": "low"
+   },
+   "ai": 0.03,
+   "typesafe": {
+    "judgment": 0.26,
+    "bounded": 0.98,
+    "deterministicIsCorrect": 0.39
+   }
+  }
+ ]
+}

@@ -198,7 +198,7 @@ async function main() {
       const r = spawnSync("npx", argv, { stdio: "inherit", cwd: REPO });
       results.push(`${p.slug}: ${r.status === 0 ? "ok" : `failed (exit ${r.status})`}`);
     }
-    if (!dry) console.log(`\nSummary:\n  ${results.join("\n  ")}\n\nNext: pnpm dev review <project> · pnpm dev dataset check · pnpm dev eval`);
+    if (!dry) console.log(`\nSummary:\n  ${results.join("\n  ")}\n\nNext: pnpm lab review <project> · pnpm lab dataset check · pnpm lab eval`);
     return;
   }
   if (cmd === "usages") {
@@ -253,7 +253,7 @@ async function main() {
       results.push(`${p.slug}: ${r.status === 0 ? "ok" : `failed (exit ${r.status})`}`);
     }
     console.log(`\nSummary:\n  ${results.join("\n  ")}`);
-    if (!dry) console.log(`\nTokens this run: ${spent.toLocaleString("en-US")} (total budget ${total.toLocaleString("en-US")})${cost ? ` · cost $${cost.toFixed(4)}` : ""}\nNext: inspect dataset/boundary/<slug>/ · then pnpm dev boundary-patterns`);
+    if (!dry) console.log(`\nTokens this run: ${spent.toLocaleString("en-US")} (total budget ${total.toLocaleString("en-US")})${cost ? ` · cost $${cost.toFixed(4)}` : ""}\nNext: inspect dataset/boundary/<slug>/ · then pnpm lab boundary-patterns`);
     return;
   }
   if (cmd === "report") {

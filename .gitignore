@@ -1,6 +1,5 @@
 node_modules
 dist
-*.tgz
 .jevx
 *.log
 .DS_Store
@@ -9,3 +8,24 @@ dist
 .env
 .env.*
 !.env.example
+
+# build outputs
+build/
+*.tgz
+*.mcpb
+
+# personal notes & research data — kept on this machine, not published
+BLUEPRINT.md
+CLAUDE.md
+AGENTS.md
+COMMUNITY-NOTES.md
+REBOOT-AUDIT.md
+JOURNAL.md
+PLAN.md
+docs/BLUEPRINT-v1.md
+docs/CURRENT-ARCHITECTURE.md
+docs/NEXT-STEPS-PROMPT.md
+dataset/
+Claude outputs/
+_to_delete/
+.claude/

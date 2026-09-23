@@ -6,7 +6,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "tsx apps/cli/src/index.tsx",
+    "dev": "tsx apps/jevx/src/index.ts --welcome",
     "build": "pnpm --filter jevx --filter jevx-lab build",
     "jevx": "tsx apps/jevx/src/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -17,7 +17,9 @@
     "corpus": "tsx scripts/corpus.ts",
     "release-check": "bash scripts/release-check.sh",
     "mcp-smoke": "tsx scripts/mcp-smoke.ts",
-    "export-patterns": "tsx scripts/export-patterns.ts"
+    "export-patterns": "tsx scripts/export-patterns.ts",
+    "lab": "tsx apps/cli/src/index.tsx",
+    "build-mcpb": "node scripts/build-mcpb.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

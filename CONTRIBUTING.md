@@ -5,7 +5,7 @@ Thanks for helping. JevX is small and moves fast — short PRs with a test are t
 ## Set up (5 minutes)
 
 ```bash
-git clone <repo-url> jevX && cd jevX
+git clone https://github.com/vij-sameerb5/JevX.git && cd JevX
 pnpm install          # Node ≥ 20.10, pnpm ≥ 9
 pnpm test             # ~220 tests, no network, no keys (mock AI + mock TypeSafe)
 pnpm jevx --help      # run the CLI from source
@@ -55,4 +55,4 @@ plus the relevant `.jevx/debug/*.json` (check them for anything private first).
 
 ## Security
 
-Found a way JevX could leak code or keys? Please email the maintainer instead of opening a public issue.
+Found a way JevX could leak code or keys? Please use GitHub's private vulnerability reporting (Security → Report a vulnerability) instead of a public issue.

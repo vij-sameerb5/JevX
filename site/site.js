@@ -46,13 +46,13 @@
         L(""), L(d("  flights / hotels → left alone: “no patient fields; Google's list is already ranked”")), L(d("  refunds, escrow, payments → never proposed"))]
     },
     card: {
-      cap: "Real scorecard from the same run: three independent opinions, averaged. 68% is under the 70% bar, so it is previewed, not written.",
+      cap: "A real scorecard: three independent opinions, averaged. 64% is under the 70% bar, so it is previewed, not written.",
       lines: [...box("#1  pay()  app/checkout/page.tsx:239  · found by AI", [
         `Decides   Classify a caught payment exception into a failure kind.`,
         `Why Jev   Wallet and RPC errors are free text that varies by provider;`,
         `          regexes on a few English phrases mislabel them.`, "",
-        `AI        ${bar(0.61)}  61%`, `TypeSafe  ${bar(0.76)}  76%`, `Patterns  ${bar(0.69)}  69%`, d("──────────────────────────────"),
-        `<span class="b">JEV FIT   68%  POSSIBLE</span>  ${o("→ preview · needs --min-fit 68")}`,
+        `AI        ${bar(0.61)}  61%`, `TypeSafe  ${bar(0.63)}  63%`, `Patterns  ${bar(0.69)}  69%`, d("──────────────────────────────"),
+        `<span class="b">JEV FIT   64%  POSSIBLE</span>  ${o("→ preview · needs --min-fit 64")}`,
         `Jev uses  choice · “Which failure kind should the user see?”`,
         `Stays     the existing messages; Jev only picks which one.`
       ])]
