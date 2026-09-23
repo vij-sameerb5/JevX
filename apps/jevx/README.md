@@ -8,7 +8,7 @@ best. jevx finds them and replaces them with a Jev decision
 (TypeSafe **noul** yes/no · **choice** · **score**) — keeping the old rule as the fallback.
 
 ```bash
-npm i -g jevx          # or: npx jevx
+npm i -g @vij-sameerb5/jevx          # or: npx @vij-sameerb5/jevx
 cd your-project
 jevx --dry-run         # see what it would change
 jevx                   # change the strong fits, run your tests, undo anytime

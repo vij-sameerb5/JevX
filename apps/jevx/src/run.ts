@@ -185,7 +185,7 @@ export async function run(f: RunFlags): Promise<number> {
   if (kept.size) lines.push(`See every change in red/green: open VS Code / Cursor → ${chalk.bold("Source Control")}`);
   const rel = path.relative(process.cwd(), report);
   lines.push(`Scorecards + diffs: ${dim(rel && !rel.startsWith("..") ? rel : report)}`);
-  if (kept.size) lines.push(`Undo everything: ${accentBold("npx jevx undo")}`);
+  if (kept.size) lines.push(`Undo everything: ${accentBold("npx @vij-sameerb5/jevx undo")}`);
   if (kept.size && !typesafe) lines.push(dim("The changed code calls Jev at runtime: set TYPESAFE_API_KEY in the app's environment."));
   log(box(lines, "JEVX RESULT"));
   logCost(result.spend, started);

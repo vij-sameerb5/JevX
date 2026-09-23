@@ -10,7 +10,7 @@ const ORANGE = chalk.hex("#c15f3c");
 const SHADOW = chalk.hex("#6e3522");
 const DIM = chalk.gray;
 
-// 5-row letters, drawn on a grid: █ = face, ▓ = drop shadow (down-right)
+// 5-row letters, drawn on a grid: █ = face, ▓ = drop shadow (down-right; printed as a solid dark █)
 const J = ["   ███", "    ██", "    ██", "██  ██", " ████ "];
 const E = ["█████", "██   ", "████ ", "██   ", "█████"];
 const V = ["██   ██", "██   ██", " ██ ██ ", " ██ ██ ", "  ███  "];
@@ -27,7 +27,7 @@ export function logoRows(): string[] {
 }
 
 export function bigLogo(version: string): string {
-  const rows = logoRows().map((r) => "   " + [...r].map((ch) => (ch === "█" ? ORANGE(ch) : ch === "▓" ? SHADOW(ch) : ch)).join(""));
+  const rows = logoRows().map((r) => "   " + [...r].map((ch) => (ch === "█" ? ORANGE(ch) : ch === "▓" ? SHADOW("█") : ch)).join(""));
   return [
     "",
     ...rows,
