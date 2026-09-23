@@ -1,0 +1,13 @@
+{
+  "positive": [
+    { "file": "src/intents.ts", "context": "handle", "note": "blueprint headline example" },
+    { "file": "src/intents.ts", "context": "isGreeting" },
+    { "file": "src/intents.ts", "context": "parseConfirmation" },
+    { "file": "src/intents.ts", "context": "wantsHuman" }
+  ],
+  "negative": [
+    { "file": "src/commands.ts", "context": "parseCommand" },
+    { "file": "src/commands.ts", "context": "runCommand" },
+    { "file": "src/commands.ts", "context": "isMention" }
+  ]
+}

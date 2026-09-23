@@ -1,0 +1,69 @@
+{
+  "$comment": "Code that matches strings deterministically over closed vocabularies. None of it should be flagged.",
+  "positive": [],
+  "negative": [
+    {
+      "file": "src/lexer.ts",
+      "context": "tokenize"
+    },
+    {
+      "file": "src/lexer.ts",
+      "context": "directionOf"
+    },
+    {
+      "file": "src/lexer.ts",
+      "context": "highlightSql"
+    },
+    {
+      "file": "src/misc.ts",
+      "context": "parseFlag"
+    },
+    {
+      "file": "src/misc.ts",
+      "context": "monthIndex"
+    },
+    {
+      "file": "src/misc.ts",
+      "context": "onKey"
+    },
+    {
+      "file": "src/misc.ts",
+      "context": "browserName"
+    },
+    {
+      "file": "src/misc.ts",
+      "context": "toKm"
+    },
+    {
+      "file": "src/misc.ts",
+      "context": "t"
+    },
+    {
+      "file": "src/misc.ts",
+      "context": "isEnabled"
+    },
+    {
+      "file": "src/misc.ts",
+      "context": "buttonClass"
+    },
+    {
+      "file": "src/cli.ts",
+      "context": "suggestCommand"
+    },
+    {
+      "file": "src/errors.ts",
+      "context": "pay",
+      "note": "caught-error text (library/app written), not human input"
+    },
+    {
+      "file": "src/errors.ts",
+      "context": "retryable",
+      "note": "caught-error text (library/app written), not human input"
+    },
+    {
+      "file": "src/errors.ts",
+      "context": "loadProfile",
+      "note": "caught-error text (library/app written), not human input"
+    }
+  ]
+}

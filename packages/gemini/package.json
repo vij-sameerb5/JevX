@@ -1,0 +1,11 @@
+{
+  "name": "@jevx/gemini",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": {
+    "@google/genai": "^2.23.0",
+    "@jevx/core": "workspace:*"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "slug": "jevlogs",
+  "fingerprint": "b6565f6e1ae2aab7b19494d5",
+  "visibility": "public",
+  "source": "https://github.com/reachjalil/jevlogs",
+  "commit": "b1ff60079c30d50a7f93dbfa09848f9539665d44",
+  "license": "MIT",
+  "languages": [
+    "typescript"
+  ],
+  "frameworks": [
+    "vercel-ai"
+  ],
+  "domains": [
+    "observability"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:30.926Z",
+  "updated": "2026-09-19T22:01:30.926Z"
+}

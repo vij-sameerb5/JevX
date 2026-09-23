@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "slug": "jev-review",
+  "fingerprint": "6e73f7a8bca60641f08a438f",
+  "visibility": "public",
+  "source": "https://github.com/devagrawal09/jev-review",
+  "commit": "31f89602797fb7bea007f8a480bf368bf564954e",
+  "license": "MIT",
+  "languages": [
+    "javascript",
+    "typescript"
+  ],
+  "frameworks": [
+    "typesafe"
+  ],
+  "domains": [
+    "code-review"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:00:54.954Z",
+  "updated": "2026-09-19T22:00:54.954Z"
+}

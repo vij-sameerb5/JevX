@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "slug": "jev-mcp",
+  "fingerprint": "ac6200a4c86eeb9c41f43566",
+  "visibility": "public",
+  "source": "https://github.com/jkudish/jev-mcp",
+  "commit": "67dd9fa5a6e895909f1b2d80bf45534c29cff25a",
+  "license": "MIT",
+  "languages": [
+    "typescript"
+  ],
+  "frameworks": [
+    "typesafe",
+    "vercel-ai"
+  ],
+  "domains": [
+    "mcp-tools"
+  ],
+  "split": "test",
+  "splitSource": "manual",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:25.866Z",
+  "updated": "2026-09-19T22:01:25.866Z"
+}

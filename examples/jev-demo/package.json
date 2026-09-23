@@ -1,0 +1,6 @@
+{
+  "name": "helpdesk-demo",
+  "description": "A tiny helpdesk: tickets come in, get routed to a team, prioritised, and billed. The BEFORE side of a JevX demo — no Jev yet.",
+  "type": "module",
+  "private": true
+}

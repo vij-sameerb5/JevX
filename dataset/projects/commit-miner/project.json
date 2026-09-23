@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "slug": "commit-miner",
+  "fingerprint": "489966090e4913e846524516",
+  "visibility": "private",
+  "languages": [
+    "typescript"
+  ],
+  "frameworks": [
+    "react"
+  ],
+  "domains": [
+    "dev-workflow"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:33.369Z",
+  "updated": "2026-09-19T22:01:33.369Z"
+}

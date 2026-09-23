@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "slug": "jev-guard",
+  "fingerprint": "c2d4587d543b6712935ee027",
+  "visibility": "public",
+  "source": "https://github.com/leepokai/jev-guard",
+  "commit": "94996ea80b6b308327ac2077706a29ce6abd3ba0",
+  "license": "MIT",
+  "languages": [
+    "javascript",
+    "typescript"
+  ],
+  "frameworks": [],
+  "domains": [
+    "agent-security"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:02.318Z",
+  "updated": "2026-09-20T06:25:59.562Z"
+}

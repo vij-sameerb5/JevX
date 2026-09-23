@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "slug": "jev-experiments",
+  "fingerprint": "edd5bc8c73bea150560c14f0",
+  "visibility": "private",
+  "languages": [
+    "javascript",
+    "typescript"
+  ],
+  "frameworks": [],
+  "domains": [
+    "mixed-demos"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:00:52.534Z",
+  "updated": "2026-09-19T22:00:52.534Z"
+}

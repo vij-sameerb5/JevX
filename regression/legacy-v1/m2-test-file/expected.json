@@ -1,0 +1,10 @@
+{
+  "$comment": "Sameer's synthetic M2 test file (good / medium / strong). Verified on his Mac 2026-09-19.",
+  "positive": [
+    { "file": "src/jevx-m2-test.ts", "context": "classifySupportMessage", "note": "MEDIUM — keyword rules, may be intentional" },
+    { "file": "src/jevx-m2-test.ts", "context": "routeCustomerMessage", "minBand": "strong", "note": "STRONG — clear semantic routing" }
+  ],
+  "negative": [
+    { "file": "src/jevx-m2-test.ts", "context": "getFileType", "note": "GOOD — deterministic file extensions" }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "slug": "pi-jev-router",
+  "fingerprint": "bad87f857819e2e71bbad2c5",
+  "visibility": "public",
+  "source": "https://github.com/mejiasd3v/pi-jev-router",
+  "commit": "24043d08b4c522a0c07aa432e82cd29bc4e88dd4",
+  "license": "MIT",
+  "languages": [
+    "typescript"
+  ],
+  "frameworks": [
+    "vercel-ai"
+  ],
+  "domains": [
+    "model-routing"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:07.114Z",
+  "updated": "2026-09-19T22:01:07.114Z"
+}

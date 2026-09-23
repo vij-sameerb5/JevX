@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "splitSeed": "jevx-split-v1",
+  "ratios": {
+    "train": 0.6,
+    "dev": 0.2,
+    "test": 0.2
+  }
+}

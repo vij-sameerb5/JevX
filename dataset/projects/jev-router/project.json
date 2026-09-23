@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "slug": "jev-router",
+  "fingerprint": "14e430553331984fd8de57fc",
+  "visibility": "public",
+  "source": "https://github.com/gargpratyush/jev-router",
+  "commit": "38da6b84ea01241bfc41fbddc0928d0f40a703f0",
+  "license": "MIT",
+  "languages": [
+    "javascript"
+  ],
+  "frameworks": [
+    "typesafe"
+  ],
+  "domains": [
+    "model-routing"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:04.748Z",
+  "updated": "2026-09-20T06:33:28.414Z"
+}

@@ -1,0 +1,73 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JevX report</title>
+<style>
+:root{--bg:#fafaf9;--fg:#1c1917;--dim:#78716c;--card:#fff;--line:#e7e5e4;--add:#dcfce7;--addf:#166534;--del:#fee2e2;--delf:#991b1b;--hunk:#eef2ff;--bar:#4f46e5}
+@media (prefers-color-scheme:dark){:root{--bg:#0c0a09;--fg:#f5f5f4;--dim:#a8a29e;--card:#1c1917;--line:#292524;--add:#052e16;--addf:#86efac;--del:#450a0a;--delf:#fca5a5;--hunk:#1e1b4b;--bar:#818cf8}}
+*{box-sizing:border-box}body{margin:0;padding:24px 16px;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif}
+main{max-width:980px;margin:auto}h1{margin:0 0 4px}.dim{color:var(--dim)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin:20px 0}
+header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}h2{margin:4px 0 0;font-size:18px}
+.pill{padding:4px 10px;border-radius:999px;font-weight:600;font-size:13px;white-space:nowrap}
+.good{background:var(--add);color:var(--addf)}.bad{background:var(--del);color:var(--delf)}.maybe,.warn{background:#fef3c7;color:#92400e}
+.meters{margin:14px 0 4px}.m{display:grid;grid-template-columns:80px 1fr 44px;gap:10px;align-items:center;margin:4px 0}.mn{grid-column:2/4;font-size:12px;color:var(--dim);margin-top:-4px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--bar)}
+.why{font-size:14px;color:var(--dim)}dl{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;font-size:14px}dt{color:var(--dim)}dd{margin:0}
+code{font:13px ui-monospace,monospace}.diff{margin-top:14px;border:1px solid var(--line);border-radius:8px;overflow-x:auto;font:13px/1.45 ui-monospace,monospace}
+.ln{white-space:pre;padding:0 12px}.add{background:var(--add);color:var(--addf)}.del{background:var(--del);color:var(--delf)}.hunk{background:var(--hunk);color:var(--dim)}
+</style></head><body><main>
+<h1>JevX report</h1>
+<p class="dim">jevx-demo-zZpj0s · 3 proposal(s) · scores are opinions to help you decide, not proof. Nothing has been changed yet.</p>
+<section class="card">
+  <header><div><code>src/routing.ts:7</code><h2>Which team should handle a support ticket, from what the customer wrote.</h2></div><span class="pill good">Strong fit · 88%</span></header>
+  <div class="meters">
+    <div class="m"><span class="ml">Patterns</span><span class="bar"><i style="width:88%"></i></span><b>88%</b><span class="mn">vs real Jev sites studied</span></div>
+    <div class="m"><span class="ml">AI</span><span class="bar"><i style="width:86%"></i></span><b>86%</b><span class="mn">your AI, after reading the code</span></div>
+    <div class="m"><span class="ml">TypeSafe</span><span class="bar"><i style="width:90%"></i></span><b>90%</b><span class="mn">Jev's own opinion</span></div>
+  </div>
+  <p class="why">3 of 3 sources agree</p>
+  <dl>
+    <dt>Primitive</dt><dd><code>choice</code> <span class="dim">(Jev suggests <code>choice</code>)</span></dd>
+    <dt>Question</dt><dd>Which team should handle this support ticket?</dd>
+    <dt>Outcomes</dt><dd><code>billing</code> <code>technical</code> <code>account</code> <code>general</code></dd>
+    <dt>State</dt><dd><code>subject</code> <code>body</code></dd>
+    <dt>Why Jev</dt><dd>Keyword lists guess intent: 'charged twice and now the app crashes' routes to billing first, and paraphrases ('my card was debited') miss every list.</dd>
+    <dt>Stays exact</dt><dd>Queueing the ticket for the chosen team; SLA hours from the plan.</dd>
+  </dl>
+  <div class="diff"><div class="ln hunk">@@ -1,11 +1,32 @@</div><div class="ln ctx"> import type { Team, Ticket } from &quot;./types.js&quot;;</div><div class="ln add">+import { TypeSafeClient, choice } from &quot;@typesafe-ai/sdk&quot;;</div><div class="ln ctx"> </div><div class="ln ctx"> const BILLING_WORDS = [&quot;invoice&quot;, &quot;refund&quot;, &quot;charge&quot;, &quot;payment&quot;, &quot;billing&quot;, &quot;subscription&quot;, &quot;price&quot;];</div><div class="ln ctx"> const TECH_WORDS = [&quot;error&quot;, &quot;bug&quot;, &quot;crash&quot;, &quot;broken&quot;, &quot;not working&quot;, &quot;500&quot;, &quot;api&quot;, &quot;timeout&quot;];</div><div class="ln ctx"> const ACCOUNT_WORDS = [&quot;password&quot;, &quot;login&quot;, &quot;log in&quot;, &quot;2fa&quot;, &quot;locked&quot;, &quot;email change&quot;, &quot;delete my account&quot;];</div><div class="ln ctx"> </div><div class="ln del">-/** Which team handles the ticket. Keyword guessing over what the customer wrote. */</div><div class="ln del">-export function routeTicket(t: Ticket): Team {</div><div class="ln add">+const jev = new TypeSafeClient();</div><div class="ln add">+</div><div class="ln add">+const TEAM = {</div><div class="ln add">+  team: choice(&quot;Which team should handle this support ticket?&quot;, {</div><div class="ln add">+    billing: &quot;Payments, invoices, refunds, plans&quot;,</div><div class="ln add">+    technical: &quot;Bugs, errors, outages, integrations&quot;,</div><div class="ln add">+    account: &quot;Login, access, profile, security settings&quot;,</div><div class="ln add">+    general: &quot;Anything else&quot;</div><div class="ln add">+  })</div><div class="ln add">+};</div><div class="ln add">+</div><div class="ln add">+/** Which team handles the ticket — Jev reads what the customer meant; the keyword rules stay as the fallback. */</div><div class="ln add">+export async function routeTicket(t: Ticket): Promise&lt;Team&gt; {</div><div class="ln add">+  try {</div><div class="ln add">+    const { answers } = await jev.systemOne({ state: { subject: t.subject, body: t.body }, questions: TEAM });</div><div class="ln add">+    return answers.team.choice;</div><div class="ln add">+  } catch {</div><div class="ln add">+    return legacyRouteTicket(t);</div><div class="ln add">+  }</div><div class="ln add">+}</div><div class="ln add">+</div><div class="ln add">+function legacyRouteTicket(t: Ticket): Team {</div><div class="ln ctx">   const text = `${t.subject} ${t.body}`.toLowerCase();</div><div class="ln ctx">   if (BILLING_WORDS.some((w) =&gt; text.includes(w))) return &quot;billing&quot;;</div><div class="ln ctx">   if (TECH_WORDS.some((w) =&gt; text.includes(w))) return &quot;technical&quot;;</div></div>
+</section>
+<section class="card">
+  <header><div><code>src/priority.ts:3</code><h2>How urgently a ticket needs a human.</h2></div><span class="pill good">Strong fit · 85%</span></header>
+  <div class="meters">
+    <div class="m"><span class="ml">Patterns</span><span class="bar"><i style="width:88%"></i></span><b>88%</b><span class="mn">vs real Jev sites studied</span></div>
+    <div class="m"><span class="ml">AI</span><span class="bar"><i style="width:78%"></i></span><b>78%</b><span class="mn">your AI, after reading the code</span></div>
+    <div class="m"><span class="ml">TypeSafe</span><span class="bar"><i style="width:90%"></i></span><b>90%</b><span class="mn">Jev's own opinion</span></div>
+  </div>
+  <p class="why">3 of 3 sources agree</p>
+  <dl>
+    <dt>Primitive</dt><dd><code>choice</code> <span class="dim">(Jev suggests <code>choice</code>)</span></dd>
+    <dt>Question</dt><dd>How urgently does this customer need help?</dd>
+    <dt>Outcomes</dt><dd><code>urgent</code> <code>normal</code> <code>low</code></dd>
+    <dt>State</dt><dd><code>subject</code> <code>body</code></dd>
+    <dt>Why Jev</dt><dd>Exclamation marks and an all-caps subject stand in for urgency; 'we lost all our data' has neither.</dd>
+    <dt>Stays exact</dt><dd>Due time from the SLA; urgent tickets capped at 2 hours.</dd>
+  </dl>
+  <p class="dim">No change previewed yet.</p>
+</section>
+<section class="card">
+  <header><div><code>src/billing.ts:15</code><h2>Seat price and volume discount for an add-on.</h2></div><span class="pill bad">Weak fit · 14%</span></header>
+  <div class="meters">
+    <div class="m"><span class="ml">Patterns</span><span class="bar"><i style="width:0%"></i></span><b>0%</b><span class="mn">vs real Jev sites studied</span></div>
+    <div class="m"><span class="ml">AI</span><span class="bar"><i style="width:5%"></i></span><b>5%</b><span class="mn">your AI, after reading the code</span></div>
+    <div class="m"><span class="ml">TypeSafe</span><span class="bar"><i style="width:37%"></i></span><b>37%</b><span class="mn">Jev's own opinion</span></div>
+  </div>
+  <p class="why">3 of 3 sources agree</p>
+  <dl>
+    <dt>Primitive</dt><dd><code>choice</code> <span class="dim">(Jev suggests <code>none</code>)</span></dd>
+    <dt>Question</dt><dd>Which discount tier applies?</dd>
+    <dt>Outcomes</dt><dd><code>none</code> <code>10%</code> <code>20%</code></dd>
+    <dt>State</dt><dd><code>plan</code> <code>seats</code></dd>
+    <dt>Why Jev</dt><dd>Checked because static analysis flagged it; it is an exact price table.</dd>
+    <dt>Stays exact</dt><dd>Everything — this is money.</dd>
+  </dl>
+  <p class="dim">No change previewed yet.</p>
+</section>
+</main></body></html>

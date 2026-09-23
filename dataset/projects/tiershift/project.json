@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "slug": "tiershift",
+  "fingerprint": "55412a9c265a562a45fd2fbf",
+  "visibility": "public",
+  "source": "https://github.com/iamvatsalpatel/tiershift",
+  "commit": "16a0826b9f62eba6699240c4b53a7237a8c41617",
+  "license": "MIT",
+  "languages": [
+    "typescript"
+  ],
+  "frameworks": [
+    "anthropic",
+    "typesafe"
+  ],
+  "domains": [
+    "model-routing"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:20.932Z",
+  "updated": "2026-09-19T22:01:20.932Z"
+}

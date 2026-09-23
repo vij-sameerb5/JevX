@@ -1,0 +1,906 @@
+{
+  "schema": 1,
+  "note": "M5 intake queue. Being a Jev project does not make every decision in it a Jev opportunity; label objectively.",
+  "projects": [
+    {
+      "n": 1,
+      "name": "Jev Ultrafast",
+      "url": "https://github.com/browser-use/jev-ultrafast",
+      "slug": "jev-ultrafast",
+      "jevDecides": "Browser operation + target",
+      "whyUseful": "Huge decision/action space",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "partial",
+      "domain": "browser-agents",
+      "checked": {
+        "commit": "1231850a0bf1a0c0341fe408ef1668dbbfdfac46",
+        "commitDate": "2026-09-18",
+        "license": "MIT",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 1681,
+          "js": 351
+        },
+        "tsjsShare": 0.17,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 5
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 2,
+        "functions": 56,
+        "candidates": 3,
+        "filtered": 0
+      },
+      "reason": "mostly python; only the TS/JS part (351 lines) can be analyzed in Phase 1",
+      "split": "train"
+    },
+    {
+      "n": 2,
+      "name": "Jev Experiments",
+      "url": "https://github.com/dabit3/jev-experiments",
+      "slug": "jev-experiments",
+      "jevDecides": "Many different decisions",
+      "whyUseful": "Collection of many real patterns",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "mixed-demos",
+      "checked": {
+        "commit": "43abec33fc2d3e620610b152164d60c72670217b",
+        "commitDate": "2026-09-19",
+        "license": "none found",
+        "mainLanguage": "ts",
+        "loc": {
+          "ts": 40437,
+          "js": 727,
+          "swift": 15947,
+          "shell": 114,
+          "python": 115
+        },
+        "tsjsShare": 0.72,
+        "usesTypesafeSdkPackage": true,
+        "filesMentioningJev": 120
+      },
+      "visibility": "private",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 259,
+        "functions": 2873,
+        "candidates": 185,
+        "filtered": 75
+      },
+      "reason": "TS/JS project; no open-source license found \u2192 stored fingerprint-only (private rules)",
+      "split": "train"
+    },
+    {
+      "n": 3,
+      "name": "Jev Review",
+      "url": "https://github.com/devagrawal09/jev-review",
+      "slug": "jev-review",
+      "jevDecides": "Code quality, risk, severity",
+      "whyUseful": "Excellent code-decision example",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "code-review",
+      "checked": {
+        "commit": "31f89602797fb7bea007f8a480bf368bf564954e",
+        "commitDate": "2026-09-17",
+        "license": "MIT",
+        "mainLanguage": "ts",
+        "loc": {
+          "ts": 1324,
+          "js": 508
+        },
+        "tsjsShare": 1.0,
+        "usesTypesafeSdkPackage": true,
+        "filesMentioningJev": 5
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 18,
+        "functions": 112,
+        "candidates": 13,
+        "filtered": 0
+      },
+      "reason": "TS/JS project",
+      "split": "train"
+    },
+    {
+      "n": 4,
+      "name": "TypeSafe Mario",
+      "url": "https://github.com/fhshaik/typesafe-mario",
+      "slug": "typesafe-mario",
+      "jevDecides": "Game action / danger",
+      "whyUseful": "Structured state \u2192 action",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "games",
+      "checked": {
+        "commit": "ca22449ed187118d19326d1f54b01b6636578aa4",
+        "commitDate": "2026-09-15",
+        "license": "none found",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 1769
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 7
+      },
+      "visibility": "private",
+      "reason": "python project \u2014 needs python support (Phase 1 is TS/JS only); no open-source license found \u2192 stored fingerprint-only (private rules)"
+    },
+    {
+      "n": 5,
+      "name": "Jev Browser Use",
+      "url": "https://github.com/wy-coliney/jev-browser-use",
+      "slug": "jev-browser-use",
+      "jevDecides": "Browser actions",
+      "whyUseful": "Agent decision boundary",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "browser-agents",
+      "checked": {
+        "commit": "f14b60e0ae1ee90cd73eb6650e30a666a84c021a",
+        "commitDate": "2026-09-18",
+        "license": "MIT",
+        "mainLanguage": "js",
+        "loc": {
+          "js": 347
+        },
+        "tsjsShare": 1.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 5
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 1,
+        "functions": 49,
+        "candidates": 7,
+        "filtered": 0
+      },
+      "reason": "TS/JS project",
+      "split": "test"
+    },
+    {
+      "n": 6,
+      "name": "Jev Browser",
+      "url": "https://github.com/jkudish/jev-browser",
+      "slug": "jev-browser",
+      "jevDecides": "Browser actions",
+      "whyUseful": "Another browser architecture",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "browser-agents",
+      "checked": {
+        "commit": "8d90c51bedbe7cd07596bfaa532ded019a31d2a8",
+        "commitDate": "2026-09-19",
+        "license": "MIT",
+        "mainLanguage": "ts",
+        "loc": {
+          "ts": 1220,
+          "js": 225
+        },
+        "tsjsShare": 1.0,
+        "usesTypesafeSdkPackage": true,
+        "filesMentioningJev": 8
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 7,
+        "functions": 67,
+        "candidates": 12,
+        "filtered": 0
+      },
+      "reason": "TS/JS project",
+      "split": "test"
+    },
+    {
+      "n": 7,
+      "name": "TypeSafe Computer Use",
+      "url": "https://github.com/awlevin/typesafe-computer-use",
+      "slug": "typesafe-computer-use",
+      "jevDecides": "Next computer action",
+      "whyUseful": "State \u2192 action",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "computer-use",
+      "checked": {
+        "commit": "cc7b5066ae1a07b5e3182e8f87a9b5b6dfdcffc1",
+        "commitDate": "2026-09-18",
+        "license": "MIT",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 3819
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 19
+      },
+      "visibility": "public",
+      "reason": "python project \u2014 needs python support (Phase 1 is TS/JS only)"
+    },
+    {
+      "n": 8,
+      "name": "Jev Guard",
+      "url": "https://github.com/leepokai/jev-guard",
+      "slug": "jev-guard",
+      "jevDecides": "Allow / ask / deny",
+      "whyUseful": "Security + risk judgment",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "agent-security",
+      "checked": {
+        "commit": "94996ea80b6b308327ac2077706a29ce6abd3ba0",
+        "commitDate": "2026-09-18",
+        "license": "MIT",
+        "mainLanguage": "js",
+        "loc": {
+          "ts": 292,
+          "js": 1323
+        },
+        "tsjsShare": 1.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 5
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 14,
+        "functions": 161,
+        "candidates": 21,
+        "filtered": 4
+      },
+      "reason": "TS/JS project",
+      "split": "train"
+    },
+    {
+      "n": 9,
+      "name": "Jev Router",
+      "url": "https://github.com/gargpratyush/jev-router",
+      "slug": "jev-router",
+      "jevDecides": "Which model to use",
+      "whyUseful": "Model routing",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "model-routing",
+      "checked": {
+        "commit": "38da6b84ea01241bfc41fbddc0928d0f40a703f0",
+        "commitDate": "2026-09-19",
+        "license": "MIT",
+        "mainLanguage": "js",
+        "loc": {
+          "js": 2314
+        },
+        "tsjsShare": 1.0,
+        "usesTypesafeSdkPackage": true,
+        "filesMentioningJev": 6
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 10,
+        "functions": 131,
+        "candidates": 10,
+        "filtered": 2
+      },
+      "reason": "TS/JS project",
+      "split": "train"
+    },
+    {
+      "n": 10,
+      "name": "Pi Jev Router",
+      "url": "https://github.com/mejiasd3v/pi-jev-router",
+      "slug": "pi-jev-router",
+      "jevDecides": "Model routing",
+      "whyUseful": "Agent routing",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "model-routing",
+      "checked": {
+        "commit": "24043d08b4c522a0c07aa432e82cd29bc4e88dd4",
+        "commitDate": "2026-09-18",
+        "license": "MIT",
+        "mainLanguage": "js",
+        "loc": {
+          "ts": 657,
+          "js": 984
+        },
+        "tsjsShare": 1.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 3
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 1,
+        "functions": 75,
+        "candidates": 9,
+        "filtered": 0
+      },
+      "reason": "TS/JS project",
+      "split": "train"
+    },
+    {
+      "n": 11,
+      "name": "OpenAgents",
+      "url": "https://github.com/OpenAgentsInc/openagents",
+      "slug": "openagents",
+      "jevDecides": "Agent/system decisions",
+      "whyUseful": "Larger real codebase",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "agents",
+      "checked": {
+        "commit": "0e02f6b3a33e1634e1d107d708585e47e8f3cf56",
+        "commitDate": "2026-09-19",
+        "license": "Apache-2.0",
+        "mainLanguage": "rust",
+        "loc": {
+          "python": 2288,
+          "rust": 46891,
+          "shell": 257,
+          "swift": 327
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 46
+      },
+      "visibility": "public",
+      "reason": "rust project \u2014 needs rust support (Phase 1 is TS/JS only)"
+    },
+    {
+      "n": 12,
+      "name": "SocAI",
+      "url": "https://github.com/socai-io/socai",
+      "slug": "socai",
+      "jevDecides": "Social-media decisions",
+      "whyUseful": "Large application",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "partial",
+      "domain": "social-media",
+      "checked": {
+        "commit": "05471bb82638a5f933ea092d109203a11d44d3b4",
+        "commitDate": "2026-09-20",
+        "license": "Apache-2.0",
+        "mainLanguage": "rust",
+        "loc": {
+          "rust": 55939,
+          "shell": 433,
+          "python": 1052,
+          "ts": 9399,
+          "js": 7223
+        },
+        "tsjsShare": 0.22,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 2
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 26,
+        "functions": 1180,
+        "candidates": 134,
+        "filtered": 31
+      },
+      "reason": "mostly rust; only the TS/JS part (16622 lines) can be analyzed in Phase 1",
+      "split": "train"
+    },
+    {
+      "n": 13,
+      "name": "Quackd",
+      "url": "https://github.com/rokbenko/quackd",
+      "slug": "quackd",
+      "jevDecides": "Robot actions",
+      "whyUseful": "Robotics/physical decisions",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "partial",
+      "domain": "robotics",
+      "checked": {
+        "commit": "6073829048b4c8152b7260d3c1d2af62709bfd02",
+        "commitDate": "2026-09-19",
+        "license": "Apache-2.0",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 81768,
+          "js": 3230,
+          "shell": 231
+        },
+        "tsjsShare": 0.04,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 15
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 7,
+        "functions": 187,
+        "candidates": 16,
+        "filtered": 0
+      },
+      "reason": "mostly python; only the TS/JS part (3230 lines) can be analyzed in Phase 1",
+      "split": "train"
+    },
+    {
+      "n": 14,
+      "name": "OpenJev-SGLang",
+      "url": "https://github.com/ekzhang/openjev-sglang",
+      "slug": "openjev-sglang",
+      "jevDecides": "Jev-compatible inference",
+      "whyUseful": "Model implementation",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "inference",
+      "checked": {
+        "commit": "604664a22b2cf44c6cc499e503092ae4e3c24c03",
+        "commitDate": "2026-09-18",
+        "license": "none found",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 4850
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 22
+      },
+      "visibility": "private",
+      "reason": "python project \u2014 needs python support (Phase 1 is TS/JS only); no open-source license found \u2192 stored fingerprint-only (private rules)"
+    },
+    {
+      "n": 15,
+      "name": "Open-Jev",
+      "url": "https://github.com/daseinlabs/open-jev",
+      "slug": "open-jev",
+      "jevDecides": "Typed decisions",
+      "whyUseful": "Jev-compatible server",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "inference",
+      "checked": {
+        "commit": "8a4fbdf712e78c5ef45509a16aacb81facdd79be",
+        "commitDate": "2026-09-18",
+        "license": "none found",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 1795
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 15
+      },
+      "visibility": "private",
+      "reason": "python project \u2014 needs python support (Phase 1 is TS/JS only); no open-source license found \u2192 stored fingerprint-only (private rules)"
+    },
+    {
+      "n": 16,
+      "name": "System One",
+      "url": "https://github.com/sgoedecke/system-one",
+      "slug": "system-one",
+      "jevDecides": "General classification",
+      "whyUseful": "Jev-style architecture",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "classification",
+      "checked": {
+        "commit": "ebde2a2db7067b920dfe51e9ce785613e66613d5",
+        "commitDate": "2026-09-18",
+        "license": "none found",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 4429
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 5
+      },
+      "visibility": "private",
+      "reason": "python project \u2014 needs python support (Phase 1 is TS/JS only); no open-source license found \u2192 stored fingerprint-only (private rules)"
+    },
+    {
+      "n": 17,
+      "name": "Jev Trader",
+      "url": "https://github.com/jarrodwatts/jev-trader",
+      "slug": "jev-trader",
+      "jevDecides": "Buy / sell",
+      "whyUseful": "Financial decision",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "finance",
+      "checked": {
+        "commit": "b587759e459ea049590102e54a0b07800864cdc3",
+        "commitDate": "2026-09-16",
+        "license": "MIT",
+        "mainLanguage": "ts",
+        "loc": {
+          "ts": 2928
+        },
+        "tsjsShare": 1.0,
+        "usesTypesafeSdkPackage": true,
+        "filesMentioningJev": 6
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 22,
+        "functions": 223,
+        "candidates": 15,
+        "filtered": 2
+      },
+      "reason": "TS/JS project",
+      "split": "train"
+    },
+    {
+      "n": 18,
+      "name": "Switchboard",
+      "url": "https://github.com/aniruddh-krovvidi/switchboard",
+      "slug": "switchboard",
+      "jevDecides": "Guardrail + model routing",
+      "whyUseful": "Relevant to the AI gateway idea",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "ai-gateway",
+      "checked": {
+        "commit": "2c0ad919d130939877c0ef8b2d31bed59b2947c9",
+        "commitDate": "2026-09-17",
+        "license": "none found",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 579
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 3
+      },
+      "visibility": "private",
+      "reason": "python project \u2014 needs python support (Phase 1 is TS/JS only); no open-source license found \u2192 stored fingerprint-only (private rules)"
+    },
+    {
+      "n": 19,
+      "name": "routeKit",
+      "url": null,
+      "slug": "routekit",
+      "jevDecides": "Best model selection",
+      "whyUseful": "Routing based on task",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "blocked",
+      "domain": "model-routing",
+      "reason": "no repository link given \u2014 need the URL"
+    },
+    {
+      "n": 20,
+      "name": "tiershift",
+      "url": "https://github.com/iamvatsalpatel/tiershift",
+      "slug": "tiershift",
+      "jevDecides": "Cheapest capable model",
+      "whyUseful": "Cost/capability decision",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "model-routing",
+      "checked": {
+        "commit": "16a0826b9f62eba6699240c4b53a7237a8c41617",
+        "commitDate": "2026-09-17",
+        "license": "MIT",
+        "mainLanguage": "ts",
+        "loc": {
+          "ts": 3347,
+          "python": 2773,
+          "shell": 63
+        },
+        "tsjsShare": 0.54,
+        "usesTypesafeSdkPackage": true,
+        "filesMentioningJev": 21
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 20,
+        "functions": 329,
+        "candidates": 15,
+        "filtered": 4
+      },
+      "reason": "TS/JS project",
+      "split": "train"
+    },
+    {
+      "n": 21,
+      "name": "TypeSafe Migration Guard",
+      "url": "https://github.com/opaielsheikh/typesafe-migration-guard",
+      "slug": "typesafe-migration-guard",
+      "jevDecides": "Safe / dangerous migration",
+      "whyUseful": "Security gate",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "db-security",
+      "checked": {
+        "commit": "7f15597d1fb35f25fdc2b7921a1274caad7bea98",
+        "commitDate": "2026-09-17",
+        "license": "none found",
+        "mainLanguage": "ts",
+        "loc": {
+          "ts": 1158,
+          "shell": 88
+        },
+        "tsjsShare": 0.93,
+        "usesTypesafeSdkPackage": true,
+        "filesMentioningJev": 7
+      },
+      "visibility": "private",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 4,
+        "functions": 16,
+        "candidates": 1,
+        "filtered": 0
+      },
+      "reason": "TS/JS project; no open-source license found \u2192 stored fingerprint-only (private rules)",
+      "split": "train"
+    },
+    {
+      "n": 22,
+      "name": "Jev Scout",
+      "url": "https://github.com/AkashPriyadarshii/jev-scout",
+      "slug": "jev-scout",
+      "jevDecides": "Repo/crate relevance",
+      "whyUseful": "Search/ranking decision",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "search-ranking",
+      "checked": {
+        "commit": "acae39260212267288353451c6977aeab7d6af1d",
+        "commitDate": "2026-09-18",
+        "license": "MIT",
+        "mainLanguage": "rust",
+        "loc": {
+          "rust": 775
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 8
+      },
+      "visibility": "public",
+      "reason": "rust project \u2014 needs rust support (Phase 1 is TS/JS only)"
+    },
+    {
+      "n": 23,
+      "name": "Jev MCP (jkudish)",
+      "url": "https://github.com/jkudish/jev-mcp",
+      "slug": "jev-mcp",
+      "jevDecides": "Verify / screen / rank",
+      "whyUseful": "Multiple decision primitives",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "mcp-tools",
+      "checked": {
+        "commit": "67dd9fa5a6e895909f1b2d80bf45534c29cff25a",
+        "commitDate": "2026-09-19",
+        "license": "MIT",
+        "mainLanguage": "ts",
+        "loc": {
+          "ts": 2041,
+          "js": 1202
+        },
+        "tsjsShare": 1.0,
+        "usesTypesafeSdkPackage": true,
+        "filesMentioningJev": 6
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 3,
+        "functions": 151,
+        "candidates": 14,
+        "filtered": 2
+      },
+      "reason": "TS/JS project",
+      "split": "test"
+    },
+    {
+      "n": 24,
+      "name": "Jev MCP (Blakestone)",
+      "url": "https://github.com/blakestone-x/jev-mcp",
+      "slug": "jev-mcp-blakestone-x",
+      "jevDecides": "Classify / score / match / screen",
+      "whyUseful": "Primitive coverage",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "mcp-tools",
+      "checked": {
+        "commit": "59289a0b472a3ebc3e9abfebba2d59ec2c881863",
+        "commitDate": "2026-09-16",
+        "license": "MIT",
+        "mainLanguage": "python",
+        "loc": {
+          "shell": 223,
+          "python": 3570
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 8
+      },
+      "visibility": "public",
+      "reason": "python project \u2014 needs python support (Phase 1 is TS/JS only)"
+    },
+    {
+      "n": 25,
+      "name": "Jevbridge",
+      "url": "https://github.com/tacticocc/Jevbridge",
+      "slug": "jevbridge",
+      "jevDecides": "Routing/gating/computer use",
+      "whyUseful": "Jev + LLM architecture",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "agents",
+      "checked": {
+        "commit": "54c5587565cb346788d67805ef2412f46a21bb33",
+        "commitDate": "2026-09-18",
+        "license": "MIT",
+        "mainLanguage": "ts",
+        "loc": {
+          "ts": 2417,
+          "js": 18
+        },
+        "tsjsShare": 1.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 4
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 20,
+        "functions": 115,
+        "candidates": 15,
+        "filtered": 6
+      },
+      "reason": "TS/JS project",
+      "split": "test"
+    },
+    {
+      "n": 26,
+      "name": "Jev Moderation Bot",
+      "url": "https://github.com/brainstormity/Jev-Moderation-Bot",
+      "slug": "jev-moderation-bot",
+      "jevDecides": "Spam/phishing/social engineering",
+      "whyUseful": "Moderation + escalation",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "moderation",
+      "checked": {
+        "commit": "1629ac80bea758883ee7541ffc654c83acfae4b6",
+        "commitDate": "2026-09-18",
+        "license": "none found",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 4550
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 11
+      },
+      "visibility": "private",
+      "reason": "python project \u2014 needs python support (Phase 1 is TS/JS only); no open-source license found \u2192 stored fingerprint-only (private rules)"
+    },
+    {
+      "n": 27,
+      "name": "JevLogs",
+      "url": "https://github.com/reachjalil/jevlogs",
+      "slug": "jevlogs",
+      "jevDecides": "Which logs are important",
+      "whyUseful": "Triage/scoring",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "ready",
+      "domain": "observability",
+      "checked": {
+        "commit": "b1ff60079c30d50a7f93dbfa09848f9539665d44",
+        "commitDate": "2026-09-17",
+        "license": "MIT",
+        "mainLanguage": "ts",
+        "loc": {
+          "ts": 850,
+          "js": 331
+        },
+        "tsjsShare": 1.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 12
+      },
+      "visibility": "public",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 9,
+        "functions": 87,
+        "candidates": 9,
+        "filtered": 3
+      },
+      "reason": "TS/JS project",
+      "split": "train"
+    },
+    {
+      "n": 28,
+      "name": "Commit Miner",
+      "url": "https://github.com/devanshbatham/commit-miner",
+      "slug": "commit-miner",
+      "jevDecides": "Commit/change classification",
+      "whyUseful": "Code understanding",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "partial",
+      "domain": "dev-workflow",
+      "checked": {
+        "commit": "977617ebce07c56b965253a68577b1d92b93fdf1",
+        "commitDate": "2026-09-17",
+        "license": "none found",
+        "mainLanguage": "rust",
+        "loc": {
+          "ts": 282,
+          "rust": 6584,
+          "js": 82
+        },
+        "tsjsShare": 0.05,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 9
+      },
+      "visibility": "private",
+      "offlineAnalysis": {
+        "analysisVersion": "a1",
+        "sourceFiles": 6,
+        "functions": 73,
+        "candidates": 5,
+        "filtered": 3
+      },
+      "reason": "mostly rust; only the TS/JS part (364 lines) can be analyzed in Phase 1; no open-source license found \u2192 stored fingerprint-only (private rules)",
+      "split": "train"
+    },
+    {
+      "n": 29,
+      "name": "Every",
+      "url": "https://github.com/sufianetaouil/every",
+      "slug": "every",
+      "jevDecides": "Question \u2192 function relevance",
+      "whyUseful": "Very relevant to JevX",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "code-search",
+      "checked": {
+        "commit": "aaa72d582a831420dfd23a788e3bc948c798c248",
+        "commitDate": "2026-09-17",
+        "license": "MIT",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 3690
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 13
+      },
+      "visibility": "public",
+      "reason": "python project \u2014 needs python support (Phase 1 is TS/JS only)"
+    },
+    {
+      "n": 30,
+      "name": "jgrep",
+      "url": "https://github.com/keltokhy/jgrep",
+      "slug": "jgrep",
+      "jevDecides": "Semantic line matching",
+      "whyUseful": "Semantic code search",
+      "source": "Sameer's list (2026-09-20)",
+      "status": "needs_language",
+      "domain": "code-search",
+      "checked": {
+        "commit": "bc0dc8ddb63f9ae940490d436123775d08217b6b",
+        "commitDate": "2026-09-19",
+        "license": "MIT",
+        "mainLanguage": "python",
+        "loc": {
+          "python": 2976
+        },
+        "tsjsShare": 0.0,
+        "usesTypesafeSdkPackage": false,
+        "filesMentioningJev": 9
+      },
+      "visibility": "public",
+      "reason": "python project \u2014 needs python support (Phase 1 is TS/JS only)"
+    }
+  ]
+}

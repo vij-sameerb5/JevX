@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "slug": "quackd",
+  "fingerprint": "753c68a7f3fb03a762b72745",
+  "visibility": "public",
+  "source": "https://github.com/rokbenko/quackd",
+  "commit": "6073829048b4c8152b7260d3c1d2af62709bfd02",
+  "license": "Apache-2.0",
+  "languages": [
+    "javascript"
+  ],
+  "frameworks": [],
+  "domains": [
+    "robotics"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:14.701Z",
+  "updated": "2026-09-19T22:01:14.701Z"
+}

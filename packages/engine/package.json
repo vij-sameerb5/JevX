@@ -1,0 +1,15 @@
+{
+  "name": "@jevx/engine",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": {
+    "@jevx/analyzer": "workspace:*",
+    "@jevx/core": "workspace:*",
+    "@jevx/gemini": "workspace:*",
+    "@jevx/scanner": "workspace:*",
+    "@jevx/typesafe": "workspace:*",
+    "diff": "^8.0.2"
+  }
+}

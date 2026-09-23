@@ -1,0 +1,62 @@
+{
+  "$comment": "Hand-labelled ground truth for the detector regression suite. positive = must score >= minimum; negative = must score < minimum. Reference by file + function name.",
+  "positive": [
+    {
+      "file": "src/router.ts",
+      "context": "routeMessage",
+      "minBand": "strong"
+    },
+    {
+      "file": "src/spam.ts",
+      "context": "isSpam"
+    },
+    {
+      "file": "src/sentiment.js",
+      "context": "reactTo"
+    },
+    {
+      "file": "src/sentiment.js",
+      "context": "classifyFeedback"
+    },
+    {
+      "file": "src/spam.ts",
+      "context": "priorityOf",
+      "note": "urgency regex over ticket text \u2014 semantic"
+    },
+    {
+      "file": "src/fuzzy.ts",
+      "context": "closestIntent",
+      "note": "fuzzy match of free text against intent phrases"
+    }
+  ],
+  "negative": [
+    {
+      "file": "src/negatives.ts",
+      "context": "loaderFor"
+    },
+    {
+      "file": "src/negatives.ts",
+      "context": "handle"
+    },
+    {
+      "file": "src/negatives.ts",
+      "context": "reducer"
+    },
+    {
+      "file": "src/negatives.ts",
+      "context": "isSecure"
+    },
+    {
+      "file": "src/negatives.ts",
+      "context": "hasFlag"
+    },
+    {
+      "file": "src/negatives.ts",
+      "context": "canEdit"
+    },
+    {
+      "file": "src/negatives.ts",
+      "context": "isEmail"
+    }
+  ]
+}

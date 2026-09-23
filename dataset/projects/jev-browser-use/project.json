@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "slug": "jev-browser-use",
+  "fingerprint": "2bd447979a0c22f3f10b07cb",
+  "visibility": "public",
+  "source": "https://github.com/wy-coliney/jev-browser-use",
+  "commit": "f14b60e0ae1ee90cd73eb6650e30a666a84c021a",
+  "license": "MIT",
+  "languages": [
+    "javascript"
+  ],
+  "frameworks": [],
+  "domains": [
+    "browser-agents"
+  ],
+  "split": "test",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:00:57.318Z",
+  "updated": "2026-09-19T22:00:57.318Z"
+}

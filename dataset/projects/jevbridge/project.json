@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "slug": "jevbridge",
+  "fingerprint": "f031af4c3cba491313785a70",
+  "visibility": "public",
+  "source": "https://github.com/tacticocc/Jevbridge",
+  "commit": "54c5587565cb346788d67805ef2412f46a21bb33",
+  "license": "MIT",
+  "languages": [
+    "typescript"
+  ],
+  "frameworks": [],
+  "domains": [
+    "agents"
+  ],
+  "split": "test",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:28.397Z",
+  "updated": "2026-09-19T22:01:28.397Z"
+}

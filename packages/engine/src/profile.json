@@ -1,0 +1,106 @@
+{
+  "source": "dataset/boundary/patterns.json",
+  "runId": "2026-09-20T18-48-01-353Z",
+  "from": {
+    "jevSites": 7,
+    "deterministicDecisions": 4,
+    "projects": 6
+  },
+  "note": "Learned from a small pilot. A match means 'looks like the Jev sites we studied', not 'Jev is right here'.",
+  "features": {
+    "semantic_ambiguity": {
+      "jevTop": "high",
+      "jev": {
+        "high": 7
+      },
+      "deterministicTop": "none",
+      "deterministic": {
+        "none": 3,
+        "high": 1
+      }
+    },
+    "context_dependence": {
+      "jevTop": "high",
+      "jev": {
+        "high": 4,
+        "medium": 3
+      },
+      "deterministicTop": "low",
+      "deterministic": {
+        "low": 2,
+        "none": 2
+      }
+    },
+    "deterministic_expressibility": {
+      "jevTop": "low",
+      "jev": {
+        "low": 6,
+        "medium": 1
+      },
+      "deterministicTop": "high",
+      "deterministic": {
+        "high": 3,
+        "low": 1
+      }
+    },
+    "judgment_required": {
+      "jevTop": "high",
+      "jev": {
+        "high": 7
+      },
+      "deterministicTop": "none",
+      "deterministic": {
+        "none": 3,
+        "high": 1
+      }
+    },
+    "rule_stability": {
+      "jevTop": "low",
+      "jev": {
+        "low": 5,
+        "medium": 2
+      },
+      "deterministicTop": "high",
+      "deterministic": {
+        "high": 3,
+        "low": 1
+      }
+    },
+    "risk_or_policy_component": {
+      "jevTop": "high",
+      "jev": {
+        "high": 5,
+        "none": 2
+      },
+      "deterministicTop": "low",
+      "deterministic": {
+        "low": 2,
+        "high": 1,
+        "medium": 1
+      }
+    },
+    "natural_language_understanding": {
+      "jevTop": "high",
+      "jev": {
+        "high": 5,
+        "medium": 2
+      },
+      "deterministicTop": "none",
+      "deterministic": {
+        "none": 3,
+        "high": 1
+      }
+    },
+    "decision_complexity": {
+      "jevTop": "medium",
+      "jev": {
+        "medium": 7
+      },
+      "deterministicTop": "low",
+      "deterministic": {
+        "low": 3,
+        "medium": 1
+      }
+    }
+  }
+}

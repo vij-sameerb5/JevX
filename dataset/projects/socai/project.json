@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "slug": "socai",
+  "fingerprint": "aedc4a629f9a7921702d2fe1",
+  "visibility": "public",
+  "source": "https://github.com/socai-io/socai",
+  "commit": "05471bb82638a5f933ea092d109203a11d44d3b4",
+  "license": "Apache-2.0",
+  "languages": [
+    "javascript",
+    "typescript"
+  ],
+  "frameworks": [],
+  "domains": [
+    "social-media"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:12.060Z",
+  "updated": "2026-09-19T22:01:12.060Z"
+}

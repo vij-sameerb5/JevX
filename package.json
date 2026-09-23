@@ -1,0 +1,46 @@
+{
+  "name": "jevx-monorepo",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx apps/cli/src/index.tsx",
+    "build": "pnpm --filter jevx --filter jevx-lab build",
+    "jevx": "tsx apps/jevx/src/index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "eval": "tsx scripts/eval.ts",
+    "corpus": "tsx scripts/corpus.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@jevx/analyzer": "workspace:*",
+    "@jevx/boundary": "workspace:*",
+    "@jevx/core": "workspace:*",
+    "@jevx/dataset": "workspace:*",
+    "@jevx/detector": "workspace:*",
+    "@jevx/engine": "workspace:*",
+    "@jevx/gemini": "workspace:*",
+    "@jevx/scanner": "workspace:*",
+    "@jevx/typesafe": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@types/figlet": "^1.7.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@typesafe-ai/sdk": "^0.6.0",
+    "eslint": "^10.11.0",
+    "execa": "^10.0.1",
+    "prettier": "^3.0.0",
+    "ts-morph": "^28.0.0",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^5.0.1"
+  },
+  "packageManager": "pnpm@10.34.5"
+}

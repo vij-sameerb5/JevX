@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "slug": "jev-browser",
+  "fingerprint": "4a51f55c17f88ced3c5bd75b",
+  "visibility": "public",
+  "source": "https://github.com/jkudish/jev-browser",
+  "commit": "8d90c51bedbe7cd07596bfaa532ded019a31d2a8",
+  "license": "MIT",
+  "languages": [
+    "typescript"
+  ],
+  "frameworks": [
+    "typesafe",
+    "vercel-ai"
+  ],
+  "domains": [
+    "browser-agents"
+  ],
+  "split": "test",
+  "splitSource": "manual",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:00:59.863Z",
+  "updated": "2026-09-19T22:00:59.863Z"
+}

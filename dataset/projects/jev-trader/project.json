@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "slug": "jev-trader",
+  "fingerprint": "bde007bc7f80c96d1d2e2bd1",
+  "visibility": "public",
+  "source": "https://github.com/jarrodwatts/jev-trader",
+  "commit": "b587759e459ea049590102e54a0b07800864cdc3",
+  "license": "MIT",
+  "languages": [
+    "typescript"
+  ],
+  "frameworks": [
+    "vercel-ai"
+  ],
+  "domains": [
+    "finance"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:01:17.760Z",
+  "updated": "2026-09-19T22:01:17.760Z"
+}

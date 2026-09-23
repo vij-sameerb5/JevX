@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "slug": "jev-ultrafast",
+  "fingerprint": "9d3a1a43084764be1946614a",
+  "visibility": "public",
+  "source": "https://github.com/browser-use/jev-ultrafast",
+  "commit": "1231850a0bf1a0c0341fe408ef1668dbbfdfac46",
+  "license": "MIT",
+  "languages": [
+    "javascript"
+  ],
+  "frameworks": [],
+  "domains": [
+    "browser-agents"
+  ],
+  "split": "train",
+  "splitSource": "hash",
+  "splitSeed": "jevx-split-v1",
+  "analysisVersion": "a1",
+  "added": "2026-09-19T22:00:45.498Z",
+  "updated": "2026-09-19T22:00:45.498Z"
+}

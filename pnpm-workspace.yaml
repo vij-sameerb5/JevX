@@ -1,0 +1,7 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# pnpm 10 blocks install scripts by default; esbuild (tsup/tsx/vitest) needs its postinstall.
+onlyBuiltDependencies:
+  - esbuild

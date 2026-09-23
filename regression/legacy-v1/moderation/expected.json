@@ -1,0 +1,14 @@
+{
+  "positive": [
+    { "file": "src/filter.ts", "context": "isAbusive" },
+    { "file": "src/filter.ts", "context": "toxicity" },
+    { "file": "src/filter.ts", "context": "spamScore" },
+    { "file": "src/filter.ts", "context": "shouldEscalate" }
+  ],
+  "negative": [
+    { "file": "src/render.ts", "context": "escapeHtml" },
+    { "file": "src/render.ts", "context": "renderInline" },
+    { "file": "src/render.ts", "context": "truncate" },
+    { "file": "src/render.ts", "context": "wordCount" }
+  ]
+}

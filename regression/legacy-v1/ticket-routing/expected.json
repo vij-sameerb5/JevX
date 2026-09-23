@@ -1,0 +1,15 @@
+{
+  "positive": [
+    { "file": "src/route.ts", "context": "departmentFor" },
+    { "file": "src/route.ts", "context": "priorityFor" },
+    { "file": "src/route.ts", "context": "isComplaint" }
+  ],
+  "negative": [
+    { "file": "src/http.ts", "context": "statusColor" },
+    { "file": "src/http.ts", "context": "isApiRoute" },
+    { "file": "src/http.ts", "context": "isJson" },
+    { "file": "src/http.ts", "context": "isImage" },
+    { "file": "src/http.ts", "context": "logLevel" },
+    { "file": "src/http.ts", "context": "isProduction" }
+  ]
+}
