@@ -236,3 +236,16 @@ footer .wrap { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; j
 .pill.x { background: color-mix(in srgb, var(--red) 16%, transparent); color: var(--red); }
 :root[data-theme="dark"] .pill.w { color: #e0bf6a; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill.w { color: #e0bf6a; } }
+
+/* ── final "What is JevX?" ── */
+.final { display: grid; gap: 18px; justify-items: center; text-align: center; padding-block: 72px 56px; margin-top: 24px; border-top: 1px solid var(--rule); }
+.final .big { font: 700 clamp(2.4rem, 8vw, 5rem)/1 var(--display); letter-spacing: -0.02em; color: var(--ink); }
+.final .lead { max-width: 40ch; font-size: clamp(1.1rem, 2.4vw, 1.4rem); line-height: 1.45; }
+.final .lead b { color: var(--accent-ink); }
+.final .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; width: 100%; max-width: 980px; text-align: left; margin-top: 8px; }
+.final .three > div { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); padding: 18px; display: grid; gap: 6px; align-content: start; }
+.final .three b { font: 600 0.75rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-ink); }
+.final .three p { color: var(--muted); font-size: 0.95rem; margin: 0; }
+.final > .muted { max-width: 60ch; }
+.final .btns { justify-content: center; }
+@media (max-width: 760px) { .final .three { grid-template-columns: 1fr; } }
