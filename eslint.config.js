@@ -15,7 +15,7 @@ export default tseslint.config(
     files: ["site/**/*.js"],
     languageOptions: {
       sourceType: "script",
-      globals: { document: "readonly", window: "readonly", navigator: "readonly", getSelection: "readonly", matchMedia: "readonly", setTimeout: "readonly", clearTimeout: "readonly" }
+      globals: { document: "readonly", window: "readonly", navigator: "readonly", getSelection: "readonly", matchMedia: "readonly", setTimeout: "readonly", clearTimeout: "readonly", history: "readonly", location: "readonly", getComputedStyle: "readonly", IntersectionObserver: "readonly" }
     }
   }
 );

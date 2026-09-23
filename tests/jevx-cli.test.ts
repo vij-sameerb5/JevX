@@ -85,7 +85,7 @@ describe("jevx (one command, no human in the loop)", () => {
     expect(out).toMatch(/Checks after: tests pass/);
     expect(out).toMatch(/Added @typesafe-ai\/sdk to package\.json/);
     expect(out).toMatch(/Source Control/);
-    expect(out).toMatch(/npx jevx undo/);
+    expect(out).toMatch(/npx @vij-sameerb5\/jevx undo/);
     expect(out).toMatch(/AI call\(s\)/);
 
     // the code on disk

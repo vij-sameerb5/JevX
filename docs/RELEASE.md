@@ -9,7 +9,7 @@ npm login                       # your npm account
 npm whoami
 ```
 
-The name `jevx` was free on 2026-09-23. Check again: `npm view jevx` → 404 means free.
+npm refused the unscoped name `jevx` (too similar to `jest`/`levn`), so the package is **`@vij-sameerb5/jevx`**. The command it installs is still `jevx`. Publish with `npm publish --access public`.
 
 ## Every release
 
@@ -37,8 +37,8 @@ pnpm build-mcpb                        # → apps/jevx/jevx-0.4.0.mcpb (validate
 After publishing, from a clean folder:
 
 ```
-npx jevx@latest --version
-npx jevx --dry-run
+npx @vij-sameerb5/jevx@latest --version
+npx @vij-sameerb5/jevx --dry-run
 ```
 
 ## A fix release (0.4.1)

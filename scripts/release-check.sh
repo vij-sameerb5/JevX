@@ -17,9 +17,9 @@ fi
 say "build + pack"
 pnpm -s build
 cd apps/jevx
-rm -f jevx-*.tgz
+rm -f jevx-*.tgz vij-sameerb5-jevx-*.tgz
 pnpm pack >/dev/null
-TGZ=$(ls jevx-*.tgz)
+TGZ=$(ls vij-sameerb5-jevx-*.tgz)
 echo "  $TGZ ($(du -h "$TGZ" | cut -f1))"
 
 say "tarball contents"

@@ -10,7 +10,7 @@ real Jev projects) and replaces the strong fits with a Jev decision (TypeSafe **
 · **score**) — keeping the old rule as the fallback, and proving it with your own tests.
 
 ```bash
-npm i -g jevx
+npm i -g @vij-sameerb5/jevx
 cd your-project
 jevx --dry-run      # preview: scorecards + red/green diffs, nothing written
 jevx                # change strong fits (70%+), run your tests, auto-revert what breaks

@@ -7,6 +7,25 @@
 
 ---
 
+## 2026-09-23 — Session 33: site terminal autoplays; full MCP / .mcpb setup guide
+
+- **Terminal on the home page now plays by itself:** every tab is typed out in turn, then it loops. Each tab shows a progress bar. A pause/play button replaces "replay". Clicking a tab jumps to it.
+  - It only plays while the terminal is on screen and the browser tab is visible.
+  - Reduced-motion users get static frames and must press play to start.
+  - It never scrolls the page (the tab strip scrolls sideways only).
+  - The screen now has a fixed height, so the page no longer jumps.
+- **New "Claude Desktop" recording** (the .mcpb install, preview, then `jevx_apply` at a named 60% fit). The Claude Code recording now shows the full `jevx mcp install` output and the 64% POSSIBLE preview.
+- **Pixel logo** is now one block with line-height 1, and the shadow is drawn as a solid dark █ instead of ▓. The same change is in the CLI (`apps/jevx/src/logo.ts`).
+- **The `#mcp` section is now a full setup guide:**
+  - 3 steps: install, restart, ask
+  - per-app tabs with steps and copyable config (deep links like `#mcp-desktop`, `#mcp-claude-code`) for Claude Desktop (.mcpb), Claude Desktop (JSON), Claude Code, Cursor, VS Code, Windsurf, Gemini CLI, Codex, and any MCP app
+  - prompts to copy
+  - a table of what each tool may do (read-only / `.jevx` only / changes files / sends, opt-in)
+  - how to add the TypeSafe key, how to uninstall, and fixes for common problems
+- docs.html links to the guide. ESLint site globals: added history, location, getComputedStyle, IntersectionObserver. 243 tests, typecheck and lint clean. Checked in Chromium at 1280px and 390px: no horizontal scroll, the loop wraps, pause/resume works, deep links work.
+
+---
+
 ## 2026-09-23 — Session 32: scorecard calibrated on real data; fewer approvals; privacy proven by tests
 
 - **Claude Desktop (.mcpb) works:** it shows 11 tools and scanned a real repo. Seen there:

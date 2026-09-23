@@ -20,7 +20,7 @@
       <a href="docs.html" aria-current="page">Docs</a>
       <a href="contributing.html">Contribute</a>
       <a href="https://github.com/vij-sameerb5/JevX">GitHub</a>
-      <a href="https://www.npmjs.com/package/jevx">npm</a>
+      <a href="https://www.npmjs.com/package/@vij-sameerb5/jevx">npm</a>
     </nav>
   </div>
 </header>
@@ -49,12 +49,12 @@
 
     <section id="start">
       <h2>Quick start</h2>
-      <div class="codebox"><pre class="code">npm i -g jevx
+      <div class="codebox"><pre class="code">npm i -g @vij-sameerb5/jevx
 export XAI_API_KEY=…         <span class="c"># your key (or OPENROUTER_API_KEY)</span>
 cd your-project
 jevx --dry-run               <span class="c"># preview, writes nothing</span>
 jevx                         <span class="c"># change strong fits, run your tests</span>
-jevx undo                    <span class="c"># put everything back</span></pre><button class="copy" type="button" data-copy="npm i -g jevx">Copy</button></div>
+jevx undo                    <span class="c"># put everything back</span></pre><button class="copy" type="button" data-copy="npm i -g @vij-sameerb5/jevx">Copy</button></div>
       <p>After a real run, open VS Code or Cursor → <b>Source Control</b>. Every change is there in red/green. <code>.jevx/report.html</code> has every scorecard and diff.</p>
     </section>
 
@@ -151,6 +151,7 @@ jevx --min-fit 55             <span class="c"># write it</span></pre><button cla
       <p>It finds and configures every supported app on your machine: <b>Claude Code, Claude Desktop, Cursor, Windsurf, VS Code (Copilot), Gemini CLI and Codex</b>. Each config file is backed up once, and anything else in it is left alone. Restart the app, open a project and say <i>"use jevx to find where Jev fits in this repo"</i>.</p>
       <p><b>Claude Desktop:</b> it has no open project, so name the folder (<i>"…in ~/code/my-app"</i>). Or install <code>jevx.mcpb</code>: double-click it, pick your project folder once, and optionally paste your TypeSafe key. Claude Desktop stores the key, not JevX. It can't edit files itself, so it uses <code>jevx_apply</code>, which backs up, runs your tests and reverts on failure.</p>
       <p><b>Any other MCP app:</b> the install output prints the command and arguments to paste.</p>
+      <p class="note">Step-by-step setup for each app (the .mcpb, config snippets, Claude Code commands, the TypeSafe key, uninstall and fixes) is on the home page: <a href="index.html#mcp-desktop">Add JevX to Claude and other apps →</a></p>
       <p>The AI uses these tools with its own tokens:</p>
       <div class="table"><table>
         <thead><tr><th>Tool</th><th>What it gives the AI</th></tr></thead>
@@ -256,7 +257,7 @@ jevx --min-fit 55             <span class="c"># write it</span></pre><button cla
 <footer>
   <div class="wrap">
     <span><b style="color:var(--accent)">JEVX</b> · MIT</span>
-    <span class="btns"><a class="btn" href="index.html">Home</a><a class="btn" href="contributing.html">Contribute</a><a class="btn" href="https://www.npmjs.com/package/jevx">npm</a></span>
+    <span class="btns"><a class="btn" href="index.html">Home</a><a class="btn" href="contributing.html">Contribute</a><a class="btn" href="https://www.npmjs.com/package/@vij-sameerb5/jevx">npm</a></span>
   </div>
 </footer>
 

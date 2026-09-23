@@ -17,11 +17,12 @@
     <a class="mark" href="index.html"><i></i>JEVX</a>
     <nav aria-label="Main">
       <a class="hide-sm" href="#how">How it works</a>
+      <a class="hide-sm" href="#mcp">Add to Claude</a>
       <a class="hide-sm" href="#commands">Commands</a>
       <a href="docs.html">Docs</a>
       <a href="contributing.html">Contribute</a>
       <a href="https://github.com/vij-sameerb5/JevX">GitHub</a>
-      <a href="https://www.npmjs.com/package/jevx">npm</a>
+      <a href="https://www.npmjs.com/package/@vij-sameerb5/jevx">npm</a>
     </nav>
   </div>
 </header>
@@ -32,11 +33,11 @@
     <p class="tag">Find where Jev fits in your codebase.</p>
     <p class="sub">Regexes that guess what an error means. Keyword lists that guess what a customer wants. <code>slice(0, 3)</code> that guesses what's best. JevX finds these judgment calls hiding as rules, and hands them to Jev. The old rule stays as the fallback.</p>
     <div class="btns">
-      <a class="btn primary" href="#install">Install <code>npm i -g jevx</code></a>
+      <a class="btn primary" href="#install">Install <code>npm i -g @vij-sameerb5/jevx</code></a>
+      <a class="btn" href="#mcp">Add to Claude</a>
       <a class="btn" href="docs.html">Read the docs</a>
-      <a class="btn" href="https://github.com/vij-sameerb5/JevX">GitHub</a>
     </div>
-    <div class="install"><span>$ <b>npx jevx --dry-run</b></span><button class="copy" type="button" data-copy="npx jevx --dry-run">Copy</button></div>
+    <div class="install"><span>$ <b>npx @vij-sameerb5/jevx --dry-run</b></span><button class="copy" type="button" data-copy="npx @vij-sameerb5/jevx --dry-run">Copy</button></div>
 
     <div class="term" role="region" aria-label="JevX terminal recordings">
       <div class="term-bar">
@@ -48,8 +49,9 @@
           <button type="button" role="tab" data-rec="diff">red/green</button>
           <button type="button" role="tab" data-rec="apply">apply + tests</button>
           <button type="button" role="tab" data-rec="mcp">Claude Code</button>
+          <button type="button" role="tab" data-rec="desktop">Claude Desktop</button>
         </div>
-        <button class="replay" id="replay" type="button">▶ replay</button>
+        <button class="replay" id="replay" type="button" aria-pressed="false">❚❚ pause</button>
       </div>
       <pre class="screen" id="screen" aria-live="polite"></pre>
       <div class="term-cap" id="term-cap"></div>
@@ -145,21 +147,265 @@ jevx undo</pre><button class="copy" type="button" data-copy="jevx --dry-run">Cop
 
   <section class="block wrap" id="mcp">
     <div class="block-head">
-      <span class="eyebrow">Claude Code · Claude Desktop · Cursor · more</span>
+      <span class="eyebrow">MCP · Claude Desktop · Claude Code · Cursor · VS Code · more</span>
       <h2>Or let the AI you already use do it.</h2>
-      <p>JevX is also an MCP server. Your AI reads the code with JevX's tools and its own tokens. JevX adds the Jev know-how, the scorecard, the diffs and a safe apply. No JevX key needed. One command adds it to Claude Code, Claude Desktop, Cursor, Windsurf, VS Code, Gemini CLI and Codex.</p>
+      <p>JevX is also an MCP server with 11 tools. Your AI reads the code with its own tokens. JevX adds the Jev know-how, the scorecard, red/green diffs and a safe apply with your tests. You don't need an xAI key for this. Pick your app below.</p>
     </div>
-    <div class="cols">
-      <div class="codebox"><pre class="code">jevx mcp install
-<span class="c"># restart Claude Code / Cursor, then say:</span>
-<span class="o">use jevx to find where Jev fits in this repo</span>
 
-<span class="c"># Claude Desktop: or double-click jevx.mcpb</span>
-<span class="c"># and pick your project folder once</span></pre><button class="copy" type="button" data-copy="jevx mcp install">Copy</button></div>
+    <div class="steps3">
+      <div><b>1 · Install</b><p>Claude Desktop: double-click <code>jevx.mcpb</code>. Everything else: <code>npm i -g @vij-sameerb5/jevx</code>, then <code>jevx mcp install</code>.</p></div>
+      <div><b>2 · Restart</b><p>Quit the app fully and open it again. JevX's tools appear in the tools / MCP menu.</p></div>
+      <div><b>3 · Ask</b><p>Open your project and say <i>"use jevx to find where Jev fits in this repo"</i>. Add <i>"preview only"</i> to change nothing.</p></div>
+    </div>
+
+    <div class="clients">
+      <div class="ctabs" role="tablist" aria-label="Choose your AI app">
+        <button type="button" role="tab" id="t-desktop" aria-controls="p-desktop" data-hash="mcp-desktop" aria-selected="true">Claude Desktop<span class="tag">1-CLICK</span></button>
+        <button type="button" role="tab" id="t-desktop-json" aria-controls="p-desktop-json" data-hash="mcp-desktop-json">Claude Desktop · JSON</button>
+        <button type="button" role="tab" id="t-code" aria-controls="p-code" data-hash="mcp-claude-code">Claude Code</button>
+        <button type="button" role="tab" id="t-cursor" aria-controls="p-cursor" data-hash="mcp-cursor">Cursor</button>
+        <button type="button" role="tab" id="t-vscode" aria-controls="p-vscode" data-hash="mcp-vscode">VS Code</button>
+        <button type="button" role="tab" id="t-windsurf" aria-controls="p-windsurf" data-hash="mcp-windsurf">Windsurf</button>
+        <button type="button" role="tab" id="t-gemini" aria-controls="p-gemini" data-hash="mcp-gemini">Gemini CLI</button>
+        <button type="button" role="tab" id="t-codex" aria-controls="p-codex" data-hash="mcp-codex">Codex</button>
+        <button type="button" role="tab" id="t-any" aria-controls="p-any" data-hash="mcp-any">Any MCP app</button>
+      </div>
+
+      <div class="cpanel" role="tabpanel" id="p-desktop" aria-labelledby="t-desktop">
+        <div>
+          <h3>Claude Desktop: the .mcpb extension</h3>
+          <ol>
+            <li>Download <code>jevx-0.4.0.mcpb</code> from <a href="https://github.com/vij-sameerb5/JevX/releases/latest">GitHub releases</a>.</li>
+            <li>Double-click it. Or go to <b>Settings → Extensions → Advanced settings → Install extension…</b> and choose the file.</li>
+            <li>Click <b>Install</b>. Pick your <b>Project folder</b>. You can add a <b>TypeSafe API key</b> too (optional).</li>
+            <li>Make sure JevX is switched on, then start a new chat.</li>
+            <li>Say <i>"use jevx to find where Jev fits in my project"</i>.</li>
+          </ol>
+        </div>
+        <div class="side">
+          <p class="note">You don't need a terminal, npm or config file. Claude Desktop keeps the TypeSafe key in its own settings, never in JevX.</p>
+          <p class="hint"><b>"Not verified by Anthropic"?</b> That's expected for any extension from outside Anthropic's directory. The code is open on <a href="https://github.com/vij-sameerb5/JevX">GitHub</a>, and the file is built by <code>scripts/build-mcpb.mjs</code>.</p>
+          <p class="hint"><b>Asked to allow every tool?</b> Choose <i>Always allow</i> for the read-only tools (see the table below). Keep <code>jevx_apply</code> on <i>Allow once</i>, because it changes files.</p>
+          <p class="hint"><b>Another project?</b> Name it in chat: <i>"…in ~/code/other-app"</i>.</p>
+        </div>
+      </div>
+
+      <div class="cpanel" role="tabpanel" id="p-desktop-json" aria-labelledby="t-desktop-json" hidden>
+        <div>
+          <h3>Claude Desktop: config file</h3>
+          <ol>
+            <li>Easiest: run <code>npm i -g @vij-sameerb5/jevx &amp;&amp; jevx mcp install</code>. It writes this entry for you, with the right paths.</li>
+            <li>By hand: go to <b>Settings → Developer → Edit Config</b> to open <code>claude_desktop_config.json</code>.</li>
+            <li>Add the <code>jevx</code> entry. Use absolute paths, because apps opened from the Dock don't see your shell's <code>PATH</code>.</li>
+            <li>Quit Claude Desktop fully (<b>⌘Q</b> / tray → Quit) and open it again.</li>
+          </ol>
+          <p class="hint">The file lives at <code>~/Library/Application Support/Claude/</code> on macOS and <code>%APPDATA%\Claude\</code> on Windows.</p>
+        </div>
+        <div class="side">
+          <div class="codebox"><pre class="code">{
+  "mcpServers": {
+    "jevx": {
+      "command": "/opt/homebrew/bin/node",
+      "args": ["/opt/homebrew/lib/node_modules/@vij-sameerb5/jevx/dist/index.js", "mcp"],
+      "env": {
+        "JEVX_ROOT": "/Users/you/code/my-app",
+        "JEVX_ENV_FILE": "/Users/you/.jevx/.env"
+      }
+    }
+  }
+}</pre><button class="copy" type="button">Copy</button></div>
+          <div class="codebox"><pre class="code"><span class="c"># your two paths:</span>
+which node
+echo "$(npm root -g)/@vij-sameerb5/jevx/dist/index.js"</pre><button class="copy" type="button">Copy</button></div>
+          <p class="hint"><code>JEVX_ROOT</code> is the default project. <code>JEVX_ENV_FILE</code> points at the file that holds <code>TYPESAFE_API_KEY=…</code>, so the key never goes in this config.</p>
+        </div>
+      </div>
+
+      <div class="cpanel" role="tabpanel" id="p-code" aria-labelledby="t-code" hidden>
+        <div>
+          <h3>Claude Code</h3>
+          <ol>
+            <li>Run <code>jevx mcp install</code>. It uses Claude's own CLI to add JevX for every project.</li>
+            <li>Or add it yourself with one of the commands on the right.</li>
+            <li>Open your project with <code>claude</code>. Type <code>/mcp</code> to see <b>jevx · connected</b>.</li>
+            <li>Say <i>"use jevx to find where Jev fits in this repo"</i>. Claude edits files itself and runs your tests.</li>
+          </ol>
+        </div>
+        <div class="side">
+          <div class="codebox"><pre class="code"><span class="c"># installed globally</span>
+claude mcp add --scope user jevx -- jevx mcp
+
+<span class="c"># or without installing</span>
+claude mcp add --scope user jevx -- npx -y @vij-sameerb5/jevx mcp
+
+<span class="c"># with your TypeSafe key file</span>
+claude mcp add --scope user -e JEVX_ENV_FILE=$HOME/.jevx/.env jevx -- jevx mcp
+
+claude mcp list   <span class="c"># check</span></pre><button class="copy" type="button">Copy</button></div>
+        </div>
+      </div>
+
+      <div class="cpanel" role="tabpanel" id="p-cursor" aria-labelledby="t-cursor" hidden>
+        <div>
+          <h3>Cursor</h3>
+          <ol>
+            <li>Run <code>jevx mcp install</code>. Or add the entry on the right to <code>~/.cursor/mcp.json</code> (every project) or <code>.cursor/mcp.json</code> (this project only).</li>
+            <li>Open <b>Cursor Settings → MCP</b> and check that <b>jevx</b> is on with 11 tools.</li>
+            <li>In Agent chat, say <i>"use jevx to find where Jev fits in this repo"</i>.</li>
+          </ol>
+        </div>
+        <div class="side">
+          <div class="codebox"><pre class="code">{
+  "mcpServers": {
+    "jevx": { "command": "npx", "args": ["-y", "@vij-sameerb5/jevx", "mcp"] }
+  }
+}</pre><button class="copy" type="button">Copy</button></div>
+          <p class="hint">Seeing "spawn npx ENOENT"? The app can't see your <code>PATH</code>. Run <code>jevx mcp install</code> instead: it writes absolute paths.</p>
+        </div>
+      </div>
+
+      <div class="cpanel" role="tabpanel" id="p-vscode" aria-labelledby="t-vscode" hidden>
+        <div>
+          <h3>VS Code (GitHub Copilot)</h3>
+          <ol>
+            <li>Run <code>jevx mcp install</code>. Or open the Command Palette → <b>MCP: Open User Configuration</b> (or add <code>.vscode/mcp.json</code> to the project).</li>
+            <li>Add the entry on the right. VS Code uses <code>servers</code>, not <code>mcpServers</code>.</li>
+            <li>Open Copilot Chat in <b>Agent</b> mode and turn on the JevX tools in the tools menu.</li>
+          </ol>
+        </div>
+        <div class="side">
+          <div class="codebox"><pre class="code">{
+  "servers": {
+    "jevx": { "type": "stdio", "command": "npx", "args": ["-y", "@vij-sameerb5/jevx", "mcp"] }
+  }
+}</pre><button class="copy" type="button">Copy</button></div>
+        </div>
+      </div>
+
+      <div class="cpanel" role="tabpanel" id="p-windsurf" aria-labelledby="t-windsurf" hidden>
+        <div>
+          <h3>Windsurf</h3>
+          <ol>
+            <li>Run <code>jevx mcp install</code>. Or add the entry on the right to <code>~/.codeium/windsurf/mcp_config.json</code>.</li>
+            <li>In Cascade, open the MCP servers panel and refresh.</li>
+            <li>Say <i>"use jevx to find where Jev fits in this repo"</i>.</li>
+          </ol>
+        </div>
+        <div class="side">
+          <div class="codebox"><pre class="code">{
+  "mcpServers": {
+    "jevx": { "command": "npx", "args": ["-y", "@vij-sameerb5/jevx", "mcp"] }
+  }
+}</pre><button class="copy" type="button">Copy</button></div>
+        </div>
+      </div>
+
+      <div class="cpanel" role="tabpanel" id="p-gemini" aria-labelledby="t-gemini" hidden>
+        <div>
+          <h3>Gemini CLI</h3>
+          <ol>
+            <li>Run <code>jevx mcp install</code>. Or add the entry on the right to <code>~/.gemini/settings.json</code>.</li>
+            <li>Start <code>gemini</code> in your project and type <code>/mcp</code> to see the JevX tools.</li>
+            <li>Say <i>"use jevx to find where Jev fits in this repo"</i>.</li>
+          </ol>
+        </div>
+        <div class="side">
+          <div class="codebox"><pre class="code">{
+  "mcpServers": {
+    "jevx": { "command": "jevx", "args": ["mcp"] }
+  }
+}</pre><button class="copy" type="button">Copy</button></div>
+        </div>
+      </div>
+
+      <div class="cpanel" role="tabpanel" id="p-codex" aria-labelledby="t-codex" hidden>
+        <div>
+          <h3>OpenAI Codex CLI</h3>
+          <ol>
+            <li>Run <code>jevx mcp install</code>. Or add the block on the right to <code>~/.codex/config.toml</code>.</li>
+            <li>Start <code>codex</code> in your project and say <i>"use jevx to find where Jev fits in this repo"</i>.</li>
+          </ol>
+        </div>
+        <div class="side">
+          <div class="codebox"><pre class="code">[mcp_servers.jevx]
+command = "jevx"
+args = ["mcp"]</pre><button class="copy" type="button">Copy</button></div>
+        </div>
+      </div>
+
+      <div class="cpanel" role="tabpanel" id="p-any" aria-labelledby="t-any" hidden>
+        <div>
+          <h3>Any MCP app</h3>
+          <p>JevX is a standard <b>stdio</b> MCP server. Point your app at it like this:</p>
+          <div class="table"><table>
+            <tbody>
+              <tr><td>command</td><td><code>jevx</code> <span class="muted">or</span> <code>npx</code></td></tr>
+              <tr><td>args</td><td><code>["mcp"]</code> <span class="muted">or</span> <code>["-y", "@vij-sameerb5/jevx", "mcp"]</code></td></tr>
+              <tr><td><code>JEVX_ROOT</code></td><td>Default project folder (optional)</td></tr>
+              <tr><td><code>JEVX_ENV_FILE</code></td><td>File with <code>TYPESAFE_API_KEY=…</code> (optional)</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="side">
+          <div class="codebox"><pre class="code"><span class="c"># test it in a terminal (Ctrl+C to stop)</span>
+jevx mcp
+<span class="c"># → jevx-mcp 0.4.0 ready (root: …)</span></pre><button class="copy" type="button" data-copy="jevx mcp">Copy</button></div>
+          <p class="hint">For an app opened from the Dock or Start menu, use absolute paths. <code>jevx mcp install</code> prints the exact command for your machine.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cols" style="margin-top:28px">
       <div>
-        <h3>11 tools</h3>
-        <p><code>jevx_guide</code>, <code>jevx_scan</code> (with a reading order), <code>jevx_read</code>, <code>jevx_related</code>, <code>jevx_search</code>, <code>jevx_scorecard</code>, <code>jevx_preview_change</code>, <code>jevx_apply</code> and <code>jevx_undo</code> for apps that can't edit files, <code>jevx_report</code>, and the opt-in <code>jevx_share</code>.</p>
-        <p>Say <i>"use Jev where the fit is at least 55%"</i> to go lower. It never goes under 50%.</p>
+        <h3>What to say</h3>
+        <div class="say">
+          <div class="q"><span>use jevx to find where Jev fits in this repo</span><button class="copy" type="button" data-copy="use jevx to find where Jev fits in this repo">Copy</button></div>
+          <div class="q"><span>use jevx on ~/code/my-app. Preview only, don't change anything</span><button class="copy" type="button" data-copy="use jevx on ~/code/my-app. Preview only, don't change anything">Copy</button></div>
+          <div class="q"><span>use Jev where the fit is at least 60%</span><button class="copy" type="button" data-copy="use Jev where the fit is at least 60%">Copy</button></div>
+          <div class="q"><span>show me the JevX report</span><button class="copy" type="button" data-copy="show me the JevX report">Copy</button></div>
+          <div class="q"><span>undo the JevX change</span><button class="copy" type="button" data-copy="undo the JevX change">Copy</button></div>
+        </div>
+        <p class="hint" style="margin-top:10px">Without a fit you name, only STRONG fits (70%+) are changed. It never goes under 50%.</p>
+      </div>
+      <div>
+        <h3>What each tool may do</h3>
+        <div class="table"><table class="perm">
+          <tbody>
+            <tr><td><span class="pill ro">READ-ONLY</span></td><td><code>jevx_guide</code> <code>jevx_scan</code> <code>jevx_read</code> <code>jevx_related</code> <code>jevx_search</code> — safe to <i>always allow</i></td></tr>
+            <tr><td><span class="pill">.JEVX ONLY</span></td><td><code>jevx_scorecard</code> <code>jevx_preview_change</code> <code>jevx_report</code> — write only JevX's own git-ignored <code>.jevx/</code> folder</td></tr>
+            <tr><td><span class="pill w">CHANGES FILES</span></td><td><code>jevx_apply</code> <code>jevx_undo</code> — backup, your tests before and after, automatic revert</td></tr>
+            <tr><td><span class="pill x">SENDS · OPT-IN</span></td><td><code>jevx_share</code> — anonymous outcomes only, never code, names or paths</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="cols" style="margin-top:28px">
+      <div>
+        <h3>Add TypeSafe (optional)</h3>
+        <p>With a TypeSafe key, every scorecard gets Jev's own opinion as a third score. Without one, <code>jevx_scan</code> says <i>TypeSafe NOT configured</i> and scorecards use two sources.</p>
+        <ul class="hint" style="padding-left:18px; margin:8px 0 0">
+          <li><b>Claude Desktop (.mcpb):</b> the <i>TypeSafe API key</i> field (Settings → Extensions → JevX)</li>
+          <li><b>Everything else:</b> put <code>TYPESAFE_API_KEY=…</code> in a file and point <code>JEVX_ENV_FILE</code> at it</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Remove it</h3>
+        <div class="codebox"><pre class="code"><span class="c"># every app it was added to</span>
+jevx mcp uninstall
+
+<span class="c"># Claude Code only</span>
+claude mcp remove --scope user jevx</pre><button class="copy" type="button" data-copy="jevx mcp uninstall">Copy</button></div>
+        <p class="hint" style="margin-top:8px">The Claude Desktop extension: Settings → Extensions → JevX → Uninstall. Each config file is backed up once before its first change, as <code>&lt;file&gt;.jevx-backup</code>.</p>
+      </div>
+      <div>
+        <h3>If something's off</h3>
+        <ul class="hint" style="padding-left:18px; margin:0; display:grid; gap:6px">
+          <li><b>No JevX tools:</b> quit the app fully and reopen it. Then check that the config is valid JSON.</li>
+          <li><b>"… is not a project folder":</b> name your project in chat, or set the Project folder / <code>JEVX_ROOT</code>.</li>
+          <li><b>spawn npx / node ENOENT:</b> the app can't see your <code>PATH</code>. Run <code>jevx mcp install</code>, which uses absolute paths.</li>
+          <li><b>Still stuck:</b> run <code>jevx mcp</code> in a terminal. It should print <i>ready</i>.</li>
+        </ul>
       </div>
     </div>
   </section>
@@ -170,11 +416,11 @@ jevx undo</pre><button class="copy" type="button" data-copy="jevx --dry-run">Cop
       <h2>Up and running in a minute.</h2>
     </div>
     <div class="cols">
-      <div class="codebox"><pre class="code">npm i -g jevx          <span class="c"># or use npx jevx</span>
+      <div class="codebox"><pre class="code">npm i -g @vij-sameerb5/jevx          <span class="c"># or use npx @vij-sameerb5/jevx</span>
 export XAI_API_KEY=…    <span class="c"># or OPENROUTER_API_KEY</span>
 export TYPESAFE_API_KEY=…  <span class="c"># optional</span>
 cd your-project
-jevx --dry-run</pre><button class="copy" type="button" data-copy="npm i -g jevx">Copy</button></div>
+jevx --dry-run</pre><button class="copy" type="button" data-copy="npm i -g @vij-sameerb5/jevx">Copy</button></div>
       <div>
         <h3>Requirements</h3>
         <p>Node 20.10 or newer, and a TypeScript or JavaScript project. Works on macOS, Linux and Windows.</p>
@@ -253,7 +499,7 @@ jevx --dry-run</pre><button class="copy" type="button" data-copy="npm i -g jevx"
 <footer>
   <div class="wrap">
     <span><b style="color:var(--accent)">JEVX</b> · Find where Jev fits in your codebase · MIT</span>
-    <span class="btns"><a class="btn" href="https://github.com/vij-sameerb5/JevX">GitHub</a><a class="btn" href="https://www.npmjs.com/package/jevx">npm</a><a class="btn" href="docs.html#versions">Changelog</a></span>
+    <span class="btns"><a class="btn" href="https://github.com/vij-sameerb5/JevX">GitHub</a><a class="btn" href="https://www.npmjs.com/package/@vij-sameerb5/jevx">npm</a><a class="btn" href="docs.html#versions">Changelog</a></span>
   </div>
 </footer>
 
