@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JevX</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="https://jevx.live" target="_blank" rel="noopener" title="jevx.live">
+      <img src="icons/icon32.png" alt="" width="22" height="22"><b>JEVX</b><span>for GitHub</span>
+    </a>
+    <nav class="links" aria-label="JevX links">
+      <a href="https://jevx.live" target="_blank" rel="noopener" title="Website · jevx.live"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.8 2.6 15.2 0 18M12 3c-2.6 2.8-2.6 15.2 0 18"/></svg><span class="sr">jevx.live</span></a>
+      <a href="https://github.com/vij-sameerb5/JevX" target="_blank" rel="noopener" title="Source code on GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg><span class="sr">Source on GitHub</span></a>
+      <a id="opts" href="#" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="sr">Settings</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- not on a repo -->
+    <section id="welcome" class="welcome" hidden>
+      <img src="icons/icon128.png" alt="" width="56" height="56">
+      <h1>Find where Jev fits in any repo</h1>
+      <p>Open a GitHub repository and JevX shows the exact lines where a hardcoded rule should be a Jev judgment, with a confidence score for each.</p>
+      <ol class="how">
+        <li><b>Open a repo</b><span>Any public repo, or private with a GitHub token.</span></li>
+        <li><b>Click Find where Jev fits</b><span>Your AI reads the logic files. Nothing changes on GitHub.</span></li>
+        <li><b>Apply it locally</b><span>Copy the prompt for Claude or the JevX command.</span></li>
+      </ol>
+      <a class="btn ghost" href="https://jevx.live" target="_blank" rel="noopener">How JevX works · jevx.live ↗</a>
+    </section>
+
+    <!-- on a repo -->
+    <section id="ctx" class="ctx" hidden>
+      <div class="repo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v15H6a2 2 0 0 0-2 2V5zM4 20a2 2 0 0 0 2 2h12v-4"/></svg><span id="repo-name"></span></div>
+      <div class="chips" id="ctx-chips"></div>
+    </section>
+
+    <section id="setup" class="panel" hidden>
+      <h2 id="setup-title">Connect your AI</h2>
+      <p id="setup-msg" class="muted"></p>
+      <button id="open-opts" class="btn primary" type="button">Open settings</button>
+    </section>
+
+    <section id="go" class="go" hidden>
+      <button id="run" class="btn primary big" type="button">Find where Jev fits</button>
+      <p id="go-msg" class="hint"></p>
+    </section>
+
+    <section id="progress" class="steps" hidden aria-live="polite"></section>
+    <section id="error" class="alert" hidden role="alert"></section>
+    <section id="results" class="results"></section>
+  </main>
+
+  <script type="module" src="panel.js"></script>
+</body>
+</html>

@@ -2,6 +2,12 @@
 
 All notable changes to `jevx`. Versions follow [semver](https://semver.org); before 1.0, minor versions may change behaviour.
 
+## Unreleased (0.4.1)
+
+- **No passing tests means no changes.** If a project has no test script or typecheck, or they already fail, JevX previews but writes nothing. `--allow-untested` (MCP: `allow_untested`) opts out.
+- **Edits tolerate whitespace:** when the AI gets indentation, trailing spaces or line endings wrong, the change is matched line by line. A missing or ambiguous match is still refused.
+- **`--only <paths…>`** limits a run to some folders or files.
+
 ## 0.4.0 — 2026-09-23 · first public release candidate
 
 - **Learns where and why Jev fits.** Every finding now carries a generic *pattern* (e.g. `error-message-regex-classifier`: input kind, rule kind, code shape, why Jev beats the rule). With `--share`, these go to the JevX dataset — scrubbed in code of every file, function, identifier and string literal. Learned outcomes feed back into the patterns score in later releases.

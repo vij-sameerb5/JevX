@@ -30,6 +30,10 @@ export interface RunFlags {
   fast?: boolean;
   /** Write the full result (local only) to this JSON file. */
   reportJson?: string;
+  /** Write even when no passing test / typecheck can verify the change. */
+  allowUntested?: boolean;
+  /** Only these folders / files. */
+  only?: string[];
 }
 
 const log = (s = "") => void process.stdout.write(s + "\n");
@@ -85,6 +89,7 @@ export async function run(f: RunFlags): Promise<number> {
     // previews show everything from 50%; real runs only write what reaches --min-fit
     minFit: f.dryRun ? MIN_FIT_FLOOR : minFit,
     includeDisagree: f.includeDisagree,
+    ...(f.only?.length ? { only: f.only.map((p) => path.relative(root, path.resolve(root, p)) || ".").filter((p) => p !== ".") } : {}),
     ...(f.fast ? { readEffort: "low" as const } : {}),
     onEvent: (e) => {
       if (e.type === "indexed") log(ok(`Indexed ${n(e.files)} files · ${e.candidates} possible spot(s)${e.existingJev ? ` · Jev already used in ${e.existingJev}` : ""} ${dim("(local, free)")}`));
@@ -134,10 +139,11 @@ export async function run(f: RunFlags): Promise<number> {
       runId,
       opportunities: toApply,
       verify: f.verify,
+      requireChecks: !f.allowUntested,
       install: f.install,
       onEvent: (e) => {
         if (e.type === "baseline" && e.results.length) log(ok(`Checks before: ${e.results.map((r) => `${r.name} ${r.ok ? chalk.green("pass") : chalk.yellow("already failing")}`).join(" · ")}`));
-        if (e.type === "baseline" && !e.results.length) log(warn("No test script or TypeScript config found — changes are not verified"));
+        if (e.type === "baseline" && !e.results.length) log(warn(f.allowUntested ? "No test script or TypeScript config found — changes are not verified (--allow-untested)" : "No test script or TypeScript config found"));
         if (e.type === "installing") log(step(`Installing @typesafe-ai/sdk with ${e.pm}…`));
         if (e.type === "isolating") log(warn(`A check failed — trying the ${e.count} change(s) one at a time`));
         if (e.type === "reverted") log(warn(`Reverted ${e.opportunity.unit.name}(): ${e.reason}`));
@@ -179,6 +185,7 @@ export async function run(f: RunFlags): Promise<number> {
     const notChanged = found.length - kept.size;
     if (notChanged) lines.push(`${chalk.yellow.bold(String(notChanged))} left as is  ${dim("(weak, unsure, or not safe to change)")}`);
     if (applied?.checks.after.length) lines.push(`Checks after: ${applied.checks.after.map((r) => `${r.name} ${r.ok ? chalk.green("pass") : chalk.red("fail")}`).join(" · ")}`);
+    if (applied?.unverified) lines.push(chalk.yellow("Nothing written: no passing tests / typecheck to prove the changes are safe. Add a test script, or rerun with --allow-untested."));
     if (applied?.dependency?.added) lines.push(applied.dependency.installed === false ? chalk.yellow(`Added @typesafe-ai/sdk to package.json — ${applied.dependency.error}`) : `Added @typesafe-ai/sdk to package.json`);
   }
   lines.push("");

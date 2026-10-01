@@ -35,6 +35,8 @@ const program = new Command()
   .option("--max <n>", "most places to inspect (default 12)", Number)
   .option("--budget <tokens>", "token budget for the run (default 400000)", Number)
   .option("--no-verify", "don't run your tests / typecheck")
+  .option("--only <paths...>", "only read and change these folders or files (e.g. --only src/api lib)")
+  .option("--allow-untested", "write changes even when the project has no passing tests / typecheck to verify them")
   .option("--no-install", "don't install @typesafe-ai/sdk")
   .option("-y, --yes", "don't ask before sending code to the AI")
   .option("--share", "share anonymous outcomes (no code) with the JevX dataset; same as JEVX_SHARE=1")
@@ -43,9 +45,9 @@ const program = new Command()
   .option("--include-disagree", "also write fits the sources disagree on, if they reach --min-fit")
   .option("--report-json <file>", "also write the full result as JSON (stays on your machine)")
   .option("--fast", "less AI reasoning while reading the code (cheaper, may miss spots)")
-  .action(async (p: string, o: { welcome?: boolean; dryRun?: boolean; provider?: string; model?: string; max?: number; budget?: number; verify: boolean; install: boolean; yes?: boolean; share?: boolean; minFit?: number; includePossible?: boolean; includeDisagree?: boolean; fast?: boolean; reportJson?: string }) => {
+  .action(async (p: string, o: { welcome?: boolean; dryRun?: boolean; provider?: string; model?: string; max?: number; budget?: number; verify: boolean; install: boolean; yes?: boolean; share?: boolean; minFit?: number; includePossible?: boolean; includeDisagree?: boolean; fast?: boolean; reportJson?: string; allowUntested?: boolean; only?: string[] }) => {
     if (o.welcome) return log(bigLogo(VERSION));
-    process.exitCode = await run({ root: p, provider: o.provider, model: o.model, max: o.max, budget: o.budget, dryRun: Boolean(o.dryRun), verify: o.verify, install: o.install, yes: Boolean(o.yes), share: o.share, envFile, minFit: o.minFit ?? (o.includePossible ? 50 : undefined), includeDisagree: Boolean(o.includeDisagree), fast: Boolean(o.fast), reportJson: o.reportJson });
+    process.exitCode = await run({ root: p, provider: o.provider, model: o.model, max: o.max, budget: o.budget, dryRun: Boolean(o.dryRun), verify: o.verify, install: o.install, yes: Boolean(o.yes), share: o.share, envFile, minFit: o.minFit ?? (o.includePossible ? 50 : undefined), includeDisagree: Boolean(o.includeDisagree), fast: Boolean(o.fast), reportJson: o.reportJson, allowUntested: Boolean(o.allowUntested), only: o.only });
   });
 
 program

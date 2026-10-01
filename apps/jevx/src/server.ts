@@ -403,10 +403,10 @@ export function createServer(): McpServer {
       title: "Apply a previewed change",
       description:
         "For AI apps that cannot edit files themselves (e.g. Claude Desktop): writes a change previewed with jevx_preview_change. Refuses fits under 50% and files you (or the user) changed since the preview, skips files with uncommitted edits, backs up, runs the project's tests / typecheck before and after and reverts the change if it breaks them. Undo with jevx_undo.",
-      inputSchema: { root: rootArg, id: z.string().describe("Proposal id from jevx_preview_change / jevx_report."), run_checks: z.boolean().optional().describe("Run the project's tests / typecheck before and after (default true).") },
+      inputSchema: { root: rootArg, id: z.string().describe("Proposal id from jevx_preview_change / jevx_report."), run_checks: z.boolean().optional().describe("Run the project's tests / typecheck before and after (default true)."), allow_untested: z.boolean().optional().describe("Write even if the project has no passing tests / typecheck to verify the change. Only when the user explicitly asks.") },
       annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false }
     },
-    async ({ root, id, run_checks }) => {
+    async ({ root, id, run_checks, allow_untested }) => {
       try {
         const r = projectRoot(root);
         const rec = loadProposal(r, id);
@@ -420,6 +420,7 @@ export function createServer(): McpServer {
           runId: `mcp-${new Date().toISOString().replace(/[:.]/g, "-")}`,
           opportunities: [{ id, file: rec.change.file, unit: { name: "", start: rec.startLine, end: rec.endLine }, origin: "ai", status: "strong", edits: [{ file: rec.change.file, find: current, replace: rec.change.after }] }],
           verify: run_checks !== false,
+          requireChecks: allow_untested !== true,
           install: false
         });
         const checks = (xs: { name: string; ok: boolean }[]) => xs.map((c) => `${c.name} ${c.ok ? "pass" : "fail"}`).join(" · ") || "none found";

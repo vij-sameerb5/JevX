@@ -202,7 +202,11 @@ describe("jevx-mcp over stdio", () => {
     });
     const lines = before.split("\n");
     await call("jevx_preview_change", { file: "src/routing.ts", start_line: 8, end_line: 8, new_code: `${lines[7]} // applied by jevx_apply` });
-    const a = await call("jevx_apply", { id: "src_routing.ts_L8" });
+    // the demo has no tests: nothing can verify the change, so it is refused unless the user opts in
+    const refused = await call("jevx_apply", { id: "src_routing.ts_L8" });
+    expect(refused.text).toMatch(/Not applied: no test script or typecheck found/);
+    expect(readFileSync(path.join(repo, "src/routing.ts"), "utf8")).toBe(before);
+    const a = await call("jevx_apply", { id: "src_routing.ts_L8", allow_untested: true });
     expect(a.isError).toBe(false);
     expect(a.text).toMatch(/Applied src_routing\.ts_L8/);
     expect(readFileSync(path.join(repo, "src/routing.ts"), "utf8")).toMatch(/applied by jevx_apply/);

@@ -7,6 +7,23 @@
 
 ---
 
+## 2026-10-01 — Session 34: community Jev study, safety fixes, Chrome extension preview
+
+- **Studied 26 open-source Jev projects** (`scripts/study-jev-repos.mjs`, needs `GITHUB_TOKEN`; output in the git-ignored `dataset/jev-community/`). 22 had visible Jev code: **82 real Jev decisions**, labelled in `dataset/jev-community-labels.json`. See `docs/COMMUNITY-PATTERNS.md`.
+  - Big finding: **43 of 82 replace an LLM call** that only picks a label or answers yes/no. Only 8 replace regex / includes / if-else rules.
+  - That explains why ordinary web apps score 33–68%. The 2.0 plan targets LLM label calls first (`docs/V2-PLAN.md`).
+- **Safety: no passing tests or typecheck → nothing is written** (preview only). `--allow-untested` (CLI) and `allow_untested` (MCP) opt out.
+- **Edits tolerate whitespace:** a line-by-line match that ignores indentation, trailing spaces and line endings. Missing or ambiguous matches are still refused.
+- **`--only <paths…>`** scopes a run to some folders or files.
+- **Chrome extension preview** (`apps/jevx-extension`, MV3, read-only):
+  - On a GitHub repo it uses your Gemini key and returns confidence cards: AI + patterns, with the same rubric and `profile.json` as the CLI.
+  - Each card has "copy prompt for Claude" and "copy CLI command". Keys stay in local extension storage.
+  - Tested with mocks: unit tests, plus loaded in Chromium end to end.
+  - Not tested against live Gemini: this session's network blocks the Gemini API.
+- 255 tests, typecheck, lint and release-check all green. No git, no publish.
+
+---
+
 ## 2026-09-23 — Session 33: site terminal autoplays; full MCP / .mcpb setup guide
 
 - **Terminal on the home page now plays by itself:** every tab is typed out in turn, then it loops. Each tab shows a progress bar. A pause/play button replaces "replay". Clicking a tab jumps to it.
