@@ -65,6 +65,30 @@ afterAll(async () => {
 });
 
 describe("jevx (one command, no human in the loop)", () => {
+  it("--only limits what is read and changed", async () => {
+    const d = demo();
+    const r = await jevx([d, "--yes", "--dry-run", "--only", "src/billing.ts"]);
+    expect(r.exitCode).toBe(0);
+    expect(r.stdout).not.toMatch(/routing\.ts:\d+/);
+  });
+
+  it("writes nothing when the project has no tests to verify the change, unless --allow-untested", async () => {
+    const d = demo();
+    const pkg = JSON.parse(readFileSync(path.join(d, "package.json"), "utf8"));
+    delete pkg.scripts;
+    writeFileSync(path.join(d, "package.json"), JSON.stringify(pkg, null, 2));
+    const before = readFileSync(path.join(d, "src/routing.ts"), "utf8");
+    const r = await jevx([d, "--yes", "--no-install"]);
+    expect(r.exitCode).toBe(0);
+    expect(r.stdout).toMatch(/Nothing written: no passing tests \/ typecheck/);
+    expect(r.stdout).toMatch(/not changed: no test script or typecheck found/);
+    expect(readFileSync(path.join(d, "src/routing.ts"), "utf8")).toBe(before);
+    const ok = await jevx([d, "--yes", "--no-install", "--allow-untested"]);
+    expect(ok.stdout).toMatch(/changes are not verified \(--allow-untested\)/);
+    expect(readFileSync(path.join(d, "src/routing.ts"), "utf8")).not.toBe(before);
+    await jevx(["undo", d]);
+  });
+
   it("finds, judges, changes the strong fit, reverts the one that breaks tests, and undo restores everything", async () => {
     const d = demo();
     const before = { routing: readFileSync(path.join(d, "src/routing.ts"), "utf8"), inbox: readFileSync(path.join(d, "src/inbox.ts"), "utf8"), priority: readFileSync(path.join(d, "src/priority.ts"), "utf8"), billing: readFileSync(path.join(d, "src/billing.ts"), "utf8") };

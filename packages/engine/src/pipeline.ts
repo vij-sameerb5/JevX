@@ -91,6 +91,8 @@ export interface PipelineOptions {
   minFit?: number;
   /** Also write fits where the sources disagree (REVIEW_DISAGREE), if they reach `minFit`. */
   includeDisagree?: boolean;
+  /** Only read and change files under these folders / files (relative to root). Default: the whole repo. */
+  only?: string[];
   onEvent?: (e: PipelineEvent) => void;
 }
 
@@ -168,13 +170,40 @@ export function applyEditsInMemory(read: (file: string) => string | undefined, e
       return t === undefined ? undefined : { before: t, after: t };
     })();
     if (!cur) return { error: `${e.file} does not exist` };
-    const at = cur.after.indexOf(e.find);
-    if (at < 0) return { error: `in ${e.file}: the text to replace was not found` };
-    if (cur.after.indexOf(e.find, at + 1) >= 0) return { error: `in ${e.file}: the text to replace occurs more than once` };
-    cur.after = cur.after.slice(0, at) + e.replace + cur.after.slice(at + e.find.length);
+    let at = cur.after.indexOf(e.find);
+    let len = e.find.length;
+    if (at < 0) {
+      // the AI often gets indentation, trailing spaces or line endings slightly wrong: match line by line, ignoring those
+      const loose = looseFind(cur.after, e.find);
+      if ("error" in loose) return { error: `in ${e.file}: ${loose.error}` };
+      ({ at, len } = loose);
+    } else if (cur.after.indexOf(e.find, at + 1) >= 0) return { error: `in ${e.file}: the text to replace occurs more than once` };
+    cur.after = cur.after.slice(0, at) + e.replace + cur.after.slice(at + len);
     files.set(e.file, cur);
   }
   return { files };
+}
+
+/** Find `find` in `text` comparing trimmed lines (blank lines in `find` ignored at the ends). Must match exactly once. */
+export function looseFind(text: string, find: string): { at: number; len: number } | { error: string } {
+  const want = find.replace(/\r\n/g, "\n").split("\n").map((l) => l.trim());
+  while (want.length && !want[0]) want.shift();
+  while (want.length && !want[want.length - 1]) want.pop();
+  if (!want.length) return { error: "the text to replace is empty" };
+  const lines = text.split("\n");
+  const starts: number[] = [];
+  let off = 0;
+  for (const l of lines) { starts.push(off); off += l.length + 1; }
+  const hits: number[] = [];
+  for (let i = 0; i + want.length <= lines.length; i++) if (want.every((w, k) => lines[i + k]!.trim() === w)) hits.push(i);
+  if (!hits.length) return { error: "the text to replace was not found" };
+  if (hits.length > 1) return { error: "the text to replace occurs more than once" };
+  const i = hits[0]!;
+  const last = lines[i + want.length - 1]!;
+  const end = starts[i + want.length - 1]! + last.replace(/\r$/, "").length;
+  // keep the original indentation of the first line
+  const at = starts[i]! + (lines[i]!.length - lines[i]!.trimStart().length);
+  return { at, len: end - at };
 }
 
 export function patchOf(files: Map<string, { before: string; after: string }>): string {
@@ -212,7 +241,9 @@ export async function runPipeline(opts: PipelineOptions): Promise<PipelineResult
   // 2. read — the AI reads the source itself
   const maxInspect = opts.maxInspect ?? DEFAULT_MAX_INSPECT;
   const existing = ws.jev.sites.filter((s) => s.role === "decision").map((s) => `${s.file}:${s.unit.start} ${s.unit.name}`);
-  const plan = planRead(root, ws.files, Math.round(budget * (opts.readShare ?? 0.5) * CHARS_PER_TOKEN));
+  const scope = (opts.only ?? []).map((p) => p.replace(/\\/g, "/").replace(/^\.\//, "").replace(/\/+$/, "")).filter(Boolean);
+  const inScope = (f: string) => !scope.length || scope.some((p) => f === p || f.startsWith(p + "/"));
+  const plan = planRead(root, ws.files.filter(inScope), Math.round(budget * (opts.readShare ?? 0.5) * CHARS_PER_TOKEN));
   opts.onEvent?.({ type: "reading", files: plan.read.length, unread: plan.unread.length, parts: plan.parts.length, estTokens: plan.estTokens, coverage: plan.coverage });
   const tree = [...plan.read, ...plan.unread];
   const spots: ReadSpot[] = [];
@@ -255,6 +286,7 @@ export async function runPipeline(opts: PipelineOptions): Promise<PipelineResult
   const targets: Omit<Opportunity, "status">[] = [];
   const seen: { file: string; start: number; end: number }[] = [];
   const push = (t: Omit<Opportunity, "status">) => {
+    if (!inScope(t.file)) return;
     if (seen.some((x) => x.file === t.file && t.unit.start <= x.end && t.unit.end >= x.start)) return;
     if (ws.jev.sites.some((j) => j.file === t.file && j.unit.start <= t.unit.start && j.unit.end >= t.unit.start)) return;
     seen.push({ file: t.file, start: t.unit.start, end: t.unit.end });

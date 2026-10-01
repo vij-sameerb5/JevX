@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JevX options</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body class="opts-page">
+  <header class="brandbar"><img src="icons/icon32.png" alt="" width="24" height="24"><b>JEVX</b><span>for GitHub · settings</span><nav><a href="https://jevx.live" target="_blank" rel="noopener">jevx.live</a><a href="https://github.com/vij-sameerb5/JevX" target="_blank" rel="noopener">GitHub</a></nav></header>
+  <main>
+    <label>AI provider
+      <select id="provider">
+        <option value="gemini">Gemini (Google) · has a free tier</option>
+        <option value="xai">xAI (Grok)</option>
+        <option value="openrouter">OpenRouter (any model)</option>
+      </select>
+      <small>JevX reads the repo with your own AI key. Pick one; you can switch any time.</small>
+    </label>
+    <label data-for="gemini">Gemini API key <span class="req">required</span>
+      <input id="key-gemini" type="password" autocomplete="off" spellcheck="false" placeholder="paste your key">
+      <small>Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>. A free-tier key works: JevX picks the newest Flash-Lite model your key can use.</small>
+    </label>
+    <label data-for="xai">xAI API key <span class="req">required</span>
+      <input id="key-xai" type="password" autocomplete="off" spellcheck="false" placeholder="xai-…">
+      <small>From <a href="https://console.x.ai" target="_blank" rel="noopener">console.x.ai</a>. Paid per use (a scan is usually a few cents).</small>
+    </label>
+    <label data-for="openrouter">OpenRouter API key <span class="req">required</span>
+      <input id="key-openrouter" type="password" autocomplete="off" spellcheck="false" placeholder="sk-or-…">
+      <small>From <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>. Works with Grok, Claude, GPT, Gemini and free models.</small>
+    </label>
+    <label>Model <span class="opt">optional</span>
+      <input id="model" type="text" spellcheck="false">
+      <small id="model-hint"></small>
+    </label>
+    <label>TypeSafe API key <span class="opt">optional · recommended</span>
+      <input id="typesafe" type="password" autocomplete="off" spellcheck="false" placeholder="your TypeSafe key">
+      <small>Adds Jev's own opinion as the third score on every card (the same check the CLI and MCP run). Only each spot's few lines are sent to TypeSafe, never whole files.</small>
+    </label>
+    <label>GitHub token <span class="opt">optional</span>
+      <input id="github" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_… (read-only)">
+      <small>Only needed for private repos or when GitHub's free limit (60 requests an hour) runs out. A fine-grained token with read-only "Contents" access is enough.</small>
+    </label>
+    <div class="row"><button id="save" class="primary" type="button">Save</button><button id="clear" type="button">Remove keys</button><span id="msg" role="status"></span></div>
+    <section class="note">
+      <b>Where your keys live</b>
+      <p>Only in this browser (Chrome's extension storage on this computer). They are never synced, never sent to JevX, and only sent to the AI provider you picked (Google, xAI or OpenRouter), to TypeSafe if you add that key, and to GitHub.</p>
+    </section>
+  </main>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

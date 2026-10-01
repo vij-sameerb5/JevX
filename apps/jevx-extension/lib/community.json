@@ -1,0 +1,135 @@
+{
+ "source": "docs/COMMUNITY-PATTERNS.md \u2014 82 Jev decisions in 22 open-source projects (2026-10-01)",
+ "total": 82,
+ "projects": 22,
+ "byRule": {
+  "llm_call": {
+   "count": 43,
+   "repos": [
+    "jev-ultrafast",
+    "foreman",
+    "fast-jev-compaction",
+    "hermes-jev-skills"
+   ],
+   "patterns": [
+    "next-action-operation",
+    "element-target-selection",
+    "agent-supervision-checks",
+    "context-keep-or-drop"
+   ]
+  },
+  "keyword_list": {
+   "count": 12,
+   "repos": [
+    "foreman",
+    "jev-search",
+    "jev-voice-browser",
+    "pg-jev"
+   ],
+   "patterns": [
+    "multi-label-activation",
+    "time-window-from-query",
+    "source-selection-fanout",
+    "voice-intent-classify"
+   ]
+  },
+  "threshold": {
+   "count": 9,
+   "repos": [
+    "fast-jev-compaction",
+    "jev-trader",
+    "jev-router",
+    "compact-adviser"
+   ],
+   "patterns": [
+    "context-keep-or-drop",
+    "directional-trade-signal",
+    "task-complexity-score",
+    "task-completion-checkpoint"
+   ]
+  },
+  "if_else_chain": {
+   "count": 4,
+   "repos": [
+    "jev-router",
+    "hermes-jev-skills",
+    "jev-review"
+   ],
+   "patterns": [
+    "model-tier-routing",
+    "policy-engine-decision",
+    "classify-file-change-type"
+   ]
+  },
+  "other": {
+   "count": 3,
+   "repos": [
+    "hermes-jev-skills",
+    "compact-adviser",
+    "jev-browser-qa"
+   ],
+   "patterns": [
+    "health-probe",
+    "conversation-shape-classify",
+    "self-healing-locator"
+   ]
+  },
+  "sort_or_slice": {
+   "count": 1,
+   "repos": [
+    "jev-search"
+   ],
+   "patterns": [
+    "result-relevance-rerank"
+   ]
+  },
+  "lookup_with_default": {
+   "count": 6,
+   "repos": [
+    "typesafe-computer-use",
+    "jev-voice-browser",
+    "jev-review"
+   ],
+   "patterns": [
+    "site-from-catalog",
+    "magnitude-from-text",
+    "severity-score",
+    "route-to-owner"
+   ]
+  },
+  "includes_or_startswith": {
+   "count": 2,
+   "repos": [
+    "typesafe-computer-use",
+    "jev-browser-qa"
+   ],
+   "patterns": [
+    "post-action-verification",
+    "nl-assertion"
+   ]
+  },
+  "regex": {
+   "count": 2,
+   "repos": [
+    "jev-voice-browser",
+    "typesafe-adblock"
+   ],
+   "patterns": [
+    "pick-span-from-candidates",
+    "dom-element-classify-fanout"
+   ]
+  }
+ },
+ "byInput": {
+  "ui_state": 17,
+  "agent_trajectory": 10,
+  "user_text": 21,
+  "market_data": 1,
+  "structured_app_data": 5,
+  "other": 2,
+  "ai_output": 1,
+  "external_api_results": 1,
+  "code_or_diff": 23,
+  "error_message": 1
+ }
+}

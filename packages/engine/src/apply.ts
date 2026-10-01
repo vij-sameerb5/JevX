@@ -36,6 +36,8 @@ export interface ApplyOptions {
   install?: boolean;
   /** Run the project's checks before and after (default true). */
   verify?: boolean;
+  /** With verify on: refuse to write when the project has no passing test / typecheck to prove the change (default false). */
+  requireChecks?: boolean;
   timeoutMs?: number;
   onEvent?: (e: ApplyEvent) => void;
 }
@@ -53,6 +55,8 @@ export interface ApplyResult {
   reverted: { opportunity: Opportunity; reason: string }[];
   skipped: { opportunity: Opportunity; reason: string }[];
   checks: { baseline: CheckResult[]; after: CheckResult[]; gate: string[] };
+  /** Set when nothing was written because no check could verify the change. */
+  unverified?: boolean;
   dependency?: { added: boolean; installed?: boolean; error?: string };
   backupDir: string;
   files: string[];
@@ -152,15 +156,22 @@ export function applyOpportunities(opts: ApplyOptions): ApplyResult {
     if (mine.length) skipped.push({ opportunity: o, reason: `you have uncommitted changes in ${mine.join(", ")}` });
     return !mine.length;
   });
-  const files = [...new Set([...ready.flatMap((o) => o.edits!.map((e) => e.file)), ...(existsSync(path.join(root, "package.json")) ? ["package.json"] : [])])];
-  const backupDir = backup(root, opts.runId, files);
-
   const verify = opts.verify !== false;
   const checks = verify ? checksFor(root) : [];
   const baseline = verify ? runChecks(root, checks, opts.timeoutMs) : [];
   opts.onEvent?.({ type: "baseline", results: baseline });
   const gate = baseline.filter((r) => r.ok).map((r) => r.name);
   const gated = checks.filter((c) => gate.includes(c.name));
+
+  // nothing can prove the change is safe: write nothing (the caller can opt out)
+  if (verify && opts.requireChecks && ready.length && !gated.length) {
+    const reason = checks.length ? "your tests / typecheck already fail, so a change can't be verified" : "no test script or typecheck found, so a change can't be verified";
+    for (const o of ready) skipped.push({ opportunity: o, reason });
+    return { changed: [], reverted: [], skipped, checks: { baseline, after: [], gate }, backupDir: "", files: [], unverified: true };
+  }
+
+  const files = [...new Set([...ready.flatMap((o) => o.edits!.map((e) => e.file)), ...(existsSync(path.join(root, "package.json")) ? ["package.json"] : [])])];
+  const backupDir = backup(root, opts.runId, files);
 
   // write every change
   let changed: Opportunity[] = [];
