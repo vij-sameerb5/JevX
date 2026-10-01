@@ -1,0 +1,19 @@
+name: Feature request
+description: An idea for JevX
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations: { required: true }
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like JevX to do?
+    validations: { required: true }
+  - type: textarea
+    id: example
+    attributes:
+      label: An example
+      description: A code snippet, repo or command where this would help (no private code).

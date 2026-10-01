@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security problem (keys or code could leak)
+    url: https://github.com/vij-sameerb5/JevX/security/advisories/new
+    about: Please report privately, not as a public issue.
+  - name: Docs and setup help
+    url: https://jevx.live/docs.html
+    about: Install, MCP setup and every command.

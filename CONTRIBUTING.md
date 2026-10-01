@@ -56,3 +56,9 @@ plus the relevant `.jevx/debug/*.json` (check them for anything private first).
 ## Security
 
 Found a way JevX could leak code or keys? Please use GitHub's private vulnerability reporting (Security → Report a vulnerability) instead of a public issue.
+
+## Reviews and merging
+
+- Every pull request is reviewed by the maintainer (@vij-sameerb5), who is the only one who merges. `main` is protected.
+- Use the pull request template. Keep one change per PR, with a test.
+- Commit messages: `git config commit.template .gitmessage` gives you the format (`fix: …`, `feat: …`).
