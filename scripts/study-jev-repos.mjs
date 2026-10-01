@@ -6,7 +6,7 @@
 //
 // The token is read from the environment only and never printed or saved.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync, existsSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
 
 const DEFAULT = [
@@ -27,15 +27,13 @@ const gh = (url, out) => {
   const cfg = `header = "Authorization: Bearer ${token}"\nheader = "User-Agent: jevx-study"\nheader = "Accept: application/vnd.github+json"\n`;
   try {
     return execFileSync("curl", ["-sSL", "--fail", "--max-time", "150", "--config", "-", ...(out ? ["-o", out] : []), url], { input: cfg, maxBuffer: 64 << 20, stdio: ["pipe", "pipe", "ignore"] }).toString();
-  } catch (e) { throw new Error(`download failed (curl exit ${e.status})`); }
+  } catch (e) { throw new Error(`download failed (curl exit ${e.status})`, { cause: e }); } // the token is on stdin, so the cause never contains it
 };
 
 const OUT = path.resolve("dataset/jev-community");
 mkdirSync(OUT, { recursive: true });
 const SRC = /\.(ts|tsx|js|jsx|mjs|cjs|py|go|rs|java|kt|swift|rb)$/;
 const SKIP = /(^|\/)(node_modules|dist|build|vendor|\.next|coverage|__pycache__|\.venv|venv)\//;
-// Jev usage signals: SDK imports, the System One call, the three primitives
-const SIGNAL = /systemOne|system_one|@typesafe-ai\/sdk|from typesafe|import typesafe|TypeSafeClient|\bnoul\s*\(|\bchoice\s*\(|\bscore\s*\(|typesafe\.ai/i;
 const PRIM = (s) => (/\bnoul\b/i.test(s) ? "noul" : /\bchoice\b/i.test(s) ? "choice" : /\bscore\b/i.test(s) ? "score" : "call");
 const CTX = 30;
 

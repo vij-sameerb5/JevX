@@ -1,0 +1,46 @@
+# Runs on every pull request and every push to main.
+# Make "CI / checks" a required status check so nothing broken can be merged.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # tests use local mocks only; no real API keys are needed (and none are set)
+      CI: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Test
+        run: pnpm test
+      - name: Build the CLI
+        run: pnpm build
+      - name: No secrets in the package
+        run: |
+          if grep -rEn 'xai-[A-Za-z0-9]{20,}|sk-(or-|proj-|ant-)?[A-Za-z0-9_-]{24,}|github_pat_[A-Za-z0-9_]{30,}|AIza[0-9A-Za-z_-]{30,}' apps/jevx/dist apps/jevx-extension --include=*.js --include=*.json; then
+            echo "Key-like string found"; exit 1
+          fi

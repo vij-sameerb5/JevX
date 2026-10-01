@@ -1,0 +1,35 @@
+name: Bug report
+description: Something in JevX (CLI, MCP or the Chrome extension) didn't work
+labels: ["bug", "needs-triage"]
+body:
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did it happen?
+      options: ["CLI (jevx)", "MCP (Claude Code / Desktop / Cursor …)", "Chrome extension", "Website"]
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "`jevx --version`, or the extension version from chrome://extensions"
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: The command or steps, the output, and what you expected instead.
+    validations: { required: true }
+  - type: textarea
+    id: logs
+    attributes:
+      label: Output or screenshots
+      description: Please remove any API keys, tokens or private code first.
+      render: shell
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Before you submit
+      options:
+        - label: I removed API keys, tokens and private code from everything above
+          required: true
