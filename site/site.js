@@ -55,7 +55,7 @@
   const REC = {
     first: {
       cap: "First run on a new machine: the JEVX welcome, then the run itself. Later runs show a one-line banner.",
-      lines: [C("npx @vij-sameerb5/jevx --dry-run"), LOGO, L("   ", `<span class="o b">JEVX</span>`, d(" · "), "Find where Jev fits in your codebase."), L(d("   v0.4.0 · preview first: jevx --dry-run · all commands: jevx --help")), L(""),
+      lines: [C("npx @vij-sameerb5/jevx --dry-run"), LOGO, L("   ", `<span class="o b">JEVX</span>`, d(" · "), "Find where Jev fits in your codebase."), L(d("   v0.4.1 · preview first: jevx --dry-run · all commands: jevx --help")), L(""),
         L(d("  Repo      "), "globalcare-ai"), L(d("  AI        "), "xAI · grok-4.6 ", d("(your key)")), L(d("  TypeSafe  "), g("✓ connected")), L(d("  Keys      from ~/Desktop/jevX/.env + your shell")), L(d("  Mode      "), "preview only — nothing is written"), L(""),
         L(d("  JevX sends xAI your source files to read (not .env files, tests, builds or node_modules), with secrets removed.")), L("  Send code to xAI for this and future runs? [Y/n] ", y("y"))]
     },
@@ -102,7 +102,7 @@
     },
     desktop: {
       cap: "Claude Desktop with the one-click jevx.mcpb extension (illustrative). It can't edit files itself, so jevx_apply makes the change: backup, your tests, auto-revert.",
-      lines: [L(d("  Claude Desktop → Settings → Extensions → Install extension… → jevx-0.4.0.mcpb")), L(d("  Project folder   "), "~/code/globalcare-ai"), L(d("  TypeSafe key     "), "••••••••••••  ", d("(kept by Claude Desktop, never by JevX)")), L("  ", g("✓"), " JevX 0.4.0 enabled · 11 tools"), L(""),
+      lines: [L(d("  Claude Desktop → Settings → Extensions → Install extension… → jevx-0.4.1.mcpb")), L(d("  Project folder   "), "~/code/globalcare-ai"), L(d("  TypeSafe key     "), "••••••••••••  ", d("(kept by Claude Desktop, never by JevX)")), L("  ", g("✓"), " JevX 0.4.1 enabled · 11 tools"), L(""),
         L(o("> "), "Use JevX on my project. Preview only — don't change anything yet."), L(o("⏺"), " jevx_guide  ", d("read-only")), L(o("⏺"), " jevx_scan  ", d("read-only · ~/code/globalcare-ai · 53 files")), L(o("⏺"), " jevx_read ×6  ", d("read-only")), L(o("⏺"), " jevx_scorecard  ", d("writes .jevx/ · 64% POSSIBLE")), L(o("⏺"), " jevx_preview_change  ", d("writes .jevx/ · diff only")), L(o("⏺"), " jevx_report  ", d("writes .jevx/report.html")), L(""),
         L("  1 possible fit (checkout errors, 64%) — previewed, not written."), L(""),
         L(o("> "), "Use Jev where the fit is at least 60%."), L(o("⏺"), " jevx_apply  ", y("changes files")), L(d("  ⎿ backup saved · tests "), g("pass"), d(" before · "), g("pass"), d(" after · 1 file changed")), L(""),

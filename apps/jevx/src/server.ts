@@ -47,7 +47,7 @@ import {
   type ProposalRecord
 } from "@jevx/engine";
 
-export const VERSION = "0.4.0";
+export const VERSION = "0.4.1"; // keep in sync with apps/jevx/package.json (tests/version.test.ts checks)
 const MAX_TEXT = 60_000;
 
 const text = (s: string) => ({ content: [{ type: "text" as const, text: s.length > MAX_TEXT ? `${s.slice(0, MAX_TEXT)}\n… (truncated at ${MAX_TEXT} characters — read a narrower item)` : s }] });

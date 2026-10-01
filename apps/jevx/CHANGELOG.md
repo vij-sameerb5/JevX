@@ -2,7 +2,7 @@
 
 All notable changes to `jevx`. Versions follow [semver](https://semver.org); before 1.0, minor versions may change behaviour.
 
-## Unreleased (0.4.1)
+## 0.4.1 — 2026-10-01 · safer apply, --only, Chrome extension preview
 
 - **No passing tests means no changes.** If a project has no test script or typecheck, or they already fail, JevX previews but writes nothing. `--allow-untested` (MCP: `allow_untested`) opts out.
 - **Edits tolerate whitespace:** when the AI gets indentation, trailing spaces or line endings wrong, the change is matched line by line. A missing or ambiguous match is still refused.
