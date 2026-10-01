@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JevX Privacy Policy</title>
+<meta name="description" content="What JevX (the CLI, the MCP server and the JevX for GitHub Chrome extension) collects, sends and stores.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Martian+Mono:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="index.html"><i></i>JEVX</a>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="docs.html">Docs</a>
+      <a href="https://github.com/vij-sameerb5/JevX">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs">
+  <nav class="toc" aria-label="On this page">
+    <b>Privacy</b>
+    <a href="#short">In short</a>
+    <a href="#extension">Chrome extension</a>
+    <a href="#cli">CLI and MCP</a>
+    <a href="#share">Opt-in sharing</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <article class="prose">
+    <h1>Privacy Policy</h1>
+    <p class="muted">Last updated: October 1, 2026 · applies to JevX for GitHub (Chrome extension), the <code>jevx</code> CLI and the JevX MCP server.</p>
+
+    <section id="short">
+      <h2>In short</h2>
+      <ul>
+        <li><b>JevX has no servers that receive your code or keys.</b> We don't collect, sell or share personal data.</li>
+        <li>Your code goes only to the AI provider <i>you</i> choose, with <i>your</i> API key, and only when you start a scan.</li>
+        <li>Your API keys stay on your device.</li>
+        <li>No analytics, no tracking, no ads.</li>
+      </ul>
+    </section>
+
+    <section id="extension">
+      <h2>JevX for GitHub (Chrome extension)</h2>
+      <h3>What it stores, on your computer only</h3>
+      <ul>
+        <li>The API keys you enter (Gemini, xAI or OpenRouter; optional TypeSafe and GitHub tokens), in Chrome's local extension storage. They are never synced to your Google account and never sent to JevX.</li>
+        <li>The results of each scan (scorecards and the few lines of code they point to), so you can see them again. "Remove keys" in settings clears the keys; removing the extension clears everything.</li>
+      </ul>
+      <h3>What it sends, and to whom</h3>
+      <ul>
+        <li><b>GitHub</b> (api.github.com, raw.githubusercontent.com): reads the file list and source files of the repository you are viewing. Your GitHub token, if you add one, is sent only to GitHub.</li>
+        <li><b>The AI provider you pick</b> (Google Gemini, xAI or OpenRouter): the selected source files, with anything that looks like a secret removed first. Sent only after you click "Find where Jev fits". That provider's own privacy policy applies.</li>
+        <li><b>TypeSafe</b> (api.typesafe.ai), only if you add a TypeSafe key: the few lines of each suggested spot and the proposed question.</li>
+      </ul>
+      <p>It does not read pages other than GitHub repositories, does not read your browsing history, and does not run in the background on other sites. It never changes anything on GitHub.</p>
+      <h3>Permissions and why</h3>
+      <ul>
+        <li><code>sidePanel</code>: show the results next to the page.</li>
+        <li><code>tabs</code>: read the address of the current tab, to know which GitHub repository you are viewing.</li>
+        <li><code>storage</code>: keep your keys and saved results on your computer.</li>
+        <li>Host access to GitHub and to the AI providers listed above: only to make the requests described here.</li>
+      </ul>
+    </section>
+
+    <section id="cli">
+      <h2>CLI and MCP server</h2>
+      <p>The <code>jevx</code> command runs on your computer. It sends source files (secrets removed) to the AI provider whose key you set, after asking you once, and optionally to TypeSafe. Keys come from your environment and are never written to disk by JevX. In the MCP server, your own AI app (e.g. Claude) does the reading; JevX sends nothing itself, except the optional TypeSafe score.</p>
+    </section>
+
+    <section id="share">
+      <h2>Opt-in sharing (<code>--share</code>)</h2>
+      <p>Only if you turn it on, the CLI shares anonymous outcomes to improve JevX: the <i>kind</i> of code (e.g. "keyword list on user text"), the scores and whether a change was kept. Never code, file or function names, paths, string literals or keys, and only a random id per repository. The Chrome extension never shares anything.</p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Questions or requests: <a href="https://github.com/vij-sameerb5/JevX/issues">open an issue</a>, or report privately via <a href="https://github.com/vij-sameerb5/JevX/security/advisories/new">GitHub security advisories</a>.</p>
+    </section>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span><b style="color:var(--accent)">JEVX</b> · MIT</span>
+    <span class="btns"><a class="btn" href="index.html">Home</a><a class="btn" href="docs.html">Docs</a><a class="btn" href="privacy.html">Privacy</a></span>
+  </div>
+</footer>
+<script src="site.js"></script>
+</body>
+</html>
