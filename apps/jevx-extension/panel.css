@@ -245,3 +245,13 @@ details.more > div { display: grid; gap: 12px; }
 .verdict-banner.yes b { color: var(--green); }
 .verdict-banner.no { background: var(--raised); border-color: var(--rule-2); }
 .verdict-banner.no b { color: var(--ink); }
+
+/* depth picker */
+.depth{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.depth label{cursor:pointer}
+.depth input{position:absolute;opacity:0;pointer-events:none}
+.depth span{display:flex;flex-direction:column;gap:2px;padding:9px 11px;border:1px solid var(--line, #333);border-radius:10px;font-size:12.5px}
+.depth em{font-style:normal;opacity:.65;font-size:11.5px}
+.depth input:checked+span{border-color:var(--accent, #e07a4f);box-shadow:0 0 0 1px var(--accent, #e07a4f) inset}
+.depth input:focus-visible+span{outline:2px solid var(--accent, #e07a4f);outline-offset:2px}
+.verdict-banner .btn{margin-top:10px;align-self:flex-start}

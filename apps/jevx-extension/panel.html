@@ -45,6 +45,10 @@
     </section>
 
     <section id="go" class="go" hidden>
+      <div class="depth" role="radiogroup" aria-label="How much of the repo to read">
+        <label><input type="radio" name="depth" value="standard" checked><span><b>Standard</b><em>Top 400 source files</em></span></label>
+        <label><input type="radio" name="depth" value="deep"><span><b>Whole repo</b><em>Up to 2,500 files · slower</em></span></label>
+      </div>
       <button id="run" class="btn primary big" type="button">Find where Jev fits</button>
       <p id="go-msg" class="hint"></p>
     </section>

@@ -20,10 +20,10 @@ const show = (id, on) => ($(id).hidden = !on);
 const cacheKey = (full) => `result:${full}`;
 
 async function settings() {
-  const s = await chrome.storage.local.get(["provider", "geminiKey", "xaiKey", "openrouterKey", "githubToken", "typesafeKey", "models", "model"]);
+  const s = await chrome.storage.local.get(["provider", "geminiKey", "xaiKey", "openrouterKey", "githubToken", "typesafeKey", "models", "model", "depth"]);
   const provider = PROVIDERS[s.provider] ? s.provider : "gemini";
   const models = s.models ?? (s.model ? { gemini: s.model } : {});
-  return { provider, apiKey: s[`${provider}Key`], model: models[provider] || undefined, githubToken: s.githubToken, typesafeKey: s.typesafeKey };
+  return { provider, apiKey: s[`${provider}Key`], model: models[provider] || undefined, githubToken: s.githubToken, typesafeKey: s.typesafeKey, depth: s.depth === "deep" ? "deep" : "standard" };
 }
 
 async function activeUrl() {
@@ -50,7 +50,7 @@ const TIPS = [
   "Money, auth and parsing stay exact: skipping those…",
   "Big repos take 30–90 seconds. Still working…"
 ];
-const STEPS = [["tree", "Reading the repo's file list"], ["fetch", "Picking the likely logic files"], ["ai", "AI is reading the code"], ["typesafe", "TypeSafe (Jev) is scoring each spot"]];
+const STEPS = [["tree", "Reading the repo's file list"], ["fetch", "Scanning source files for rules (free, on your computer)"], ["ai", "AI is reading the code"], ["typesafe", "TypeSafe (Jev) is scoring each spot"]];
 
 async function refresh() {
   if (running) return;
@@ -79,7 +79,8 @@ async function refresh() {
   show("go", Boolean(s.apiKey));
   $("setup-title").textContent = `Connect ${P.label}`;
   $("setup-msg").textContent = `JevX reads the repo with your own ${P.label} key. Keys stay in this browser and are never sent to JevX.`;
-  $("go-msg").textContent = `${P.label} reads up to 40 likely logic files (secrets removed). Read-only: nothing changes on GitHub.`;
+  document.querySelectorAll('input[name="depth"]').forEach((el) => (el.checked = el.value === s.depth));
+  $("go-msg").textContent = `Every picked file is scanned on your computer for free; only the ones with rules or AI calls go to ${P.label} (secrets removed). Read-only: nothing changes on GitHub.`;
   const cached = (await chrome.storage.local.get(cacheKey(current.full)))[cacheKey(current.full)];
   $("results").innerHTML = cached ? render(cached, true) : "";
   $("run").textContent = cached ? "Run again" : "Find where Jev fits";
@@ -163,15 +164,18 @@ function render(res, cached = false) {
   const stats = `<div class="stats">
     <div class="stat g"><b>${strong}</b><span>strong fits (70%+)</span></div>
     <div class="stat a"><b>${possible}</b><span>possible (50–69%)</span></div>
-    <div class="stat"><b>${res.stats.sent}</b><span>of ${res.stats.files.toLocaleString()} files read</span></div>
-  </div>${res.existingJev?.length ? `${res.stats.failedParts ? `<p class="note warn">${res.stats.failedParts} of ${res.parts.length} parts couldn't be read (the AI was busy or failed), so some files weren't checked. Run again to retry them.</p>` : ""}<p class="note">This repo already uses Jev in ${res.existingJev.length} file(s); those weren't repeated.</p>` : ""}`;
+    <div class="stat"><b>${(res.stats.fetched ?? res.stats.sent).toLocaleString()}</b><span>files scanned${res.stats.candidates ? ` of ${res.stats.candidates.toLocaleString()} source` : ""} · ${res.stats.sent} sent to AI</span></div>
+  </div>${res.stats.failedParts ? `<p class="note warn">${res.stats.failedParts} of ${res.parts.length} parts couldn't be read (the AI was busy or failed), so some files weren't checked. Run again to retry them.</p>` : ""}${res.existingJev?.length ? `<p class="note">This repo already uses Jev in ${res.existingJev.length} file(s); those weren't repeated.</p>` : ""}`;
   const main = res.spots.filter((s) => (s.card.average ?? 0) >= 0.5 && s.card.verdict !== "WEAK_FIT");
   const rest = res.spots.filter((s) => !main.includes(s));
   const cards = main.map((s, i) => card(s, i, res)).join("");
   const more = rest.length ? `<details class="more"><summary>Show ${rest.length} weaker spot(s) (under 50% or the scores disagree)</summary><div>${rest.map((s, i) => card(s, main.length + i, res)).join("")}</div></details>` : "";
   const anyGood = res.spots.some((s) => s.card.verdict === "STRONG_FIT" || s.card.verdict === "POSSIBLE_FIT");
+  const partial = res.depth !== "deep" && res.stats.candidates > (res.stats.fetched ?? 0);
+  const deepBtn = partial ? `<button class="btn sm" type="button" data-deep="1">Scan the whole repo</button>` : "";
+  const scanned = `${(res.stats.fetched ?? res.stats.sent).toLocaleString()} file${res.stats.fetched === 1 ? "" : "s"} scanned`;
   const none = !anyGood
-    ? `<div class="verdict-banner no"><b>This repo doesn't need Jev right now</b><span>${res.spots.length ? "Nothing reached 50% with all scores agreeing. The spots below are borderline; the current code is fine." : "No judgment calls hiding as rules in the files read. Most code is exact logic, and that's a good answer."}</span></div>`
+    ? `<div class="verdict-banner no"><b>No Jev fits found${partial ? " yet" : ""}</b><span>${res.spots.length ? `Nothing reached 50% with all scores agreeing in the ${scanned}. The spots below are borderline.` : `No judgment calls hiding as rules in the ${scanned}.`}${partial ? " Only part of this repo was scanned: a whole-repo scan may find more." : " Most code is exact logic, and that can be the right answer."}</span>${deepBtn}</div>`
     : `<div class="verdict-banner yes"><b>${strong ? `Jev fits in ${strong} place${strong === 1 ? "" : "s"}` : `Jev could help in ${possible} place${possible === 1 ? "" : "s"}`}</b><span>${strong ? "Start with the strong fits below." : "No strong fits; the possible ones are optional."}</span></div>`;
   const when = new Date(res.at).toLocaleString();
   const ts = res.typesafe?.status === "on" ? "TypeSafe on" : res.typesafe?.status === "error" ? `TypeSafe failed: ${esc(res.typesafe.error)}` : "TypeSafe off";
@@ -193,6 +197,7 @@ $("run").addEventListener("click", async () => {
   const started = Date.now();
   let at = "tree";
   let parts = [];
+  let scan = null;
   let tip = 0;
   const secs = (ms) => `${Math.max(0, Math.round(ms / 1000))}s`;
   const short = (files) => {
@@ -214,7 +219,8 @@ $("run").addEventListener("click", async () => {
     const rows = steps.map(([k, l], j) => {
       const cls = at === "done" || j < idx ? "done" : j === idx ? "now" : "";
       const sub = k === "ai" && parts.length && (cls === "now" || cls === "done") ? `<div class="parts">${parts.map(partRow).join("")}</div>` : "";
-      return `<div class="step ${cls}"><span class="dot"></span><span>${esc(label(k, l))}${k === "ai" && parts.length ? ` <em>${parts.length} parts · ${Math.min(2, parts.length)} at a time</em>` : ""}</span></div>${sub}`;
+      const count = k === "fetch" && scan ? ` <em>${scan.scanned.toLocaleString()} / ${scan.total.toLocaleString()}</em>` : "";
+      return `<div class="step ${cls}"><span class="dot"></span><span>${esc(label(k, l))}${count}${k === "ai" && parts.length ? ` <em>${parts.length} parts · ${Math.min(2, parts.length)} at a time</em>` : ""}</span></div>${sub}`;
     }).join("");
     prog.innerHTML = `<div class="ph"><span>Working on it</span><span class="clock">${secs(Date.now() - started)}</span></div>${rows}<p class="tip">${esc(TIPS[tip % TIPS.length])}</p>`;
   };
@@ -223,7 +229,7 @@ $("run").addEventListener("click", async () => {
   $("results").innerHTML = `<div class="skel"><i></i><i></i><i></i></div>`;
   draw();
   try {
-    const res = await analyzeRepo({ fetch: (...a) => fetch(...a), url: current.url, provider: s.provider, apiKey: s.apiKey, githubToken: s.githubToken || undefined, typesafeKey: s.typesafeKey || undefined, model: s.model, progress: (step, _d, extra) => { at = step; if (extra?.parts) parts = extra.parts; draw(); } });
+    const res = await analyzeRepo({ fetch: (...a) => fetch(...a), url: current.url, provider: s.provider, apiKey: s.apiKey, githubToken: s.githubToken || undefined, typesafeKey: s.typesafeKey || undefined, model: s.model, depth: s.depth, progress: (step, _d, extra) => { at = step; if (extra?.parts) parts = extra.parts; if (extra?.total) scan = extra; draw(); } });
     await chrome.storage.local.set({ [cacheKey(res.repo)]: res });
     $("results").innerHTML = render(res);
     show("progress", false);
@@ -256,3 +262,14 @@ chrome.tabs.onActivated.addListener(refresh);
 chrome.tabs.onUpdated.addListener((_id, info) => info.url && refresh());
 chrome.storage.onChanged.addListener((ch) => (ch.typesafeKey || ch.provider || ch.geminiKey || ch.xaiKey || ch.openrouterKey || ch.githubToken || ch.models) && refresh());
 refresh();
+
+// depth picker: remembered per browser
+document.querySelectorAll('input[name="depth"]').forEach((el) => el.addEventListener("change", () => { if (el.checked) chrome.storage.local.set({ depth: el.value }); }));
+// "Scan the whole repo" button in the no-fits banner
+$("results").addEventListener("click", async (e) => {
+  const b = e.target?.closest?.("[data-deep]");
+  if (!b || running) return;
+  await chrome.storage.local.set({ depth: "deep" });
+  document.querySelectorAll('input[name="depth"]').forEach((el) => (el.checked = el.value === "deep"));
+  $("run").click();
+});

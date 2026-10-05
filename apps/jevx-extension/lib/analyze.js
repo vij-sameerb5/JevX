@@ -15,9 +15,13 @@ export const PROVIDERS = {
   openrouter: { label: "OpenRouter", model: "x-ai/grok-4.6", keyHint: "openrouter.ai/keys", hostname: "openrouter.ai" }
 };
 export const PROMPT_VERSION = "ext-1";
-const MAX_FILES_FETCHED = 40;
 const MAX_FILE_BYTES = 80_000;
-const PROMPT_CHARS = 110_000; // ~30k tokens: cheap on Flash Lite, fits easily
+// Two depths. Scanning is local and free (plain file downloads + regex signals); only the
+// best-signal files go to the AI, so the AI bill grows much slower than the repo.
+export const DEPTHS = {
+  standard: { scan: 400, promptChars: 120_000 }, // ~35k AI tokens
+  deep: { scan: 2500, promptChars: 360_000 } // whole repo for most projects; ~100k AI tokens
+};
 
 // ─── URL ───
 const NOT_REPO = new Set(["settings", "orgs", "marketplace", "explore", "topics", "notifications", "pulls", "issues", "login", "signup", "features", "sponsors", "about", "pricing", "search", "new", "codespaces", "collections", "trending", "apps", "enterprise", "organizations", "users", "site", "security"]);
@@ -55,13 +59,19 @@ const SKIP = /(^|\/)(node_modules|dist|build|out|vendor|coverage|\.next|\.nuxt|_
 const LOGIC = /(^|\/)(api|lib|server|services?|core|agents?|routes?|handlers?|controllers?|domain|utils?|engine|bot|workers?|jobs?|llm|ai|pipeline|src)\//i;
 const UI = /(^|\/)(components?|ui|views?|pages?|styles?|app\/\(.*\))\//i;
 
-export function pickFiles(files, scopePath) {
+// file names that usually hold a judgment call
+const DECIDES = /(classif|categor|moderat|filter|spam|detect|intent|route|router|triage|rank|scor|priorit|label|sentiment|tone|toxic|policy|guard|valid|review|match|recommend|prompt|llm|agent|judge|decid|select|pick|tag)/i;
+
+export function pickFiles(files, scopePath, limit = DEPTHS.standard.scan) {
   return files
-    .filter((f) => SRC.test(f.path) && !SKIP.test(f.path) && f.size > 0 && f.size <= MAX_FILE_BYTES)
+    .filter((f) => SRC.test(f.path) && !SKIP.test(f.path) && f.size <= MAX_FILE_BYTES)
+    // one-line re-exports and index barrels hold no decisions (kept only if that's all there is)
+    .filter((f, _i, all) => f.size >= 300 || scopePath || all.every((g) => g.size < 300))
     .filter((f) => !scopePath || f.path === scopePath || f.path.startsWith(scopePath.replace(/\/?$/, "/")))
-    .map((f) => ({ ...f, prior: (LOGIC.test(f.path) ? 2 : 0) - (UI.test(f.path) ? 1 : 0) + (/\.(tsx|jsx)$/.test(f.path) ? -0.5 : 0) }))
-    .sort((a, b) => b.prior - a.prior || a.size - b.size)
-    .slice(0, MAX_FILES_FETCHED);
+    .map((f) => ({ ...f, prior: (LOGIC.test(f.path) ? 2 : 0) + (DECIDES.test(f.path.split("/").pop()) ? 3 : 0) - (UI.test(f.path) ? 1 : 0) + (/\.(tsx|jsx)$/.test(f.path) ? -0.5 : 0) }))
+    // within the same prior, bigger files first: that is where the logic lives
+    .sort((a, b) => b.prior - a.prior || b.size - a.size)
+    .slice(0, limit);
 }
 
 /** Cheap signals that a file holds judgment calls written as rules (or as LLM calls). */
@@ -73,7 +83,7 @@ export function signals(text) {
     includesChain: count(/\.(includes|startsWith|endsWith)\(\s*["'`]/g) + count(/\bin\s+\w+\.lower\(\)/g),
     sliceTopN: count(/\.slice\(\s*0\s*,\s*\d+\s*\)/g) + count(/\[\s*:\s*\d+\s*\]/g),
     threshold: count(/[<>]=?\s*0\.\d+/g),
-    llmCall: count(/chat\.completions\.create|messages\.create\(|generateContent\(|\.invoke\(|openai\.|anthropic\.|ChatOpenAI|generateText\(|generateObject\(/g),
+    llmCall: count(/chat\.completions\.create|messages\.create\(|generateContent\(|\.invoke\(|ChatOpenAI|ChatAnthropic|generateText\(|generateObject\(|streamText\(|\/chat\/completions|\/v1\/messages|ollama\.|litellm|completion\(\s*model|\bresponse_format\b|structured_output|with_structured_output/g),
     stringSwitch: count(/case\s+["'`][\w\s-]+["'`]\s*:/g),
     jev: count(/systemOne|@typesafe-ai\/sdk|TypeSafeClient/g)
   };
@@ -87,9 +97,10 @@ export function scrub(text) {
   return SECRET.reduce((t, re) => t.replace(re, "[secret removed]"), text);
 }
 
-export async function fetchFiles({ fetch, owner, repo, branch, files, token, concurrency = 6 }) {
+export async function fetchFiles({ fetch, owner, repo, branch, files, token, concurrency = 12, onProgress }) {
   const out = [];
   let i = 0;
+  let done = 0;
   const one = async () => {
     while (i < files.length) {
       const f = files[i++];
@@ -100,6 +111,7 @@ export async function fetchFiles({ fetch, owner, repo, branch, files, token, con
           : await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(branch)}/${f.path.split("/").map(encodeURIComponent).join("/")}`);
         if (r.ok) out.push({ path: f.path, text: await r.text(), prior: f.prior });
       } catch { /* skip this file */ }
+      if (++done % 25 === 0) onProgress?.(done, files.length);
     }
   };
   await Promise.all(Array.from({ length: concurrency }, one));
@@ -107,18 +119,20 @@ export async function fetchFiles({ fetch, owner, repo, branch, files, token, con
 }
 
 /** Files to show the AI: highest signals first, within the prompt budget. */
-export function chooseForPrompt(fetched, budget = PROMPT_CHARS) {
+export function chooseForPrompt(fetched, budget = DEPTHS.standard.promptChars) {
   const ranked = fetched.map((f) => ({ ...f, sig: signals(f.text) })).sort((a, b) => b.sig.score + b.prior - (a.sig.score + a.prior));
   const chosen = [];
   let used = 0;
   for (const f of ranked) {
-    if (f.sig.score === 0 && chosen.length >= 6) continue; // don't spend budget on files with no signal
+    if (f.sig.jev > 0 && f.sig.score === 0) continue;
+    // files with no signal only fill in when nothing else was found (judgment may still hide in plain ifs)
+    if (f.sig.score === 0 && chosen.length >= 8) continue;
     const size = f.text.length + 200;
     if (used + size > budget) continue;
     chosen.push(f);
     used += size;
   }
-  return { chosen, existingJev: ranked.filter((f) => f.sig.jev > 0).map((f) => f.path) };
+  return { chosen, existingJev: ranked.filter((f) => f.sig.jev > 0).map((f) => f.path), withSignal: ranked.filter((f) => f.sig.score > 0).length };
 }
 
 // ─── the AI ───
@@ -371,13 +385,13 @@ export function communityNote(spot) {
 
 // ─── reading in parts, two at a time ───
 export const PARALLEL = 2; // two AI calls at once: faster, and well inside every provider's per-minute limits
-const PART_CHARS = 32_000;
+const PART_CHARS = 40_000;
 
-/** Split the chosen files into up to 4 parts of similar size (big files first). */
+/** Split the chosen files into up to 8 parts of similar size (big files first). */
 export function splitParts(files) {
   const total = files.reduce((n, f) => n + f.text.length, 0);
   // small repos: one call. Otherwise 2–4 parts, so two can run at once
-  const k = files.length < 4 ? 1 : Math.min(4, Math.max(2, Math.ceil(total / PART_CHARS)));
+  const k = files.length < 4 ? 1 : Math.min(8, Math.max(2, Math.ceil(total / PART_CHARS)));
   const parts = Array.from({ length: k }, () => ({ files: [], size: 0 }));
   for (const f of [...files].sort((a, b) => b.text.length - a.text.length)) {
     const p = parts.reduce((a, b) => (b.size < a.size ? b : a));
@@ -405,7 +419,8 @@ async function askWithRetry(args, onRetry) {
 }
 
 /** The whole analysis. `progress(step, detail)` reports each stage to the UI. */
-export async function analyzeRepo({ fetch, url, provider = "gemini", apiKey, geminiKey, githubToken, typesafeKey, model, progress = () => {} }) {
+export async function analyzeRepo({ fetch, url, provider = "gemini", apiKey, geminiKey, githubToken, typesafeKey, model, depth = "standard", progress = () => {} }) {
+  const D = DEPTHS[depth] ?? DEPTHS.standard;
   const P = PROVIDERS[provider];
   if (!P) throw new Error(`Unknown AI provider "${provider}".`);
   const key = apiKey ?? geminiKey;
@@ -414,11 +429,12 @@ export async function analyzeRepo({ fetch, url, provider = "gemini", apiKey, gem
   if (!key) throw new Error(`Add your ${P.label} API key in JevX options first.`);
   progress("tree", `Reading ${r.full}…`);
   const { meta, branch, files, truncated } = await repoTree({ fetch, owner: r.owner, repo: r.repo, token: githubToken, ref: r.ref });
-  const picked = pickFiles(files, r.path);
+  const picked = pickFiles(files, r.path, D.scan);
+  const candidates = files.filter((f) => SRC.test(f.path) && !SKIP.test(f.path)).length;
   if (!picked.length) return { repo: r.full, branch, meta, spots: [], note: "No JavaScript, TypeScript or Python source files found.", stats: { files: files.length, fetched: 0, sent: 0 } };
-  progress("fetch", `Fetching ${picked.length} likely file(s)…`);
-  const fetched = await fetchFiles({ fetch, owner: r.owner, repo: r.repo, branch, files: picked, token: githubToken });
-  const { chosen, existingJev } = chooseForPrompt(fetched);
+  progress("fetch", `Scanning ${picked.length} source file(s) on your computer…`, { scanned: 0, total: picked.length });
+  const fetched = await fetchFiles({ fetch, owner: r.owner, repo: r.repo, branch, files: picked, token: githubToken, onProgress: (n, t) => progress("fetch", `Scanned ${n} of ${t}`, { scanned: n, total: t }) });
+  const { chosen, existingJev, withSignal } = chooseForPrompt(fetched, D.promptChars);
   // the AI reads in parts, PARALLEL at a time; every part reports its own progress
   const groups = splitParts(chosen);
   const parts = groups.map((g, i) => ({ n: i + 1, files: g.map((f) => f.path), status: "waiting" }));
@@ -478,5 +494,5 @@ export async function analyzeRepo({ fetch, url, provider = "gemini", apiKey, gem
     s.code_more = s.end_line > end;
   }
   progress("done", `${spots.length} spot(s)`);
-  return { repo: r.full, branch, meta, spots, existingJev, truncated, provider, typesafe, model: ans.model, tokens: ans.tokens, parts: parts.map(({ n, files: f, status, spots: k, ms, error }) => ({ n, files: f, status, spots: k, ms, error })), stats: { files: files.length, fetched: fetched.length, sent: chosen.length, failedParts: failed.length }, at: new Date().toISOString() };
+  return { repo: r.full, branch, meta, spots, existingJev, truncated, provider, typesafe, model: ans.model, tokens: ans.tokens, parts: parts.map(({ n, files: f, status, spots: k, ms, error }) => ({ n, files: f, status, spots: k, ms, error })), depth, stats: { files: files.length, candidates, fetched: fetched.length, withSignal, sent: chosen.length, failedParts: failed.length }, at: new Date().toISOString() };
 }

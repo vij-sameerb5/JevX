@@ -151,7 +151,7 @@ describe("JevX for GitHub (extension)", () => {
 
   it("reads big repos in parts, two at a time, retries a rate limit, and keeps going if one part fails", async () => {
     const big = (i: number) => `export function f${i}(m: string) {\n  if (/refund/.test(m)) return "billing";\n${"  // pad\n".repeat(1200)}}\n`;
-    const paths = Array.from({ length: 6 }, (_, i) => `src/api/f${i}.ts`);
+    const paths = Array.from({ length: 9 }, (_, i) => `src/api/f${i}.ts`);
     let live = 0, peak = 0, calls = 0, limited = false;
     const f = async (url: string, init?: { body?: string }) => {
       const json = (b: unknown, status = 200) => ({ ok: status < 400, status, json: async () => b, text: async () => JSON.stringify(b) });
@@ -172,7 +172,7 @@ describe("JevX for GitHub (extension)", () => {
       throw new Error("unexpected " + url);
     };
     const seen: { parts: { status: string }[] }[] = [];
-    const res = await A.analyzeRepo({ fetch: f, url: "https://github.com/acme/big", provider: "xai", apiKey: "k", progress: (_s: string, _d: string, x?: { parts: { status: string }[] }) => x && seen.push(x) });
+    const res = await A.analyzeRepo({ fetch: f, url: "https://github.com/acme/big", provider: "xai", apiKey: "k", progress: (_s: string, _d: string, x?: { parts: { status: string }[] }) => x?.parts && seen.push(x) });
     expect(res.parts.length).toBeGreaterThanOrEqual(2);
     expect(peak).toBe(2); // never more than two at once
     expect(seen.some((x) => x.parts.some((p) => p.status === "retrying"))).toBe(true);
@@ -184,5 +184,27 @@ describe("JevX for GitHub (extension)", () => {
   it("an empty answer is a valid result", async () => {
     const res = await A.analyzeRepo({ fetch: mockFetch({ spots: [] }), url: "https://github.com/acme/helpdesk", geminiKey: "gem-key" });
     expect(res.spots).toEqual([]);
+  });
+
+  it("scans many files for free and sends only the ones with signals; skips tiny barrels; deep reads more", () => {
+    const tree = [
+      ...Array.from({ length: 600 }, (_, i) => ({ path: `src/lib/f${i}.ts`, size: 2000 })),
+      { path: "src/index.ts", size: 40 },
+      { path: "src/moderation/filter.ts", size: 3000 }
+    ];
+    const std = A.pickFiles(tree);
+    expect(std.length).toBe(400);
+    expect(std[0].path).toBe("src/moderation/filter.ts"); // decision-y names first
+    expect(std.some((f: { path: string }) => f.path === "src/index.ts")).toBe(false);
+    expect(A.pickFiles(tree, undefined, A.DEPTHS.deep.scan).length).toBe(601);
+    const fetched = [
+      { path: "a.ts", prior: 0, text: "export const x = 1;\n".repeat(50) },
+      ...Array.from({ length: 20 }, (_, i) => ({ path: `n${i}.ts`, prior: 0, text: "const y = 2;\n" })),
+      { path: "b.ts", prior: 0, text: "if (/spam|scam/i.test(t)) return 'spam';\nawait openai.chat.completions.create({ model })" }
+    ];
+    const { chosen, withSignal } = A.chooseForPrompt(fetched);
+    expect(chosen[0].path).toBe("b.ts");
+    expect(withSignal).toBe(1);
+    expect(chosen.length).toBeLessThanOrEqual(9); // zero-signal files only top up to 8
   });
 });

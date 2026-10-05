@@ -1,4 +1,4 @@
-# JevX for GitHub (Chrome extension) · preview 0.3.0
+# JevX for GitHub (Chrome extension) · preview 0.3.1
 
 Open any GitHub repo, click the JevX button, and see where Jev (TypeSafe noul / choice / score) fits in it, as the same confidence cards the CLI shows.
 
@@ -20,8 +20,8 @@ Open any GitHub repo, click the JevX button, and see where Jev (TypeSafe noul / 
 
 1. **Gets the file list** from the GitHub API.
 2. **Picks likely logic files on your computer**, at no cost. It skips tests, builds, config and UI-heavy folders. Logic folders like `api/`, `lib/`, `server/` and `agents/` go first.
-3. **Fetches up to 40 files** and ranks them by rule signals: regex tests, keyword lists, `includes()` chains, `slice(0, n)`, thresholds, and LLM calls that pick a label.
-4. **Sends the best files to your AI in one call.** That's about 30k tokens, less than a cent on Flash Lite. Secrets are removed first.
+3. **Scans up to 400 source files (2,500 with "Whole repo")** on your computer, free, and ranks them by rule signals: regex tests, keyword lists, `includes()` chains, `slice(0, n)`, thresholds, and LLM calls that pick a label.
+4. **Sends only the files with signals to your AI**, in parts, two at a time: about 35k tokens (Standard) or up to ~100k (Whole repo). Secrets are removed first.
 5. **Shows a scorecard for each spot:**
    - **AI:** your AI's score, using the same 0.1–0.9 rubric as the CLI.
    - **Patterns:** the same `profile.json` match as the CLI.
@@ -37,7 +37,7 @@ Open any GitHub repo, click the JevX button, and see where Jev (TypeSafe noul / 
 ## Not yet
 
 - Python repos get only basic support (file picking works, and the prompt is the same).
-- Very large repos: only the 40 most likely files are read.
+- Very large repos: Whole repo scans up to 2,500 source files; past that, the most likely ones.
 - Not on the Chrome Web Store yet. See `docs/V2-PLAN.md`.
 
 ## Tests
